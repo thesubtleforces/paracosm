@@ -45,6 +45,27 @@ the mechanics but flatten the prose; this is the single biggest quality dial you
    systemd on Linux/Pi. **Required** for the living world: cron ticks only fire while the
    gateway daemon runs).
 
+### Access model: pairing, not open access
+
+Keep the gateway's default **pairing** mode. Do NOT enable open/allow-all access: Paracosm's
+skills run real shell commands (dice RNG, fal.ai scripts, zip exports), so an open bot lets
+any Telegram user who finds it drive command execution on your box, drain your fal.ai
+credits and LLM tokens, and hammer the persona guardrails with prompt injection. The Fourth
+Wall is theater; **gateway auth is the actual lock.** (The Hermes docs say the same: never
+open-access a bot with terminal access.)
+
+Pairing costs almost nothing in practice:
+
+1. A new player DMs the bot → they receive (or request) a pairing code.
+2. You approve once from the box: `hermes pair approve <code>` (see `hermes pair --help`
+   on your version for the exact subcommands / `/pair` flow).
+3. They're in forever — no per-user config beyond that one approval.
+
+**Party-mode onboarding:** pair each member once via DM *before* Session Zero in the group
+— unpaired members' messages are invisible to the bot, which otherwise looks like "the GM
+is ignoring Dave." A 30-second lobby round of everyone DMing the bot first is the smooth
+path.
+
 ## 3. fal.ai (scene art & cutscenes)
 
 1. Sign up at https://fal.ai → create a key at https://fal.ai/dashboard/keys.
@@ -134,6 +155,7 @@ Run in order; each step assumes the previous passed.
 |---|---|
 | Bot silent in DM | Gateway not running → `hermes gateway install`, check `hermes gateway status`/logs. |
 | Bot ignores group messages | BotFather group privacy still ON → `/setprivacy` → Disable, then remove/re-add bot to the group. |
+| Bot ignores one specific player | That player isn't paired → have them DM the bot and approve the pairing code (§2). |
 | Slash commands missing from Telegram menu | `/setcommands` not set (menu is cosmetic — `/new-game` works regardless). |
 | "GM forgot what happened" | It narrated without reading files (or state write failed). Check `games/<slug>/state.json` parses: `python3 -m json.tool games/<slug>/state.json`. The journal is the recovery source — ask the GM `ooc:` to rebuild state from the journal. |
 | No images, no error | No FAL_KEY (by design). Check `~/.hermes/.env`; test the script directly: `FAL_KEY=... bash ~/.hermes/skills/scene-art/scripts/fal_image.sh "a lighthouse at dusk" /tmp/test.png`. |
