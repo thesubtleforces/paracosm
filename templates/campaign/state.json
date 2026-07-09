@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "title": "",
+    "slug": "",
+    "genre": "",
+    "tone": "",
+    "rating": "PG-13",
+    "difficulty": "standard",
+    "campaign_length": "one-shot",
+    "dice_visibility": "shown",
+    "permadeath": false,
+    "living_world": false,
+    "image_cadence_turns": 5,
+    "art_style_locked": true,
+    "created": "",
+    "last_played": "",
+    "party_mode": false,
+    "telegram_chat_id": null
+  },
+  "players": [
+    {
+      "player_id": "solo",
+      "telegram_user": null,
+      "character": {
+        "name": "",
+        "concept": "",
+        "stats": {
+          "might": 0,
+          "agility": 0,
+          "wits": 0,
+          "presence": 0,
+          "spirit": 0
+        },
+        "hp": { "current": 10, "max": 10 },
+        "conditions": [],
+        "inventory": [],
+        "gold": 0,
+        "notes": ""
+      }
+    }
+  ],
+  "party_inventory": [],
+  "world_clock": {
+    "day": 1,
+    "time_of_day": "morning",
+    "last_tick": null
+  },
+  "location": {
+    "current": "",
+    "region": "",
+    "dark": false,
+    "visited": []
+  },
+  "quests": [
+    {
+      "id": "main",
+      "title": "",
+      "status": "active",
+      "act": 1,
+      "beat": "opening",
+      "objectives": [],
+      "notes": ""
+    }
+  ],
+  "flags": {},
+  "story_position": {
+    "act": 1,
+    "total_acts": 3,
+    "turn_count": 0,
+    "turns_since_last_image": 0,
+    "cutscenes_used": { "title": false, "midpoint": false, "ending": false }
+  },
+  "art": {
+    "style_tokens": "",
+    "character_descriptors": {},
+    "title_card": null
+  }
+}
