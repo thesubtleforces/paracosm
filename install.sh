@@ -52,9 +52,15 @@ for dep in curl python3; do
 done
 say ""
 
-# --- persona + protocol into the workspace -----------------------------------
+# --- persona + protocol --------------------------------------------------------
+# SOUL.md MUST live at $HERMES_HOME/SOUL.md directly (Hermes loads it from
+# HERMES_HOME only, never a subdirectory). AGENTS.md loads from the gateway's
+# CWD at startup, which is NOT fixed by default (terminal.cwd defaults to the
+# launch directory) — it goes in the workspace, and terminal.cwd must be
+# pinned there in config.yaml (see the printed reminder below) for it to load
+# reliably regardless of how the gateway service is started.
 act "create workspace $WORKSPACE"           mkdir -p "$WORKSPACE"
-act "install SOUL.md -> workspace"          cp "$SRC_DIR/hermes/SOUL.md"   "$WORKSPACE/SOUL.md"
+act "install SOUL.md -> \$HERMES_HOME"      cp "$SRC_DIR/hermes/SOUL.md"   "$HERMES_HOME/SOUL.md"
 act "install AGENTS.md -> workspace"        cp "$SRC_DIR/hermes/AGENTS.md" "$WORKSPACE/AGENTS.md"
 
 # --- skills into ~/.hermes/skills/ --------------------------------------------
@@ -83,6 +89,16 @@ else
   say "  FAL_KEY=... to $HERMES_HOME/.env"
 fi
 
+say ""
+say "IMPORTANT — one manual config step (installer won't touch config.yaml):"
+say "  Add this to $HERMES_HOME/config.yaml so AGENTS.md and games/ resolve"
+say "  correctly no matter how the gateway service is launched:"
+say ""
+say "    terminal:"
+say "      cwd: \"$WORKSPACE\""
+say ""
+say "  Without this, terminal.cwd defaults to the gateway's launch directory,"
+say "  and AGENTS.md / games/ / templates/ may silently fail to load."
 say ""
 say "Done. Next steps (full guide: IMPLEMENTATION.md):"
 say "  1. hermes gateway setup     # connect Telegram if you haven't"

@@ -87,21 +87,61 @@ cd paracosm
 Updates later: `git pull && ./install.sh` (idempotent; campaign folders in `games/` are
 never touched by the installer).
 
-## 5. Recommended Hermes config (drift guards)
+## 5. Recommended Hermes config (drift guards + a REQUIRED step)
 
-In `~/.hermes/config.yaml`:
+In `~/.hermes/config.yaml` (or the profile's `config.yaml` if you installed under a
+[profile](#running-alongside-an-existing-hermes-instance) — see below):
 
 ```yaml
+terminal:
+  cwd: "/full/path/to/HERMES_HOME/workspace"   # REQUIRED — see note below
 cron:
   wrap_response: false   # world-tick messages arrive in the GM's voice, no cron header
 skills:
   write_approval: true   # any agent-authored skill change waits for your review
 ```
 
+**`terminal.cwd` is not optional.** `install.sh` places `AGENTS.md`, `templates/`, and the
+`games/` folder under `$HERMES_HOME/workspace`, but Hermes only auto-discovers `AGENTS.md`
+from the gateway process's *current working directory at startup* — which defaults to
+wherever the gateway service happens to launch from, not the workspace. Without this
+setting, AGENTS.md (the whole turn contract, mode routing, media budget) may silently
+never load, and campaign folders under `games/` won't resolve. `install.sh` prints the
+exact path to paste in after it runs — use that value verbatim, then restart the gateway.
+
+(`SOUL.md`, by contrast, is installed directly at `$HERMES_HOME/SOUL.md` and needs no
+config — Hermes always loads it from there.)
+
 Keep the Telegram gateway's toolsets minimal — Paracosm needs terminal (dice + fal
 scripts), file tools, and skills; it has no business with web toolsets (the `/emulate`
 fetch is the one exception, via the skill) or dev/browser toolsets. See your Hermes
 version's gateway/toolset config for the allowlist syntax.
+
+### Running alongside an existing Hermes instance
+
+If this box already runs Hermes for something else, **do not point `install.sh` at that
+instance's `HERMES_HOME`** — it will overwrite that instance's `SOUL.md` with the Game
+Master persona and merge 9 game skills into its skill set. Instead use Hermes's built-in
+**profile** feature to run Paracosm as a fully separate instance — its own config, skills,
+memory, and gateway service, alongside the existing one untouched:
+
+```bash
+hermes profile create paracosm       # creates a "paracosm" command alias + its own HERMES_HOME
+paracosm setup                       # pick a model provider for this profile only
+
+cd paracosm-repo-clone
+HERMES_HOME=~/.hermes/profiles/paracosm ./install.sh --dry-run
+HERMES_HOME=~/.hermes/profiles/paracosm ./install.sh
+# apply the printed terminal.cwd step to ~/.hermes/profiles/paracosm/config.yaml
+
+paracosm gateway setup       # a NEW, distinct bot token from BotFather — never reuse
+                              # an existing gateway's token
+paracosm gateway install     # per-user service by default; omit --system (needs sudo,
+paracosm gateway start       # and starting/stopping it later would too)
+```
+
+Every `hermes`/`paracosm` command pair after `profile create` operates on its own isolated
+state — `paracosm gateway stop` never touches the other instance's gateway, and vice versa.
 
 ## 6. Cron & the living world
 
@@ -163,3 +203,4 @@ Run in order; each step assumes the previous passed.
 | Cron ticks never fire | Gateway daemon not running (CLI sessions don't tick), or job missing → `hermes cron list`, `hermes cron tick`. |
 | World-tick messages have a "Cronjob Response" header | Set `cron.wrap_response: false` (§5). |
 | Dice look fake / no roll shown | Dice visibility set to hidden at Session Zero (`ooc: show dice` to flip), or python3 missing on the box. |
+| GM sounds generic, ignores the turn contract, mentions a different agent name/persona | `terminal.cwd` isn't set (§5) — AGENTS.md never loaded, and/or an old `HERMES_HOME/SOUL.md` from before an install.sh version fix is stale. Fix: confirm `terminal.cwd` points at the workspace path `install.sh` printed, `cat $HERMES_HOME/SOUL.md` and confirm it's Paracosm's (re-run `./install.sh` if not — it now installs SOUL.md directly to `$HERMES_HOME`, not a subdirectory), then restart the gateway. |

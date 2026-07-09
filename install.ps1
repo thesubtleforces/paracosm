@@ -32,8 +32,13 @@ foreach ($dep in @('curl', 'python3')) {
 Write-Host "  note: the fal.ai scripts are bash - on native Windows, Hermes needs Git Bash on PATH to run them."
 Write-Host ""
 
+# SOUL.md MUST live at $HermesHome\SOUL.md directly (Hermes loads it from
+# HERMES_HOME only, never a subdirectory). AGENTS.md loads from the gateway's
+# CWD at startup (terminal.cwd, default = launch dir) - it goes in the
+# workspace, and terminal.cwd must be pinned there in config.yaml (see the
+# printed reminder below).
 Act "create workspace $Workspace" { New-Item -ItemType Directory -Force $Workspace | Out-Null }
-Act "install SOUL.md -> workspace"   { Copy-Item (Join-Path $SrcDir 'hermes\SOUL.md')   (Join-Path $Workspace 'SOUL.md')   -Force }
+Act "install SOUL.md -> HermesHome"  { Copy-Item (Join-Path $SrcDir 'hermes\SOUL.md')   (Join-Path $HermesHome 'SOUL.md')   -Force }
 Act "install AGENTS.md -> workspace" { Copy-Item (Join-Path $SrcDir 'hermes\AGENTS.md') (Join-Path $Workspace 'AGENTS.md') -Force }
 
 $SkillsDst = Join-Path $HermesHome 'skills'
@@ -64,6 +69,16 @@ else {
   Write-Host "  To enable images/video: get a key at https://fal.ai/dashboard/keys and add FAL_KEY=... to $envFile"
 }
 
+Write-Host ""
+Write-Host "IMPORTANT - one manual config step (installer won't touch config.yaml):"
+Write-Host "  Add this to $HermesHome\config.yaml so AGENTS.md and games/ resolve"
+Write-Host "  correctly no matter how the gateway service is launched:"
+Write-Host ""
+Write-Host "    terminal:"
+Write-Host "      cwd: `"$Workspace`""
+Write-Host ""
+Write-Host "  Without this, terminal.cwd defaults to the gateway's launch directory,"
+Write-Host "  and AGENTS.md / games/ / templates/ may silently fail to load."
 Write-Host ""
 Write-Host "Done. Next steps (full guide: IMPLEMENTATION.md):"
 Write-Host "  1. hermes gateway setup     # connect Telegram if you haven't"
