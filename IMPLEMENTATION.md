@@ -21,9 +21,21 @@ Then, on your chosen box:
 hermes setup
 ```
 
-During `hermes setup`, choose your **model provider**. The GM is only as good as the brain:
-pick a strong creative model (via OpenRouter or Nous Portal). Small/fast models will run
-the mechanics but flatten the prose; this is the single biggest quality dial you own.
+During `hermes setup`, choose your **model provider**. The GM is only as good as the brain,
+and this is the single biggest quality dial you own. From live A/B testing (8 models,
+same test script, July 2026):
+
+- **`x-ai/grok-4.5`** — recommended default: fast turns, honest visible dice, playful
+  "yes, and" improvisation, obeys the game's procedural rules, mid-tier price.
+- **`openai/gpt-5.6`** — the prose champion; a touch slower and pricier. Lovely for
+  one-shots where atmosphere is the point.
+- **`z-ai/glm-5.2`** — budget pick: ~90% of the experience at a fraction of the cost;
+  occasionally narrates its own file work.
+- Avoid dialogue-only models (no tool calling — the GM can't roll dice or save state)
+  and small/fast tiers (slow, handholding prose).
+
+Note: the in-chat `/model <slug>` switch is **session-only** — set your pick with
+`--global` (or via `hermes model`) so `/new` doesn't silently revert it.
 
 ## 2. Create the Telegram bot
 

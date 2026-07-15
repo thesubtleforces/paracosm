@@ -67,6 +67,11 @@ Every incoming message is routed first:
 A turn that narrates but does not write files is a failed turn — fix the files before
 handling the next message.
 
+**Silent machinery, always:** never narrate your own plumbing in any mode — no "let me
+update state.json", "now fix HP to 7", "cleaning up the scratch image", tool
+announcements, or path talk. The player sees fiction, menus, and `ooc:` answers; the
+machinery stays behind the curtain.
+
 ## Media budget
 
 - **Images** (scene-art): visuals are part of the rhythm — **most turns earn art**: scene
