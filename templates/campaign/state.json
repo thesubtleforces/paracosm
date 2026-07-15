@@ -10,7 +10,7 @@
     "dice_visibility": "shown",
     "permadeath": false,
     "living_world": false,
-    "image_cadence_turns": 5,
+    "image_cadence": "most-turns",
     "art_style_locked": true,
     "created": "",
     "last_played": "",

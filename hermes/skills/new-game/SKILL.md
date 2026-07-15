@@ -1,7 +1,7 @@
 ---
 name: new-game
-description: Session Zero wizard - create a new Paracosm campaign
-version: 1.0.0
+description: Start a campaign - quick cards default, deep wizard opt-in
+version: 2.0.0
 metadata:
   hermes:
     tags: [paracosm, game, setup]
@@ -13,63 +13,112 @@ metadata:
         prompt: "Where should campaigns be stored?"
 ---
 
-# New Game — Session Zero
+# New Game — from zero to playing in two messages
 
 ## When to Use
-`/new-game` in any chat, or when a player in lobby mode wants to start. `/emulate` hands
-off to step 3 of this procedure after building its world bible.
+`/new-game` in any chat (quick start, the default), `/new-game deep` (the full Session Zero
+wizard), or a lobby-mode player wanting to start. `/emulate` hands off to the **seed write**
+step of quick start after building its world bible.
 
-## Procedure
+## Procedure — QUICK START (default)
 
-### 1. Choose the door
-Offer two openings:
-- **The Interview** — a short conversational setup (dials below, asked in 2–3 grouped
-  messages, not an interrogation).
-- **The Roulette** 🎲 — player picks nothing (or just a genre); everything else is rolled
-  with real dice and revealed with showmanship.
+The contract: **the player is playing by their second message.** Reply 1 = the cards.
+Reply 2 = Scene 1. No file I/O before reply 1, no bulk writes ever, no narrating your setup
+work.
 
-### 2. The dials
-Collect (or roll) and confirm as a compact summary before generating:
+### Reply 1 — the table cards (instant, zero file I/O)
+Post three pre-rolled **table cards** — distinct genres, each 2 lines — plus the
+describe-your-own line. Then (art) fire the triptych. Specimen shape:
 
-| Dial | Options (default bold) |
-|---|---|
-| Genre | fantasy, sci-fi, horror, mystery, western, cyberpunk, historical, mash-up, 🎲 |
-| Tone | **pulp adventure**, whimsical, grimdark, cozy, noir, epic |
-| Rating | G, PG, **PG-13**, R (hard lines asked explicitly and recorded) |
-| Difficulty | story-mode, **standard**, brutal |
-| Dice visibility | **shown**, hidden, gm-only |
-| Permadeath | on / **off** |
-| Length | **one-shot**, feature, epic, infinite |
-| Art style | rolled suggestion from genre, or player's description |
-| Image cadence | ~every N turns, **5**, or "minimal" / "maximal" |
-| Living world | on / **off** — only meaningful for infinite (offered for epic too) |
+> 🎴 **1 — THE LONG HAUL** *(trucker noir)*
+> Your rig, a corpse in the trailer you didn't load, and 800 miles of witnesses. You: Dee "Redline" Calloway, owes the wrong people.
+>
+> 🎴 **2 — EMBERWOOD** *(cozy fantasy w/ teeth)*
+> The village hedge-witch died and named you successor. The hedge has opinions. You: a baker who knows exactly one spell.
+>
+> 🎴 **3 — DERELICT** *(deep-space salvage horror)*
+> The wreck's black box is still warm. You: last-shift salvager, three days of air, one company lie.
+>
+> Reply **1**, **2**, or **3** — or **describe your own scenario in a sentence** and I'll build that instead.
 
-### 3. Build the campaign folder
-1. Slugify the (proposed) title → create `games/<slug>/` by copying `templates/campaign/`
-   (workspace `templates/campaign/` installed by install.sh). Create `games/<slug>/art/`.
-2. Fill `world.md` (premise, setting, regions + ASCII map, factions, rules, story
-   structure for the chosen length), `secrets.md` (the truth, opening puzzles
-   pre-committed, hidden agendas, faction clocks if living world), `npcs.md` (opening
-   cast), `style.md` (locked style prefix from the art-style dial), `state.json` (all meta
-   dials, chat id, created date), `recap.md` header.
-3. **Character:** guided (name/concept, assign modifiers +2/+1/+1/0/-1 across the five
-   stats, pick 3 starting items) or quick-start (GM builds a fitting one, player may veto).
-   Write the sheet + locked visual descriptor into `state.json` and `style.md`.
+- Cards must be freshly invented each time (never reuse the specimen), tonally distinct,
+  each with a hook + a ready-made character.
+- **Card art:** immediately after posting the text, generate ONE triptych image via
+  scene-art (single fal call, fast model): three labeled panels, one per card, each in an
+  art style fitting its genre. Send it as its own message when ready — never make the
+  player wait for it.
+- Group chat: first pick wins, or `/vote` if the table argues.
 
-### 4. Raise the curtain
-1. Render the **title card**: invoke cutscene for the title-card video if FAL_KEY is
-   present and player wants video; otherwise scene-art image; otherwise ASCII banner.
-   Mark `cutscenes_used.title`.
-2. If living world was chosen: register the world-tick cron per world-tick/SKILL.md.
-3. Open **Scene 1** with a proper turn (full turn contract), ending on the first choice.
+### Reply 2 — Scene 1 (seed write, then curtain; target under ~60s)
+On the pick (a bare number or a described scenario):
+
+1. **Seed write — three small files only.** Create `games/<slug>/` from the template
+   (slug from card title; collision → `-2`), then write ONLY:
+   - `state.json` — quick-start defaults: PG-13, standard difficulty, dice **shown**,
+     permadeath **off**, feature length, image cadence "most turns", living world **off**;
+     player sheet from the card's character (stats +2/+1/+1/0/-1 fitting the concept,
+     3 starting items); `meta.telegram_chat_id` set.
+   - `secrets.md` — a stub: The Truth in 2 sentences + ONE pre-committed opening
+     puzzle/lead (solution + hint ladder). That's enough integrity to open fair.
+   - `style.md` — the style prefix line (from the card's panel style) + the player
+     character's locked descriptor.
+   Register the chat in `games/.active.json` (`{"<chat_id>": "<slug>"}` — create the file
+   if missing, update the key if present).
+2. **Curtain.** Narrate Scene 1 per the turn contract: 1–2 tight paragraphs, straight into
+   a situation with stakes, ending on a numbered choice block. One line of orientation for
+   first-timers above the scene: *"(Reply with a number, or type anything you want to do.
+   `HELP` shows the ropes, `ooc:` talks to me out of character.)"* — first scene only.
+3. **Art follows** (scene-art, fast model) as its own message.
+
+**Do NOT write** `world.md`, `npcs.md`, `recap.md`, `journal.md` beyond their template
+stubs at seed time — they fill progressively (see below). Do NOT announce any of this
+file work in chat; the player sees cards, then a scene.
+
+### Progressive world-building (every turn after)
+The world deepens as it's touched, one file section per turn as needed:
+- First named NPC → their `npcs.md` entry (with locked descriptor) that same turn.
+- First new region → its `world.md` section (+ premise/tone sections on first expansion).
+- Journal appends every turn as normal (turn contract); `recap.md` starts at act breaks.
+- Secrets grow ahead of play: invent a twist or puzzle → commit it to `secrets.md` in the
+  same turn it's introduced, before the player responds.
+- **Hard rule: never a bulk multi-file write, never re-copy templates for an existing
+  campaign.** If a file seems missing mid-game, re-read the folder — do not rebuild.
+
+### Settings after the fact
+Any dial changes any time via `ooc:` ("ooc: make it R-rated", "ooc: permadeath on",
+"ooc: fewer pictures") — confirm in one line, write to `state.json`. Offer living world
+once, briefly, around Scene 3 ("want this world to keep moving between sessions?") —
+if yes, register the world-tick cron per world-tick/SKILL.md.
+
+## Procedure — DEEP MODE (`/new-game deep`)
+
+The full Session Zero ceremony, for tables that want it. Two doors:
+- **The Interview** — conversational setup in 2–3 grouped messages.
+- **The Roulette** 🎲 — player picks nothing (or just a genre); everything else rolled
+  with real dice, revealed with showmanship.
+
+Dials (collect or roll, confirm as a compact summary): genre, tone, rating (ask hard
+lines), difficulty, dice visibility, permadeath, length (one-shot/feature/epic/infinite),
+art style, image cadence, living world. Then: seed write as in quick start (state +
+secrets stub + style), register `.active.json`, character build (guided: name/concept,
++2/+1/+1/0/-1, 3 items — or quick-start with veto), title card via cutscene/scene-art
+(quality model), open Scene 1 with the choice block. World files still fill progressively
+— deep mode buys richer *dials*, not a 7-file upfront write.
+
+Group chats (either mode): each registered player gets a quick character built **on their
+first in-game message** (one line + 3 items, veto via `ooc:`), not as an upfront
+everyone-at-once step. Party rules per party-mode/SKILL.md.
 
 ## Pitfalls
-- Don't generate the world before the rating/safety dial is confirmed.
-- secrets.md must be written BEFORE Scene 1 opens (puzzle integrity starts at turn 1).
-- Slug collisions: append `-2`, never overwrite an existing campaign.
-- Group chat? Set `party_mode: true` and run the party-mode Session Zero addendum instead
-  of the solo character step.
+- Reply 1 before ANY file/tool work — the cards are pure invention.
+- Never open Scene 1 before the secrets stub exists (puzzle integrity starts at turn 1).
+- Rating: quick start defaults PG-13 without asking; honor `ooc:` changes immediately.
+- Slug collisions: append `-2`, never overwrite.
+- The specimen cards above are a SHAPE reference; shipping them verbatim is a bug.
+- `.active.json`: update the entry — a chat starting a second campaign points at the new
+  slug (the old campaign stays on the shelf for `/saves load`).
 
 ## Verification
-Folder exists with all 7 files + art/; `state.json` parses and carries every dial; journal
-has its Turn 0 entry; a cron job exists iff living world is on.
+After reply 2: `games/<slug>/` exists with seeded state/secrets/style + template stubs;
+`.active.json` maps this chat to the slug; journal has Turn 0 + Scene 1 entries; the
+scene ended with a numbered choice block.

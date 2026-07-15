@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # fal_image.sh — generate an image via fal.ai queue API and download it locally.
 #
-# Usage:   fal_image.sh "<prompt>" <output_path.png> [aspect]
+# Usage:   fal_image.sh "<prompt>" <output_path.png> [aspect] [tier]
 #   aspect: landscape_4_3 (default) | portrait_4_3 | square | landscape_16_9 | portrait_16_9
-# Env:     FAL_KEY (required)  FAL_IMAGE_MODEL (default fal-ai/flux/dev)
+#   tier:   quality (default) | fast
+# Env:     FAL_KEY (required)
+#          FAL_IMAGE_MODEL      quality-tier model (default fal-ai/flux/dev)
+#          FAL_IMAGE_MODEL_FAST fast-tier model    (default fal-ai/flux/schnell)
 # Output:  prints JSON {"file": "<path>", "url": "<fal.media url>"} on success (exit 0).
 #          On failure prints {"error": "..."} and exits non-zero — callers degrade to
 #          ASCII art / prose per AGENTS.md; never surface this error in the fiction.
@@ -12,11 +15,17 @@ set -u
 PROMPT="${1:-}"
 OUT="${2:-}"
 ASPECT="${3:-landscape_4_3}"
-MODEL="${FAL_IMAGE_MODEL:-fal-ai/flux/dev}"
+TIER="${4:-quality}"
 
 fail() { printf '{"error": "%s"}\n' "$1" >&2; exit 1; }
 
-[ -n "$PROMPT" ] && [ -n "$OUT" ] || fail "usage: fal_image.sh <prompt> <output_path> [aspect]"
+case "$TIER" in
+  fast)    MODEL="${FAL_IMAGE_MODEL_FAST:-fal-ai/flux/schnell}" ;;
+  quality) MODEL="${FAL_IMAGE_MODEL:-fal-ai/flux/dev}" ;;
+  *) fail "unknown tier '$TIER' (use fast|quality)" ;;
+esac
+
+[ -n "$PROMPT" ] && [ -n "$OUT" ] || fail "usage: fal_image.sh <prompt> <output_path> [aspect] [fast|quality]"
 [ -n "${FAL_KEY:-}" ] || fail "FAL_KEY not set"
 command -v curl >/dev/null 2>&1 || fail "curl not found"
 command -v python3 >/dev/null 2>&1 || fail "python3 not found"

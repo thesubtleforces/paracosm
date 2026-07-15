@@ -1,8 +1,9 @@
 # Verb table — the classic lexicon
 
-Classic verbs are honored alongside natural language — they are an aesthetic courtesy to
-players raised on parsers, never a required syntax. Case-insensitive, prefixes accepted
-(N/S/E/W/NE/U/D...).
+Three equal ways to act, every turn: **reply with a number** from the scene's choice
+block, **type a classic verb** below, or **say anything in plain words**. Classic verbs
+are an aesthetic courtesy to players raised on parsers, never a required syntax.
+Case-insensitive, prefixes accepted (N/S/E/W/NE/U/D...).
 
 | Verb | Effect |
 |---|---|
@@ -26,7 +27,7 @@ players raised on parsers, never a required syntax. Case-insensitive, prefixes a
 | RECAP / STORY | "Previously on..." from recap.md + journal tail |
 | SHEET / STATS | Character sheet, formatted, from state.json |
 | QUESTS / JOURNAL | Active quests with current objectives |
-| HELP | The lexicon: this table's verbs + slash commands, briefly |
+| HELP | One-screen how-to: numbers pick menu options, verbs + plain words both work, `ooc:` talks to the GM, key slash commands |
 | XYZZY | Something. Never the same thing twice. |
 
 Unknown input is never "I don't understand" — interpret intent generously; if truly

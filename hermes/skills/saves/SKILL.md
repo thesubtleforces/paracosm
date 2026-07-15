@@ -23,16 +23,18 @@ Scan `games/*/state.json`. For each campaign show one shelf card:
 > 🎮 **The Salt-Glass Crown** — fantasy · feature · Act 2, turn 31 · last played 2026-07-01
 > *Previously on: you bargained the ferryman down to one memory, and he chose your name.*
 
-The "previously on" line is distilled from the last journal entry (or recap.md). Mark which
-campaign is active in this chat.
+The "previously on" line is distilled from the last journal entry (or recap.md). Mark the
+campaign `games/.active.json` maps to THIS chat (if any) as ▶ active.
 
 ### load <name>
 1. Match name/slug fuzzily; ambiguity → ask.
-2. Set as the chat's active campaign: update `meta.telegram_chat_id` + `meta.last_played`.
+2. Set as the chat's active campaign: **update this chat's entry in `games/.active.json`**
+   (the registry is the single source of truth for chat→campaign); also update
+   `meta.telegram_chat_id` + `meta.last_played` in the campaign's state.
 3. Re-read state.json + recap.md + last ~10 journal entries (never trust prior chat
    context — this is a hard context reset for the fiction).
 4. Deliver a "previously on..." recap (3-6 sentences from recap + journal tail), then
-   re-establish the current scene and end on the live choice.
+   re-establish the current scene and end on the numbered choice block.
 
 ### branch <name> [new-name]
 Copy the ENTIRE folder `games/<slug>/` → `games/<new-slug>/` (default `<slug>-branch-N`).
@@ -41,7 +43,9 @@ Original untouched. Then offer to load the branch.
 
 ### delete <name>
 Confirm explicitly (show the shelf card, require a yes — in party mode, require it from a
-human, not a vote). Then remove the folder. Offer `/saves export` first as a courtesy.
+human, not a vote). Then remove the folder AND any `games/.active.json` entries pointing
+at it. Offer `/saves export` first as a courtesy. If a living-world cron exists for it,
+remove that too.
 
 ### export <name>
 Zip the campaign folder from the terminal, portably:

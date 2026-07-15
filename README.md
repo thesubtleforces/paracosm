@@ -21,14 +21,21 @@ what do you do?
 
 ## What it does
 
+- **⚡ Playing in two messages** — `/new-game` deals three illustrated table cards
+  (distinct genres, ready-made characters) plus "describe your own scenario." Pick one and
+  the next reply IS Scene 1 — under a minute from cold start. The world deepens
+  progressively as you play, not in a big upfront build. Want the full Session Zero
+  ceremony (interview or dice-rolled Roulette, every dial)? `/new-game deep`.
+- **🎯 Always a next move** — every scene is tight (1–2 paragraphs, TV-episode pacing) and
+  ends with a numbered choice block: reply `2`, type `GO NORTH`, or say anything at all —
+  the menu is a courtesy, never a cage.
 - **🎲 Real gameplay** — d20 + stats vs DC, rolled by an actual RNG and shown in the open.
   Combat, skill checks, inventory, economy. Puzzles whose solutions are pre-committed
   before you ever see them (no "the GM made it up when you guessed").
-- **🌍 Worlds on demand** — `/new-game` interviews you (or you spin the Roulette): genre,
-  tone, rating, difficulty, permadeath, campaign length from one-shot to infinite sandbox.
-- **🎨 Illustrated** — scene art at the big moments via fal.ai FLUX, with a locked
-  per-campaign style bible so turn 40 looks like turn 1. Three cinematic video cutscenes
-  per campaign: title, set piece, ending.
+- **🎨 Illustrated at pace** — art most turns via fal.ai FLUX (fast tier for turn art,
+  quality tier for the big moments), with a locked per-campaign style bible so turn 40
+  looks like turn 1. Three cinematic video cutscenes per campaign: title, set piece,
+  ending.
 - **💾 Real saves** — every campaign is a folder of readable files: world bible, character
   sheet, append-only journal, GM secrets. List, load, **branch into what-if timelines**,
   export as a zip.

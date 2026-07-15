@@ -1,7 +1,7 @@
 ---
 name: scene-art
-description: Generate a scene illustration with locked style
-version: 1.0.0
+description: Turn art most turns, locked style, fast/quality split
+version: 2.0.0
 required_environment_variables:
   - name: FAL_KEY
     prompt: fal.ai API key
@@ -13,61 +13,82 @@ metadata:
     category: paracosm
     config:
       - key: paracosm.image_model
-        description: "fal.ai model id for scene images"
+        description: "fal.ai model id for key-moment (quality) images"
         default: "fal-ai/flux/dev"
-        prompt: "Which fal.ai image model?"
+        prompt: "Which fal.ai quality image model?"
+      - key: paracosm.image_model_fast
+        description: "fal.ai model id for per-turn (fast) images"
+        default: "fal-ai/flux/schnell"
+        prompt: "Which fal.ai fast image model?"
 ---
 
-# Scene Art — illustrated moments
+# Scene Art — the world, illustrated at pace
 
 ## When to Use
-Called by the game turn's ART CHECK when a moment qualifies under AGENTS.md's media budget
-(new location, key NPC intro, dramatic reveal, boss), by new-game (title card fallback),
-by chronicle (cover art), and on explicit player request ("show me"). Not a per-turn
-default — scarcity is what makes the pictures land.
+Called by nearly every game turn's ART CHECK (media budget: most turns — scene changes,
+NPC intros, reveals, action beats; skip rapid dialogue), by new-game (table-card triptych
++ Scene 1 art), by chronicle (cover), and on player request ("show me"). Art keeps pace
+with the game because generation is always async and turn art uses the fast model.
+
+## Two speeds
+
+| Tier | Model env | Default | Used for |
+|---|---|---|---|
+| **fast** | `FAL_IMAGE_MODEL_FAST` | `fal-ai/flux/schnell` | Per-turn art, card triptych — pennies, seconds |
+| **quality** | `FAL_IMAGE_MODEL` | `fal-ai/flux/dev` | Title cards, act breaks, cutscene keyframes, chronicle covers |
+
+`scripts/fal_image.sh "<prompt>" <out.png> [aspect] [fast|quality]` — 4th arg picks the
+tier (default `quality`).
 
 ## Procedure
 
 ### 1. Assemble the prompt (consistency is everything)
 Concatenate, in order:
-1. **Style prefix** from `games/<slug>/style.md` — verbatim, always first.
-2. **Scene description** — one tight sentence of the moment being illustrated (subject,
-   action, setting, lighting/mood). Written fresh; never paste raw narration.
-3. **Locked descriptors** for every recurring subject in frame — copied verbatim from
-   `npcs.md` "Descriptor (locked)" / `state.json → art.character_descriptors`. A character
-   appearing in art for the FIRST time: write their locked descriptor to those files in
-   the same turn, then use it.
+1. **Style prefix** from `games/<slug>/style.md` — verbatim, always first. More images
+   makes the locked style MORE important, not less: every frame must look like the same
+   hand drew it.
+2. **Scene description** — one tight sentence (subject, action, setting, light). Written
+   fresh; never paste raw narration.
+3. **Locked descriptors** for every recurring subject in frame — verbatim from `npcs.md` /
+   `state.json → art.character_descriptors`. First-time subjects get their descriptor
+   written to those files the same turn, then used.
 4. Style.md's "Never" constraints.
 
-### 2. Generate
+### 2. Generate (async, always)
+Narration + choice block are already sent before this runs. Then:
 ```bash
 bash ~/.hermes/skills/scene-art/scripts/fal_image.sh "<full prompt>" \
-  "games/<slug>/art/turn<NNN>-<slug-hint>.png" <aspect>
+  "games/<slug>/art/turn<NNN>-<hint>.png" landscape_4_3 fast
 ```
-Aspect per style.md composition rules (default `landscape_4_3`; NPC portraits
-`portrait_4_3`). The script prints `{"file": ..., "url": ...}` on success.
+Aspect per style.md rules (`portrait_4_3` for NPC portraits). Use `quality` for the
+key-moment tier only.
 
-### 3. Deliver
-Send narration FIRST (never block the turn), then attach the image with a `MEDIA:` path
-tag on its own line, plus a one-line caption in scene voice:
+### 3. Card triptych (new-game reply 1)
+ONE generation, fast tier, `landscape_16_9`: a three-panel image, panels labeled 1/2/3,
+each panel a distinct art style matching its table card's genre. Prompt shape: "Triptych,
+three labeled vertical panels side by side. Panel 1: <style A> — <card 1 scene>. Panel 2:
+<style B> — <card 2 scene>. Panel 3: <style C> — <card 3 scene>." Save to the scratch
+area (`games/.cards-<chat_id>.png` — no campaign folder exists yet); send when ready;
+delete after the pick. Never delay the cards text waiting for it.
 
-```
-MEDIA:games/<slug>/art/turn031-ferry.png
-```
+### 4. Deliver
+`MEDIA:` path tag on its own line as its own message, at most one short in-voice caption
+line. Reset `turns_since_last_image`; note art in the journal entry.
 
-Reset `turns_since_last_image` in state.json; note the art in the journal entry.
-
-### 4. Degrade gracefully (no FAL_KEY / script error / timeout)
-Never mention the failure in-fiction and never retry more than once. Instead deliver ASCII
-art (a small, evocative sketch — 10-20 lines max) or an extra flourish of descriptive
-prose. Log the real error to the journal entry's notes only.
+### 5. Degrade gracefully (no FAL_KEY / error / timeout)
+Never mention the failure in-fiction; never retry more than once; never let art trouble
+slow a turn. Deliver ASCII art (small, evocative) or nothing — the choice block already
+landed, the game is still moving. Log the real error in the journal entry's notes only.
 
 ## Pitfalls
-- Style prefix drift breaks the campaign's visual identity — always re-read style.md,
-  never reconstruct it from memory.
+- Never generate before narration is sent — art is a chaser, not a blocker.
+- Style prefix drift breaks the campaign's look — re-read style.md, never reconstruct.
 - Respect `meta.rating` in prompts exactly as in narration.
-- Don't illustrate secrets the player hasn't seen (art leaks are still leaks).
-- Filenames: always under the campaign's `art/` dir, prefixed with the turn number.
+- Don't illustrate secrets the player hasn't seen.
+- Honor the player's cadence dial (`ooc: fewer pictures`) immediately — it's stored in
+  state and binding.
+- Filenames: under the campaign's `art/`, prefixed with the turn number.
 
 ## Verification
-Image file exists and is non-empty; the MEDIA: tag path matches it; state + journal updated.
+Image exists and is non-empty; the MEDIA: tag matches it; state + journal updated; turn
+art used the fast tier.

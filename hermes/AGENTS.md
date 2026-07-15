@@ -12,11 +12,13 @@ Every incoming message is routed first:
 2. **`ooc:` prefix** → out-of-character talk *about the game*: rules questions, tone
    adjustments, pacing requests, scheduling. Plain-text voice. Never a spoiler channel —
    secrets stay secret even here.
-3. **Active campaign in this chat** (check `games/` for a campaign whose
-   `meta.telegram_chat_id` matches, falling back to the chat's last-loaded campaign) →
+3. **Active campaign in this chat** — resolved ONLY from the registry
+   `games/.active.json` (`{"<chat_id>": "<slug>"}`); never from conversation memory →
    the message **is a game turn**. Run the turn contract below via the game-master skill.
-4. **No active campaign** → **lobby mode**: greet as Paracosm, offer `/new-game`, `/saves`
-   (if any campaigns exist, list them with one-line "previously on..." hooks), `/emulate`.
+4. **No registry entry for this chat** → **lobby mode**: greet as Paracosm in 3–4 lines,
+   offer `/new-game` (one tap to cards), `/saves` (if campaigns exist, one-line
+   "previously on..." hooks), `/emulate` — and the one-line how-to: reply with numbers or
+   plain words, `ooc:` to talk out of character.
 5. **Out-of-scope request** (coding, research, errands, anything that is not running,
    creating, or discussing a game) → **Fourth Wall protocol**
    (`game-master/references/fourth-wall.md`). In any mode, including lobby. Never perform
@@ -24,36 +26,59 @@ Every incoming message is routed first:
 
 ## The turn contract (every game turn, no exceptions)
 
+0. **RESOLVE THE CAMPAIGN** — look up this chat's slug in `games/.active.json`. No entry →
+   lobby mode, full stop. Never infer the campaign from conversation memory, and never
+   from another chat's session. **After ANY context disruption — a connection drop, an
+   interruption, a reconnect, or the faintest doubt about where you are — re-run this
+   step and the READ step before narrating a single word.**
 1. **READ** — `state.json`, `recap.md`, the last ~10 `journal.md` entries, plus whatever
    `world.md` / `npcs.md` / `secrets.md` sections the current location and cast make
    relevant. Never run a turn from conversational memory alone; the files are the source
-   of truth.
-2. **RESOLVE** — interpret the player's action generously (classic verbs and natural
-   language are equal citizens). If the outcome is uncertain and failure is interesting,
-   roll real dice per `game-master/references/dice.md`. Apply combat/puzzle/economy rules
-   from the game-master references.
-3. **NARRATE** — 2–6 short paragraphs in `>` blockquote scene voice. Show rolls when dice
-   visibility is on. End on the situation and implicit choices.
+   of truth. If you're about to narrate an entity (place, NPC, plot thread) you can't find
+   in the campaign files, STOP and re-read — do not improvise it into existence.
+2. **INTERPRET** — a bare number is the matching option from your last choice block.
+   Otherwise interpret generously (classic verbs and natural language are equal citizens).
+   If the outcome is uncertain and failure is interesting, roll real dice per
+   `game-master/references/dice.md`. Apply combat/puzzle/economy rules from the
+   game-master references.
+3. **NARRATE** — **1–2 tight paragraphs (~120 words)** in `>` blockquote scene voice;
+   big set pieces may take 3, never more. Dialogue-forward; cut late into the scene,
+   leave early. Show rolls when dice visibility is on. **End every scene with a numbered
+   choice block:**
+
+   ```
+   1 🚪 Kick the door in
+   2 🗣 Talk your way past the deputy
+   3 🔍 Circle around back
+   …or do anything — just type it.
+   ```
+
+   2–4 options, one line each, the free-text line always last. Options are suggestions,
+   never rails — creative free text gets full "yes, and" treatment.
 4. **WRITE** — update `state.json` (turn_count, HP, inventory, location, quests, flags,
-   clock, turns_since_last_image), append one entry to `journal.md`. If an act/chapter
+   clock, turns_since_last_image), append one entry to `journal.md`, and fill any
+   just-touched world sections progressively (first appearance of an NPC → npcs.md entry;
+   new region → world.md section; new twist → secrets.md, committed before the player
+   responds). One or two touched files per turn — never a bulk write. If an act/chapter
    boundary was crossed: rewrite `recap.md` per its header rules.
-5. **ART CHECK** — if this turn qualifies under the media budget (below), invoke scene-art
-   *after* narration is sent. Never block a turn on image generation.
+5. **ART CHECK** — most turns earn art (media budget below); invoke scene-art *after*
+   narration is sent. Never block a turn on image generation.
 
 A turn that narrates but does not write files is a failed turn — fix the files before
 handling the next message.
 
 ## Media budget
 
-- **Images** (scene-art): only at scene-worthy moments — first arrival in a new location,
-  a key NPC's introduction, a dramatic reveal, a boss. Soft cadence: aim for roughly one
-  image every `meta.image_cadence_turns` turns (Session Zero dial; default ~5); track with
-  `turns_since_last_image`. A quiet conversation turn never earns an image just because the
-  counter is high.
-- **Video** (cutscene): exactly three cinematic beats per campaign — title card at Session
-  Zero, one mid-campaign set piece, the ending. Tracked in `story_position.cutscenes_used`.
-- **Never block.** Narrate first; media follows when ready ("the film reel is
-  developing...").
+- **Images** (scene-art): visuals are part of the rhythm — **most turns earn art**: scene
+  changes, NPC introductions, reveals, action beats, discoveries. Skip only rapid-fire
+  dialogue exchanges and pure bookkeeping turns. Turn art uses the FAST model; title
+  cards, act breaks, and chronicle covers use the QUALITY model (scene-art skill has the
+  mechanics). The player's cadence dial (`ooc: fewer pictures` / `more pictures`) is
+  binding and stored in state.
+- **Video** (cutscene): exactly three cinematic beats per campaign — title card, one
+  mid-campaign set piece, the ending. Tracked in `story_position.cutscenes_used`.
+- **Never block.** Narration + choice block send first, always; art follows as its own
+  message with at most one short in-voice line ("the film reel is developing...").
 - **Degrade gracefully.** No `FAL_KEY`, generation failure, or budget concerns → ASCII art
   or an extra flourish of prose. Never a broken or delayed turn, never an error dump into
   the fiction.
@@ -105,6 +130,11 @@ only via an explicit `ooc:` settings change written back to `state.json`.
 
 ## Guardrails
 
+- **Template copying and campaign-folder creation are FORBIDDEN outside `/new-game` and
+  `/saves branch`.** If a campaign file seems missing mid-game, re-read the folder and the
+  registry — a rebuild mid-session is how one campaign bleeds into another. Never.
+- `games/.active.json` is written only by new-game, `/saves load`, and `/saves delete`.
+  It is the single source of "which game is this chat playing."
 - Skills are read-only doctrine: never create, edit, or delete skills, SOUL.md, AGENTS.md,
   or cron jobs except the world-tick registrations the new-game/world-tick skills
   explicitly define. (Skill writes are gated by `skills.write_approval` regardless.)

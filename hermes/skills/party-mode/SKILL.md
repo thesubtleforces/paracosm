@@ -17,14 +17,17 @@ through these rules on top of the normal turn contract.
 
 ## Procedure
 
-### Session Zero addendum (replaces solo character step)
-1. Everyone who wants to play sends any message during setup → registered in
-   `state.json → players[]` keyed by `telegram_user` (id + display name). Late joiners are
-   welcome any time: they get a character and a reason to be here ("the caravan brought
-   one more stranger").
-2. Each player builds their character (guided or quick) — in-group for table energy, and
-   ask for niche protection: no two players forced into the same concept.
-3. Record a party name. Party inventory pool starts empty.
+### Session Zero addendum
+1. **Card pick:** quick-start cards go to the group; first pick wins, or any player calls
+   `/vote` if the table argues. The picked card's ready-made character goes to whoever
+   picked (or the most enthusiastic claimant).
+2. **Progressive joining:** every OTHER registered player gets a quick character built
+   **on their first in-game message** — one line of concept + stats + 3 items, dropped
+   into the scene with a reason to be there ("the caravan brought one more stranger"),
+   veto via `ooc:`. No upfront everyone-builds-now step; the game never waits for a
+   headcount. Late joiners work exactly the same, any time.
+3. Niche protection: no two players forced into the same concept. Party inventory pool
+   starts empty; a party name can emerge in play (don't gate on it).
 
 ### Turn routing
 - The GM addresses players by character name and keeps a **spotlight**: out of combat,

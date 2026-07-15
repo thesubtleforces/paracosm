@@ -70,8 +70,10 @@ path.
 
 1. Sign up at https://fal.ai → create a key at https://fal.ai/dashboard/keys.
 2. Add `FAL_KEY=...` to `~/.hermes/.env`.
-3. Optional overrides in the same file: `FAL_IMAGE_MODEL` (default `fal-ai/flux/dev`),
-   `FAL_VIDEO_MODEL` (default `fal-ai/kling-video/v2.1/standard/image-to-video`).
+3. Optional overrides in the same file: `FAL_IMAGE_MODEL` (quality tier, default
+   `fal-ai/flux/dev`), `FAL_IMAGE_MODEL_FAST` (per-turn tier, default
+   `fal-ai/flux/schnell`), `FAL_VIDEO_MODEL` (default
+   `fal-ai/kling-video/v2.1/standard/image-to-video`).
 
 Skippable — Paracosm degrades to ASCII art and extra prose without a key.
 
@@ -99,7 +101,14 @@ cron:
   wrap_response: false   # world-tick messages arrive in the GM's voice, no cron header
 skills:
   write_approval: true   # any agent-authored skill change waits for your review
+display:
+  tool_progress: off            # hide terminal/read/write tool cards — pure fiction in chat
+  file_mutation_verifier: false # keep the file-verifier footer out of the narration
 ```
+
+While the GM is mid-task (e.g. building a campaign), messages interrupt it by default —
+`/busy steer` makes them feed into the running task instead, which reads much better at
+the table.
 
 **`terminal.cwd` is not optional.** `install.sh` places `AGENTS.md`, `templates/`, and the
 `games/` folder under `$HERMES_HOME/workspace`, but Hermes only auto-discovers `AGENTS.md`
@@ -157,35 +166,47 @@ state — `paracosm gateway stop` never touches the other instance's gateway, an
 
 Run in order; each step assumes the previous passed.
 
-1. **Lobby** — DM the bot anything. Expect a Paracosm-voiced greeting offering
-   `/new-game`, `/saves`, `/emulate`.
-2. **First campaign** — `/new-game`, pick the Roulette, quick-start character, one-shot.
-   Expect: dials confirmed, title card (image or ASCII), Scene 1 ending on a choice.
-3. **Dice are real** — try something risky ("I leap the chasm"). Expect a visible roll
+1. **Lobby** — DM the bot anything. Expect a short Paracosm-voiced greeting offering
+   `/new-game`, `/saves`, `/emulate` and the one-line how-to.
+2. **Quick start speed** — `/new-game`. Expect three table cards + "describe your own"
+   in the FIRST reply (near-instant, no visible setup work), with a triptych image
+   arriving moments later. Reply `2`. Expect Scene 1 — tight, 1–2 paragraphs, ending in
+   a numbered choice block — **inside a minute**.
+3. **Numbered choices** — reply with a bare number. Expect that action resolved. Then
+   reply with free text ("I do something no menu offered"). Expect full "yes, and".
+4. **Dice are real** — try something risky ("I leap the chasm"). Expect a visible roll
    (`🎲 d20(...) + mod = total vs DC`) with consequences that stick.
-4. **Scene art** — reach a new location. Expect an image in the campaign's art style
-   within a minute of the narration (or graceful ASCII if no FAL_KEY).
-5. **Saves** — `/saves` shows the campaign with a "previously on" line. Start a second
-   campaign, then `/saves load` the first: expect a recap sourced from the journal and
-   the correct scene re-established.
-6. **Emulate** — `/emulate <a wiki URL of something you love>`. Expect framing questions
-   (new vs existing character), then a Session Zero in that world.
-7. **Party mode** — add the bot to a small group, `/new-game`. Expect per-player
-   registration and characters, spotlight rotation, `/vote` working.
-8. **Living world** — in a living campaign, `hermes cron run <job_id>`; check journal
-   tick entry. (For an unprompted message, run it a few times — most ticks are silent
-   by design, or temporarily set a faction clock to 1 segment from full in secrets.md.)
-9. **Chronicle** — `/chronicle` on any campaign with a few turns. Expect chapters,
-   numbers, cast — and nothing from secrets.md.
-10. **Fourth Wall** — ask the bot to write you a Python script. Expect flavor, the
+5. **Per-turn art** — expect images most turns, in a consistent style, always AFTER the
+   narration (or graceful ASCII if no FAL_KEY). `ooc: fewer pictures` slows the cadence.
+6. **Interrupt drill** — send a message while the GM is mid-setup. Expect no campaign
+   rebuild, no stray `cp`/template work, no bleed.
+7. **Cross-chat drill** — run a second campaign in a different chat, play a turn in each.
+   Expect zero bleed: each chat stays anchored to its own campaign (check
+   `games/.active.json` maps both chats correctly).
+8. **Saves** — `/saves` shows campaigns with "previously on" lines and marks this chat's
+   active one. `/saves load` the other: expect a journal-sourced recap and the right
+   scene, ending in a choice block.
+9. **Deep mode** — `/new-game deep`, pick the Roulette. Expect the full dial ceremony
+   from v1, then a normal quick curtain.
+10. **Describe-your-own** — `/new-game`, then type a scenario sentence instead of a
+    number. Expect Scene 1 built from your premise.
+11. **Emulate** — `/emulate <a wiki URL of something you love>`. Expect framing questions
+    (new vs existing character), then a fast Scene 1 in that world.
+12. **Party mode** — add the bot to a small group, `/new-game`. Expect first-pick/vote on
+    cards, and each other player getting a character on their first in-game message.
+13. **Living world** — opt in when offered (~Scene 3), then `hermes cron run <job_id>`;
+    check the journal tick entry. (Most ticks are silent by design.)
+14. **Chronicle** — `/chronicle` on any campaign with a few turns. Expect chapters,
+    numbers, cast — and nothing from secrets.md.
+15. **Fourth Wall** — ask the bot to write you a Python script. Expect flavor, the
     one-sentence signpost, zero code.
 
 ## 8. Costs & tuning
 
 | Lever | Effect |
 |---|---|
-| Image cadence dial (Session Zero, default ~5 turns) | Main fal.ai spend control. FLUX dev ≈ a few cents/image; a feature-length campaign at default cadence ≈ 12–15 images. `FAL_IMAGE_MODEL=fal-ai/flux/schnell` is cheaper/faster, lower fidelity. |
-| Video | 3 cutscenes/campaign hard cap ≈ tens of cents to ~$1 each depending on model. Skip by declining video at Session Zero. |
+| Per-turn art (default: most turns, fast tier) | Turn art runs on `FAL_IMAGE_MODEL_FAST` (flux/schnell ≈ fractions of a cent, 2–4s) — art-most-turns costs a few cents per session. Key moments (title, act breaks, chronicle cover) use the quality tier (flux/dev ≈ a few cents each). `ooc: fewer pictures` is the brake, stored per campaign. |
+| Video | 3 cutscenes/campaign hard cap ≈ tens of cents to ~$1 each depending on model. Skip by declining video when offered. |
 | Model tokens | Scale with campaign length: a one-shot is trivial; Epics re-read state+recap+journal-tail each turn (the recap discipline exists to keep this flat). Living-world ticks ≈ 1 short session/campaign/day. |
 | Living world off | Zero background spend; purely reactive. |
 
@@ -204,3 +225,6 @@ Run in order; each step assumes the previous passed.
 | World-tick messages have a "Cronjob Response" header | Set `cron.wrap_response: false` (§5). |
 | Dice look fake / no roll shown | Dice visibility set to hidden at Session Zero (`ooc: show dice` to flip), or python3 missing on the box. |
 | GM sounds generic, ignores the turn contract, mentions a different agent name/persona | `terminal.cwd` isn't set (§5) — AGENTS.md never loaded, and/or an old `HERMES_HOME/SOUL.md` from before an install.sh version fix is stale. Fix: confirm `terminal.cwd` points at the workspace path `install.sh` printed, `cat $HERMES_HOME/SOUL.md` and confirm it's Paracosm's (re-run `./install.sh` if not — it now installs SOUL.md directly to `$HERMES_HOME`, not a subdirectory), then restart the gateway. |
+| Bot narrates a DIFFERENT campaign's scene (cross-campaign bleed) | This chat's entry in `games/.active.json` is missing/wrong, or you're on pre-v2 skills. `cat games/.active.json`, fix or `/saves load <name>` to re-anchor, and make sure you've pulled + reinstalled v2 (which forbids mid-game template copying and re-anchors after connection drops). |
+| Same scene posted twice | Gateway resend after a stream stall — cosmetic, Hermes platform behavior. Play on. |
+| Tool cards / "⚠️ file verifier" text in the fiction | `display.tool_progress: off` and `display.file_mutation_verifier: false` not set (§5); restart the gateway after adding. |

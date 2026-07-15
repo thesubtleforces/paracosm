@@ -17,10 +17,17 @@ party-mode) call into these rules too — this skill is the single source of mec
 
 ## Procedure
 
-Follow AGENTS.md's turn contract: **READ → RESOLVE → NARRATE → WRITE → ART CHECK.**
-The mechanics for RESOLVE:
+Follow AGENTS.md's turn contract: **RESOLVE CAMPAIGN → READ → INTERPRET → NARRATE →
+WRITE → ART CHECK.** The mechanics for INTERPRET:
+
+### 0. Anchor first
+- The campaign is whatever `games/.active.json` says for THIS chat — nothing else. After
+  any connection drop, interruption, or reconnect: re-resolve and re-read before
+  narrating. If the scene in your head references anything not in this campaign's files,
+  that's bleed from somewhere else — re-read and narrate only from the files.
 
 ### 1. Interpret the action
+- A bare number = that option from your last choice block.
 - Classic verbs (see `references/verb-table.md`) and natural language are equal. Interpret
   generously; ask only when genuinely ambiguous *and* the stakes make guessing unfair.
 - Multiple actions in one message: resolve in order until one fails or the situation
@@ -54,7 +61,14 @@ dice-visibility setting; d20 + stat mod vs DC; advantage/disadvantage).
 
 ## Pitfalls
 - Never resolve from memory of the chat — the files are the truth (a player may have
-  `/saves load`-ed a different campaign since the last message).
+  `/saves load`-ed a different campaign since the last message, and cross-chat session
+  bleed is real: the registry + files are the only anchor).
+- Never copy templates or create campaign folders during a game turn — that's new-game's
+  job, once. A "missing file" mid-game means re-read, not rebuild.
+- Never end a scene without the numbered choice block + free-text line; never offer more
+  than 4 options; never punish a player for ignoring the menu.
+- Keep it tight: if the narration is pushing past two short paragraphs, cut — save it for
+  the set piece.
 - Never invent dice results; every shown roll must come from the RNG procedure in
   `references/dice.md`.
 - Never quote or paraphrase `secrets.md` content that hasn't been earned through play.
