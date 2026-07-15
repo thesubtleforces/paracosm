@@ -219,7 +219,8 @@ Run in order; each step assumes the previous passed.
 | Bot ignores one specific player | That player isn't paired → have them DM the bot and approve the pairing code (§2). |
 | Slash commands missing from Telegram menu | `/setcommands` not set (menu is cosmetic — `/new-game` works regardless). |
 | "GM forgot what happened" | It narrated without reading files (or state write failed). Check `games/<slug>/state.json` parses: `python3 -m json.tool games/<slug>/state.json`. The journal is the recovery source — ask the GM `ooc:` to rebuild state from the journal. |
-| No images, no error | No FAL_KEY (by design). Check `~/.hermes/.env`; test the script directly: `FAL_KEY=... bash ~/.hermes/skills/scene-art/scripts/fal_image.sh "a lighthouse at dusk" /tmp/test.png`. |
+| No images, no error | No FAL_KEY (by design). Check the instance's `.env` (`$HERMES_HOME/.env`); test the script directly from the workspace: `cd $HERMES_HOME/workspace && bash scripts/fal_image.sh "a lighthouse at dusk" /tmp/test.png landscape_4_3 fast`. |
+| Art fails with "FAL_KEY not set" though the key IS in .env | Wrong instance's script ran — usually a stale skills copy under the MAIN `~/.hermes/skills/` on machines using the profile pattern. Skills call `scripts/fal_image.sh` relative to the workspace precisely to avoid this; delete stale Paracosm skill folders from any Hermes home that shouldn't have them, `git pull && ./install.sh` on the right one. |
 | fal script errors | Run the direct test above; the JSON error names the failure (auth, model id, timeout). Check fal.ai dashboard for credit/quota. |
 | Cron ticks never fire | Gateway daemon not running (CLI sessions don't tick), or job missing → `hermes cron list`, `hermes cron tick`. |
 | World-tick messages have a "Cronjob Response" header | Set `cron.wrap_response: false` (§5). |

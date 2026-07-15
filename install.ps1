@@ -59,6 +59,12 @@ Act "install campaign templates" {
   Copy-Item -Recurse -Force (Join-Path $SrcDir 'templates\campaign') $tpl
 }
 Act "create games/ directory" { New-Item -ItemType Directory -Force (Join-Path $Workspace 'games') | Out-Null }
+Act "install media scripts -> workspace" {
+  $ws = Join-Path $Workspace 'scripts'
+  New-Item -ItemType Directory -Force $ws | Out-Null
+  Copy-Item (Join-Path $SrcDir 'hermes\skills\scene-art\scripts\fal_image.sh') (Join-Path $ws 'fal_image.sh') -Force
+  Copy-Item (Join-Path $SrcDir 'hermes\skills\cutscene\scripts\fal_video.sh') (Join-Path $ws 'fal_video.sh') -Force
+}
 
 Write-Host ""
 $envFile = Join-Path $HermesHome '.env'

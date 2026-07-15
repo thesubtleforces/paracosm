@@ -79,6 +79,15 @@ act "install campaign templates"            mkdir -p "$WORKSPACE/templates"
 act "  copy templates/campaign"             cp -R "$SRC_DIR/templates/campaign" "$WORKSPACE/templates/"
 act "create games/ directory"               mkdir -p "$WORKSPACE/games"
 
+# --- media scripts into the workspace (skills call them as scripts/<name>.sh,
+#     relative to the pinned terminal.cwd, so the right instance's copy always runs) ---
+act "install media scripts -> workspace"    mkdir -p "$WORKSPACE/scripts"
+act "  copy fal_image.sh"                   cp "$SRC_DIR/hermes/skills/scene-art/scripts/fal_image.sh" "$WORKSPACE/scripts/fal_image.sh"
+act "  copy fal_video.sh"                   cp "$SRC_DIR/hermes/skills/cutscene/scripts/fal_video.sh"  "$WORKSPACE/scripts/fal_video.sh"
+if [ "$DRY_RUN" -eq 0 ]; then
+  chmod +x "$WORKSPACE/scripts/"*.sh 2>/dev/null
+fi
+
 # --- environment check ---------------------------------------------------------
 say ""
 if [ -n "${FAL_KEY:-}" ] || grep -qs '^FAL_KEY=' "$HERMES_HOME/.env" 2>/dev/null; then

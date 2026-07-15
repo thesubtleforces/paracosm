@@ -19,11 +19,19 @@ fail() { printf '{"error": "%s"}\n' "$1" >&2; exit 1; }
 
 [ -n "$PROMPT" ] && [ -n "$IMAGE_URL" ] && [ -n "$OUT" ] || fail "usage: fal_video.sh <prompt> <keyframe_url> <output_path>"
 
-# Fall back to the Hermes home's .env if the gateway didn't export FAL_KEY (script lives
-# at $HERMES_HOME/skills/cutscene/scripts/).
+# Fall back to the Hermes home's .env if the gateway didn't export FAL_KEY. The script
+# may live at $HERMES_HOME/skills/<skill>/scripts/ or $HERMES_HOME/workspace/scripts/,
+# so walk upward until a .env appears.
 if [ -z "${FAL_KEY:-}" ]; then
-  ENV_FILE="$(cd "$(dirname "$0")/../../.." && pwd)/.env"
-  [ -f "$ENV_FILE" ] && FAL_KEY=$(sed -n 's/^FAL_KEY=//p' "$ENV_FILE" | tail -1 | tr -d '"' | tr -d "'")
+  DIR="$(cd "$(dirname "$0")" && pwd)"
+  i=0
+  while [ "$i" -lt 5 ] && [ "$DIR" != "/" ]; do
+    if [ -f "$DIR/.env" ]; then
+      FAL_KEY=$(sed -n 's/^FAL_KEY=//p' "$DIR/.env" | tail -1 | tr -d '"' | tr -d "'")
+      [ -n "$FAL_KEY" ] && break
+    fi
+    DIR=$(dirname "$DIR"); i=$((i + 1))
+  done
 fi
 [ -n "${FAL_KEY:-}" ] || fail "FAL_KEY not set (env or \$HERMES_HOME/.env)"
 command -v curl >/dev/null 2>&1 || fail "curl not found"

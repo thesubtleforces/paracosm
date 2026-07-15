@@ -32,8 +32,9 @@ with the game because generation is always async and turn art uses the fast mode
 | **fast** | `FAL_IMAGE_MODEL_FAST` | `fal-ai/flux/schnell` | Per-turn art, card triptych — pennies, seconds |
 | **quality** | `FAL_IMAGE_MODEL` | `fal-ai/flux/dev` | Title cards, act breaks, cutscene keyframes, chronicle covers |
 
-`scripts/fal_image.sh "<prompt>" <out.png> [aspect] [fast|quality]` — 4th arg picks the
-tier (default `quality`).
+`bash scripts/fal_image.sh "<prompt>" <out.png> [aspect] [fast|quality]` — 4th arg picks
+the tier (default `quality`). The script lives at `scripts/fal_image.sh` **relative to
+the workspace** (the terminal's working directory).
 
 ## Procedure
 
@@ -63,9 +64,12 @@ the built-in tool.
 
 Narration + choice block are already sent before this runs. Then:
 ```bash
-bash ~/.hermes/skills/scene-art/scripts/fal_image.sh "<full prompt>" \
+bash scripts/fal_image.sh "<full prompt>" \
   "games/<slug>/art/turn<NNN>-<hint>.png" landscape_4_3 fast
 ```
+The path is relative to the working directory (the workspace) — **never** call the copy
+under `~/.hermes/skills/...`, which may belong to a different Hermes instance on shared
+machines.
 Aspect per style.md rules (`portrait_4_3` for NPC portraits). Use `quality` for the
 key-moment tier only.
 

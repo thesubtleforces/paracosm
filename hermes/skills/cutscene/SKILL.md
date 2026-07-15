@@ -34,9 +34,11 @@ Video takes minutes. Send the narration/moment first, plus one line in voice:
 > *The film reel is developing...*
 Then run:
 ```bash
-bash ~/.hermes/skills/cutscene/scripts/fal_video.sh "<motion prompt>" \
+bash scripts/fal_video.sh "<motion prompt>" \
   "<keyframe fal.media url>" "games/<slug>/art/cutscene-<beat>.mp4"
 ```
+(Path relative to the workspace working directory — never the `~/.hermes/skills/...`
+copy, which may belong to a different Hermes instance.)
 Motion prompt = one sentence of camera + motion ("slow push-in as embers rise, cloak
 stirring in the wind"), not a scene re-description. **Always attempt the script — it finds
 its own FAL key** (reads the Hermes home's `.env`; the gateway environment is irrelevant).
