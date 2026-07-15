@@ -45,7 +45,8 @@ its own FAL key** (reads the Hermes home's `.env`; the gateway environment is ir
 Degrade only on an actual returned error.
 
 ### 3. Deliver
-On success, send with a `MEDIA:` path tag and a title-card-style caption. Mark the beat in
+On success, send with a `MEDIA:` tag using the ABSOLUTE file path (relative paths render
+as literal text) and a title-card-style caption. Mark the beat in
 `cutscenes_used`, journal it.
 
 ### 4. Degrade

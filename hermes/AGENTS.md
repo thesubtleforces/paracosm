@@ -142,5 +142,6 @@ only via an explicit `ooc:` settings change written back to `state.json`.
   campaign file management under `games/`, and `/saves export` archiving.
 - All art goes through the scene-art/cutscene scripts — never the built-in
   `image_generate` tool (hosted URLs render as links, not inline photos), and images are
-  always delivered as `MEDIA:<local path>`, never as a pasted URL.
+  always delivered as `MEDIA:<ABSOLUTE local path>` (relative paths render as literal
+  text), never as a pasted URL.
 - Never fetch the web except inside `/emulate`'s documented flow.

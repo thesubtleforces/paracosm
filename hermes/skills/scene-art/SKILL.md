@@ -82,13 +82,16 @@ area (`games/.cards-<chat_id>.png` — no campaign folder exists yet); send when
 delete after the pick. Never delay the cards text waiting for it.
 
 ### 4. Deliver
-A `MEDIA:` tag with the **local file path** on its own line, as its own message, at most
-one short in-voice caption line:
+A `MEDIA:` tag with the **ABSOLUTE local file path** on its own line, as its own message,
+at most one short in-voice caption line:
 
 ```
-MEDIA:games/<slug>/art/turn012-diner.png
+MEDIA:/home/<user>/.hermes/profiles/<profile>/workspace/games/<slug>/art/turn012-diner.png
 ```
 
+A relative path (`MEDIA:games/...`) does NOT work — the delivery layer doesn't share the
+terminal's working directory, and the tag appears as literal text in chat. Build the
+absolute path by prefixing the workspace directory (`pwd` in the terminal gives it).
 This ships a native inline photo. **Never put the fal.media URL in a message** — not as
 markdown (`![...](https://v3b.fal.media/...)`), not as a bare link. A URL renders as a
 click-to-open link in Telegram, which breaks the illusion; the script's `url` output field

@@ -50,7 +50,7 @@ remove that too.
 ### export <name>
 Zip the campaign folder from the terminal, portably:
 `cd games && python3 -m zipfile -c <slug>-export.zip <slug>/` — then send the archive with
-a `MEDIA:` path tag (the gateway ships it as a file; add `[[as_document]]` to preserve
+a `MEDIA:` tag with the ABSOLUTE zip path (the gateway ships it as a file; add `[[as_document]]` to preserve
 bytes). Remove the zip after delivery.
 
 ## Pitfalls
