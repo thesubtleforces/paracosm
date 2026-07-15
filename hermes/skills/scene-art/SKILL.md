@@ -72,8 +72,18 @@ area (`games/.cards-<chat_id>.png` — no campaign folder exists yet); send when
 delete after the pick. Never delay the cards text waiting for it.
 
 ### 4. Deliver
-`MEDIA:` path tag on its own line as its own message, at most one short in-voice caption
-line. Reset `turns_since_last_image`; note art in the journal entry.
+A `MEDIA:` tag with the **local file path** on its own line, as its own message, at most
+one short in-voice caption line:
+
+```
+MEDIA:games/<slug>/art/turn012-diner.png
+```
+
+This ships a native inline photo. **Never put the fal.media URL in a message** — not as
+markdown (`![...](https://v3b.fal.media/...)`), not as a bare link. A URL renders as a
+click-to-open link in Telegram, which breaks the illusion; the script's `url` output field
+exists ONLY for cutscene keyframe input. Reset `turns_since_last_image`; note art in the
+journal entry.
 
 ### 5. Degrade gracefully (no FAL_KEY / error / timeout)
 Never mention the failure in-fiction; never retry more than once; never let art trouble
@@ -81,6 +91,8 @@ slow a turn. Deliver ASCII art (small, evocative) or nothing — the choice bloc
 landed, the game is still moving. Log the real error in the journal entry's notes only.
 
 ## Pitfalls
+- Delivering the fal.media URL instead of `MEDIA:<local path>` — players get a link to
+  click instead of an inline picture. Always the local path.
 - Never generate before narration is sent — art is a chaser, not a blocker.
 - Style prefix drift breaks the campaign's look — re-read style.md, never reconstruct.
 - Respect `meta.rating` in prompts exactly as in narration.
