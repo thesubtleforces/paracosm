@@ -1,12 +1,7 @@
 ---
 name: cutscene
 description: Cinematic video for the three big beats
-version: 1.0.0
-required_environment_variables:
-  - name: FAL_KEY
-    prompt: fal.ai API key
-    help: Create one at https://fal.ai/dashboard/keys
-    required_for: full functionality (degrades to a still image without it)
+version: 1.1.0
 metadata:
   hermes:
     tags: [paracosm, game, media, video]
@@ -43,7 +38,9 @@ bash ~/.hermes/skills/cutscene/scripts/fal_video.sh "<motion prompt>" \
   "<keyframe fal.media url>" "games/<slug>/art/cutscene-<beat>.mp4"
 ```
 Motion prompt = one sentence of camera + motion ("slow push-in as embers rise, cloak
-stirring in the wind"), not a scene re-description.
+stirring in the wind"), not a scene re-description. **Always attempt the script — it finds
+its own FAL key** (reads the Hermes home's `.env`; the gateway environment is irrelevant).
+Degrade only on an actual returned error.
 
 ### 3. Deliver
 On success, send with a `MEDIA:` path tag and a title-card-style caption. Mark the beat in

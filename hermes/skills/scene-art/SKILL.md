@@ -1,12 +1,7 @@
 ---
 name: scene-art
 description: Turn art most turns, locked style, fast/quality split
-version: 2.0.0
-required_environment_variables:
-  - name: FAL_KEY
-    prompt: fal.ai API key
-    help: Create one at https://fal.ai/dashboard/keys
-    required_for: full functionality (degrades to ASCII art without it)
+version: 2.1.0
 metadata:
   hermes:
     tags: [paracosm, game, media, image]
@@ -55,6 +50,11 @@ Concatenate, in order:
 4. Style.md's "Never" constraints.
 
 ### 2. Generate (async, always)
+**ALWAYS attempt the script — do not pre-judge whether a FAL key is configured.** The
+script finds its own key (it reads the Hermes home's `.env` directly; the gateway
+environment not showing `FAL_KEY` means nothing). Run it, and only if it actually returns
+an error do you degrade to ASCII (step 5).
+
 **The ONLY way to generate art is `scripts/fal_image.sh` via the terminal.** Never use
 Hermes's built-in `image_generate`/`image_gen` tool — it returns a hosted URL that renders
 as a click-to-open link instead of an inline photo, and it bypasses the style bible's
