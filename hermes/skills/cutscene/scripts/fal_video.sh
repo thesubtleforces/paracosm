@@ -18,7 +18,14 @@ MODEL="${FAL_VIDEO_MODEL:-fal-ai/kling-video/v2.1/standard/image-to-video}"
 fail() { printf '{"error": "%s"}\n' "$1" >&2; exit 1; }
 
 [ -n "$PROMPT" ] && [ -n "$IMAGE_URL" ] && [ -n "$OUT" ] || fail "usage: fal_video.sh <prompt> <keyframe_url> <output_path>"
-[ -n "${FAL_KEY:-}" ] || fail "FAL_KEY not set"
+
+# Fall back to the Hermes home's .env if the gateway didn't export FAL_KEY (script lives
+# at $HERMES_HOME/skills/cutscene/scripts/).
+if [ -z "${FAL_KEY:-}" ]; then
+  ENV_FILE="$(cd "$(dirname "$0")/../../.." && pwd)/.env"
+  [ -f "$ENV_FILE" ] && FAL_KEY=$(sed -n 's/^FAL_KEY=//p' "$ENV_FILE" | tail -1 | tr -d '"' | tr -d "'")
+fi
+[ -n "${FAL_KEY:-}" ] || fail "FAL_KEY not set (env or \$HERMES_HOME/.env)"
 command -v curl >/dev/null 2>&1 || fail "curl not found"
 command -v python3 >/dev/null 2>&1 || fail "python3 not found"
 

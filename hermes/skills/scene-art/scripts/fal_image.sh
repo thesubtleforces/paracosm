@@ -29,7 +29,15 @@ case "$TIER" in
 esac
 
 [ -n "$PROMPT" ] && [ -n "$OUT" ] || fail "usage: fal_image.sh <prompt> <output_path> [aspect] [fast|quality]"
-[ -n "${FAL_KEY:-}" ] || fail "FAL_KEY not set"
+
+# The gateway may not export custom .env vars to terminal subprocesses — fall back to
+# reading FAL_KEY from the Hermes home this skill is installed under (script lives at
+# $HERMES_HOME/skills/scene-art/scripts/).
+if [ -z "${FAL_KEY:-}" ]; then
+  ENV_FILE="$(cd "$(dirname "$0")/../../.." && pwd)/.env"
+  [ -f "$ENV_FILE" ] && FAL_KEY=$(sed -n 's/^FAL_KEY=//p' "$ENV_FILE" | tail -1 | tr -d '"' | tr -d "'")
+fi
+[ -n "${FAL_KEY:-}" ] || fail "FAL_KEY not set (env or \$HERMES_HOME/.env)"
 command -v curl >/dev/null 2>&1 || fail "curl not found"
 command -v python3 >/dev/null 2>&1 || fail "python3 not found"
 
