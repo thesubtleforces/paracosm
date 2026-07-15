@@ -43,6 +43,10 @@ describe-your-own line. Then (art) fire the triptych. Specimen shape:
 
 - Cards must be freshly invented each time (never reuse the specimen), tonally distinct,
   each with a hook + a ready-made character.
+- **Fresh means fresh:** never build a card from the settings, characters, or IP of this
+  chat's previous or concurrent campaigns, or from franchises discussed earlier in the
+  conversation — unless the player explicitly asks ("give me a Star Trek one"). Emulating
+  a property is `/emulate`'s job, deliberately chosen, not a card default.
 - **Card art:** immediately after posting the text, generate ONE triptych image via
   scene-art (single fal call, fast model): three labeled panels, one per card, each in an
   art style fitting its genre. Send it as its own message when ready — never make the
@@ -52,8 +56,15 @@ describe-your-own line. Then (art) fire the triptych. Specimen shape:
 ### Reply 2 — Scene 1 (seed write, then curtain; target under ~60s)
 On the pick (a bare number or a described scenario):
 
-1. **Seed write — three small files only.** Create `games/<slug>/` from the template
-   (slug from card title; collision → `-2`), then write ONLY:
+1. **Seed write — three small files only.** First, ONE terminal command copies the
+   template (slug from card title; collision → `-2`):
+   ```bash
+   cp -r templates/campaign games/<slug> && mkdir -p games/<slug>/art
+   ```
+   (relative to the workspace — do NOT go hunting for templates elsewhere; if the copy
+   fails, say so out of character rather than hand-writing the folder). Then write ONLY
+   these three files — **writing more than three files at Session Zero is a bug**, the
+   rest stay as template stubs:
    - `state.json` — quick-start defaults: PG-13, standard difficulty, dice **shown**,
      permadeath **off**, feature length, image cadence "most turns", living world **off**;
      player sheet from the card's character (stats +2/+1/+1/0/-1 fitting the concept,

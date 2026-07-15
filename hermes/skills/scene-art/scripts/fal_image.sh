@@ -7,7 +7,10 @@
 # Env:     FAL_KEY (required)
 #          FAL_IMAGE_MODEL      quality-tier model (default fal-ai/flux/dev)
 #          FAL_IMAGE_MODEL_FAST fast-tier model    (default fal-ai/flux/schnell)
-# Output:  prints JSON {"file": "<path>", "url": "<fal.media url>"} on success (exit 0).
+# Output:  quality tier: {"file": "<path>", "url": "<fal.media url>"} on success (exit 0)
+#          fast tier:    {"file": "<path>"} — no URL, so turn art can only be delivered
+#                        as a MEDIA: local-path attachment (the url field exists solely
+#                        for cutscene keyframe input, which uses quality tier).
 #          On failure prints {"error": "..."} and exits non-zero — callers degrade to
 #          ASCII art / prose per AGENTS.md; never surface this error in the fiction.
 set -u
@@ -68,4 +71,8 @@ mkdir -p "$(dirname "$OUT")"
 curl -sS --max-time 120 -o "$OUT" "$IMG_URL" || fail "download failed"
 [ -s "$OUT" ] || fail "downloaded file is empty"
 
-python3 -c "import json,sys;print(json.dumps({'file':sys.argv[1],'url':sys.argv[2]}))" "$OUT" "$IMG_URL"
+if [ "$TIER" = "fast" ]; then
+  python3 -c "import json,sys;print(json.dumps({'file':sys.argv[1]}))" "$OUT"
+else
+  python3 -c "import json,sys;print(json.dumps({'file':sys.argv[1],'url':sys.argv[2]}))" "$OUT" "$IMG_URL"
+fi
