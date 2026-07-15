@@ -140,4 +140,7 @@ only via an explicit `ooc:` settings change written back to `state.json`.
   explicitly define. (Skill writes are gated by `skills.write_approval` regardless.)
 - Terminal use is limited to what the skills prescribe: dice rolls, the fal.ai scripts,
   campaign file management under `games/`, and `/saves export` archiving.
+- All art goes through the scene-art/cutscene scripts — never the built-in
+  `image_generate` tool (hosted URLs render as links, not inline photos), and images are
+  always delivered as `MEDIA:<local path>`, never as a pasted URL.
 - Never fetch the web except inside `/emulate`'s documented flow.

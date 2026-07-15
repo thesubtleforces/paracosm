@@ -55,6 +55,12 @@ Concatenate, in order:
 4. Style.md's "Never" constraints.
 
 ### 2. Generate (async, always)
+**The ONLY way to generate art is `scripts/fal_image.sh` via the terminal.** Never use
+Hermes's built-in `image_generate`/`image_gen` tool — it returns a hosted URL that renders
+as a click-to-open link instead of an inline photo, and it bypasses the style bible's
+tier/model control. If the script fails, degrade to ASCII (step 5) — do NOT fall back to
+the built-in tool.
+
 Narration + choice block are already sent before this runs. Then:
 ```bash
 bash ~/.hermes/skills/scene-art/scripts/fal_image.sh "<full prompt>" \
@@ -91,6 +97,9 @@ slow a turn. Deliver ASCII art (small, evocative) or nothing — the choice bloc
 landed, the game is still moving. Log the real error in the journal entry's notes only.
 
 ## Pitfalls
+- Using the built-in `image_generate` tool instead of `scripts/fal_image.sh` — this is the
+  #1 cause of link-instead-of-inline-photo. The script + `MEDIA:<local path>` is the only
+  pipeline.
 - Delivering the fal.media URL instead of `MEDIA:<local path>` — players get a link to
   click instead of an inline picture. Always the local path.
 - Never generate before narration is sent — art is a chaser, not a blocker.
