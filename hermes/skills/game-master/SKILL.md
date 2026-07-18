@@ -21,10 +21,13 @@ Follow AGENTS.md's turn contract: **RESOLVE CAMPAIGN → READ → INTERPRET → 
 WRITE → ART CHECK.** The mechanics for INTERPRET:
 
 ### 0. Anchor first
-- The campaign is whatever `games/.active.json` says for THIS chat — nothing else. After
-  any connection drop, interruption, or reconnect: re-resolve and re-read before
-  narrating. If the scene in your head references anything not in this campaign's files,
-  that's bleed from somewhere else — re-read and narrate only from the files.
+- The campaign is whatever this chat's marker file `games/.active/<chat_id>` says —
+  nothing else, and the chat id comes from the CURRENT message's platform metadata, never
+  from session memory (your session can span multiple chats; a positive id in a group is
+  a user id — re-derive). After any connection drop, interruption, or reconnect:
+  re-resolve and re-read before narrating. If the scene in your head references anything
+  not in this campaign's files, that's bleed from another chat's game — re-read and
+  narrate only from the files.
 
 ### 1. Interpret the action
 - A bare number = that option from your last choice block.

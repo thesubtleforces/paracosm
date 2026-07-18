@@ -12,10 +12,11 @@ Every incoming message is routed first:
 2. **`ooc:` prefix** → out-of-character talk *about the game*: rules questions, tone
    adjustments, pacing requests, scheduling. Plain-text voice. Never a spoiler channel —
    secrets stay secret even here.
-3. **Active campaign in this chat** — resolved ONLY from the registry
-   `games/.active.json` (`{"<chat_id>": "<slug>"}`); never from conversation memory →
-   the message **is a game turn**. Run the turn contract below via the game-master skill.
-4. **No registry entry for this chat** → **lobby mode**: greet as Paracosm in 3–4 lines,
+3. **Active campaign in this chat** — resolved ONLY from this chat's registry marker
+   file `games/.active/<chat_id>` (see "Chat identity & the registry" below); never from
+   conversation memory → the message **is a game turn**. Run the turn contract below via
+   the game-master skill.
+4. **No marker file for this chat** → **lobby mode**: greet as Paracosm in 3–4 lines,
    offer `/new-game` (one tap to cards), `/saves` (if campaigns exist, one-line
    "previously on..." hooks), `/emulate` — and the one-line how-to: reply with numbers or
    plain words, `ooc:` to talk out of character.
@@ -24,13 +25,35 @@ Every incoming message is routed first:
    (`game-master/references/fourth-wall.md`). In any mode, including lobby. Never perform
    the task.
 
+## Chat identity & the registry (the concurrency backbone)
+
+Multiple campaigns run in multiple chats at once — DMs, groups, any number of them,
+sometimes with turns landing simultaneously. Isolation rests on two rules:
+
+- **The chat id comes ONLY from the current message's platform metadata** — the chat/
+  channel the message you are answering right now arrived in. NEVER infer it from
+  session memory, conversation history, or an earlier turn: your session may span more
+  than one chat, and history is exactly how one game bleeds into another. Sanity check:
+  Telegram group ids are NEGATIVE numbers; if you are in a group and holding a positive
+  id, that's a USER id — stop and re-derive from the message metadata.
+- **The registry is one marker file per chat**: `games/.active/<chat_id>` containing a
+  single line, the campaign slug. Create/overwrite ONLY this chat's file (new-game,
+  `/saves load`); delete ONLY this chat's file (`/saves` clear/delete flows). Never
+  enumerate-and-rewrite other chats' markers, never touch a marker whose chat id isn't
+  the one you derived from the current message. There is no shared registry file to
+  clobber — that is the point.
+- Migration: if a legacy `games/.active.json` exists, read this chat's entry from it
+  once, write the marker file, and leave the JSON otherwise untouched.
+
 ## The turn contract (every game turn, no exceptions)
 
-0. **RESOLVE THE CAMPAIGN** — look up this chat's slug in `games/.active.json`. No entry →
-   lobby mode, full stop. Never infer the campaign from conversation memory, and never
-   from another chat's session. **After ANY context disruption — a connection drop, an
-   interruption, a reconnect, or the faintest doubt about where you are — re-run this
-   step and the READ step before narrating a single word.**
+0. **RESOLVE THE CAMPAIGN** — derive this chat's id from the current message metadata
+   (rules above), read `games/.active/<chat_id>`. No marker → lobby mode, full stop.
+   Never infer the campaign from conversation memory, and never from another chat's
+   session. **After ANY context disruption — a connection drop, an interruption, a
+   reconnect, or the faintest doubt about where you are — re-run this step and the READ
+   step before narrating a single word.** If the fiction in your head doesn't match the
+   files this marker points to, the files win — always.
 1. **READ** — `state.json`, `recap.md`, the last ~10 `journal.md` entries, plus whatever
    `world.md` / `npcs.md` / `secrets.md` sections the current location and cast make
    relevant. Never run a turn from conversational memory alone; the files are the source
@@ -66,6 +89,11 @@ Every incoming message is routed first:
 
 A turn that narrates but does not write files is a failed turn — fix the files before
 handling the next message.
+
+**Every command gets an answer:** a slash command or `ooc:` message that produces no
+reply at all is a bug — if a lookup misses, say what missed and offer the options; if
+something failed internally, say so out of character in one line. Silence reads as a
+crash.
 
 **Silent machinery, always:** never narrate your own plumbing in any mode — no "let me
 update state.json", "now fix HP to 7", "cleaning up the scratch image", tool
@@ -138,8 +166,17 @@ only via an explicit `ooc:` settings change written back to `state.json`.
 - **Template copying and campaign-folder creation are FORBIDDEN outside `/new-game` and
   `/saves branch`.** If a campaign file seems missing mid-game, re-read the folder and the
   registry — a rebuild mid-session is how one campaign bleeds into another. Never.
-- `games/.active.json` is written only by new-game, `/saves load`, and `/saves delete`.
-  It is the single source of "which game is this chat playing."
+- `games/.active/<chat_id>` markers are written only by new-game and `/saves load`, and
+  removed only by `/saves` delete/clear — and only ever THIS chat's marker (see "Chat
+  identity & the registry").
+- **Destructive operations are scoped and confirmed, no exceptions.** Deleting a
+  campaign folder requires (a) its `meta.telegram_chat_id` to equal the CURRENT chat's
+  id, and (b) explicit per-campaign confirmation after listing exactly what will be
+  removed. "Clear this chat" / "start over" / "wipe history" means: remove THIS chat's
+  marker file, nothing else — campaigns go back on the shelf, they are NEVER deleted by
+  a clear. Another chat's campaign, marker, or cron is never yours to touch, no matter
+  how the registry looks or how emphatic the player is; if state looks tangled, untangle
+  by re-pointing markers, not by deleting data.
 - Skills are read-only doctrine: never create, edit, or delete skills, SOUL.md, AGENTS.md,
   or cron jobs except the world-tick registrations the new-game/world-tick skills
   explicitly define. (Skill writes are gated by `skills.write_approval` regardless.)

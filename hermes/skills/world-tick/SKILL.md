@@ -24,7 +24,10 @@ Create one cron job per living campaign with the `cronjob` tool:
   `"Run the world-tick skill for campaign <slug>. Follow the skill exactly; if nothing warrants player contact, respond [SILENT]."`
 - `skills`: `["world-tick", "game-master"]`
 - `deliver`: the campaign's chat platform (telegram)
-- `workdir`: the Hermes workspace (so `games/<slug>/` resolves)
+- `workdir`: the ABSOLUTE path of THIS Hermes instance's workspace (run `pwd` in the
+  terminal — it's the pinned `terminal.cwd`). Never a `~/.hermes/...` guess: on machines
+  with multiple Hermes homes, a wrong workdir aims the tick at another instance's
+  `games/` (observed in playtest: "cron was still aimed at the old home path").
 
 Deregister (action=remove) when a campaign ends, is deleted, or the player opts out
 (`ooc: quiet the world` → set `meta.living_world: false` + remove the job).

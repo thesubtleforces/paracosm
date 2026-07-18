@@ -47,7 +47,8 @@ verbatim; the property inspires the world, the play is original.
 ### 4. Hand off
 Jump into new-game's quick-start **seed write** step with genre/tone/rating pre-filled
 from the property (player can still adjust any dial via `ooc:`): seed state/secrets/style,
-register `.active.json`, then straight to Scene 1 with the numbered choice block. The
+register this chat's marker file (`games/.active/<chat_id>`), then straight to Scene 1
+with the numbered choice block. The
 world bible you built here IS the world.md — the one case where world.md is written up
 front. Title card art (quality tier) follows Scene 1.
 

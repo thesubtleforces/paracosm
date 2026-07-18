@@ -109,14 +109,39 @@ In `~/.hermes/config.yaml` (or the profile's `config.yaml` if you installed unde
 ```yaml
 terminal:
   cwd: "/full/path/to/HERMES_HOME/workspace"   # REQUIRED — see note below
+group_sessions_per_user: false   # REQUIRED for group play — one shared table per chat (see below)
 cron:
   wrap_response: false   # world-tick messages arrive in the GM's voice, no cron header
 skills:
   write_approval: true   # any agent-authored skill change waits for your review
+stt:
+  enabled: true          # voice-message actions at the table (needs faster-whisper — below)
 display:
   tool_progress: off            # hide terminal/read/write tool cards — pure fiction in chat
   file_mutation_verifier: false # keep the file-verifier footer out of the narration
 ```
+
+**`group_sessions_per_user: false` is not optional if you play in groups.** Hermes's
+default keys group sessions per *sender*: every player gets their own GM brain, and one
+user's sessions can span multiple group chats. In live play this produced both failure
+modes — party desync (a player's message answered without the table's context) and
+**cross-campaign interference between concurrently running games** (one user's session
+carrying another chat's fiction mid-message). `false` gives each group chat one shared
+session: the whole table talks to one GM, and different chats get different sessions.
+DMs are unaffected (always keyed per chat). The trade-off the Hermes docs note — group
+members share context and interrupt state — is exactly what a game table wants.
+
+**Voice at the table:** install the local transcriber so spoken actions work —
+`uv pip install faster-whisper` in the Hermes venv (or `pip install faster-whisper`) —
+plus the `stt.enabled: true` above. Without it, voice messages bounce with a setup
+lecture in the middle of the fiction.
+
+**No approval prompts mid-fiction:** the GM's terminal use (dice, fal scripts, campaign
+file ops) triggers exec-approval prompts (`✅ Approved once by …`) inside the story
+unless pre-approved. Use your Hermes version's approval allowlist to pre-approve the
+game's command shapes (`python3 -c …`, `bash scripts/fal_*.sh …`, `cp -r
+templates/campaign …`, file ops under `games/`) — or set this profile's approval mode to
+auto-accept, which is reasonable given its deliberately minimal toolset.
 
 While the GM is mid-task (e.g. building a campaign), messages interrupt it by default —
 `/busy steer` makes them feed into the running task instead, which reads much better at
@@ -192,9 +217,16 @@ Run in order; each step assumes the previous passed.
    narration (or graceful ASCII if no FAL_KEY). `ooc: fewer pictures` slows the cadence.
 6. **Interrupt drill** — send a message while the GM is mid-setup. Expect no campaign
    rebuild, no stray `cp`/template work, no bleed.
-7. **Cross-chat drill** — run a second campaign in a different chat, play a turn in each.
-   Expect zero bleed: each chat stays anchored to its own campaign (check
-   `games/.active.json` maps both chats correctly).
+7. **Concurrency drill (N-chat)** — run at least THREE campaigns at once: two group
+   chats + one DM, three different worlds. Interleave turns across all three, including
+   sending from two chats at effectively the same moment. Expect zero bleed anywhere:
+   each chat stays locked to its own campaign, narration never references another
+   table's fiction, and `ls games/.active/` shows one marker file per chat (group ids
+   negative, DM id positive) each containing the right slug. Then, in ONE chat, say
+   "ooc: clear this chat and start over" — expect only that chat's marker removed; the
+   other two campaigns keep playing untouched and every campaign folder still exists.
+   The marker-file registry has no shared state to contend on, so this scales to any
+   number of chats — rerun the drill with more whenever a new group joins.
 8. **Saves** — `/saves` shows campaigns with "previously on" lines and marks this chat's
    active one. `/saves load` the other: expect a journal-sourced recap and the right
    scene, ending in a choice block.
@@ -238,6 +270,10 @@ Run in order; each step assumes the previous passed.
 | World-tick messages have a "Cronjob Response" header | Set `cron.wrap_response: false` (§5). |
 | Dice look fake / no roll shown | Dice visibility set to hidden at Session Zero (`ooc: show dice` to flip), or python3 missing on the box. |
 | GM sounds generic, ignores the turn contract, mentions a different agent name/persona | `terminal.cwd` isn't set (§5) — AGENTS.md never loaded, and/or an old `HERMES_HOME/SOUL.md` from before an install.sh version fix is stale. Fix: confirm `terminal.cwd` points at the workspace path `install.sh` printed, `cat $HERMES_HOME/SOUL.md` and confirm it's Paracosm's (re-run `./install.sh` if not — it now installs SOUL.md directly to `$HERMES_HOME`, not a subdirectory), then restart the gateway. |
-| Bot narrates a DIFFERENT campaign's scene (cross-campaign bleed) | This chat's entry in `games/.active.json` is missing/wrong, or you're on pre-v2 skills. `cat games/.active.json`, fix or `/saves load <name>` to re-anchor, and make sure you've pulled + reinstalled v2 (which forbids mid-game template copying and re-anchors after connection drops). |
+| Bot narrates a DIFFERENT campaign's scene (cross-campaign bleed) | Two causes, check both: (1) `group_sessions_per_user` not set to `false` (§5) — one user's session spans multiple groups and carries fiction between them; (2) this chat's marker `games/.active/<chat_id>` missing/wrong — `ls games/.active/`, fix with `/saves load <name>`. Ensure you're on the marker-file registry (post-2026-07-18 build); the old shared `.active.json` could be clobbered cross-chat. |
+| Two concurrent games broke each other | Same as above — the session-keying config is the root cause; the marker-file registry + chat-id-from-metadata rules are the containment. Run the §7 concurrency drill after fixing config to verify. |
+| "Clear this chat" deleted campaigns from ANOTHER chat | Pre-2026-07-18 skills. Update: clears now only remove the requesting chat's marker; deletion requires per-campaign confirmation and chat ownership. Restore lost campaigns from `/saves export` zips or ask the GM to reconstruct from the session ledger (it can). |
+| Voice messages bounce with "no speech-to-text provider" | faster-whisper not installed in this instance's venv or `stt.enabled` not set for the profile (§5) — each Hermes home/profile configures STT separately. |
+| `/saves load <name>` returns nothing at all | Known pre-2026-07-18 bug on fuzzy-miss; updated skill always replies with the shelf. If it persists, check gateway logs for a crashed turn. |
 | Same scene posted twice | Gateway resend after a stream stall — cosmetic, Hermes platform behavior. Play on. |
 | Tool cards / "⚠️ file verifier" text in the fiction | `display.tool_progress: off` and `display.file_mutation_verifier: false` not set (§5); restart the gateway after adding. |

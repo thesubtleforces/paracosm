@@ -73,8 +73,11 @@ On the pick (a bare number or a described scenario):
      puzzle/lead (solution + hint ladder). That's enough integrity to open fair.
    - `style.md` — the style prefix line (from the card's panel style) + the player
      character's locked descriptor.
-   Register the chat in `games/.active.json` (`{"<chat_id>": "<slug>"}` — create the file
-   if missing, update the key if present).
+   Register the chat: write the slug as the single line of `games/.active/<chat_id>`
+   (create the `.active/` dir if missing). The chat id comes from the CURRENT message's
+   platform metadata — never from session memory; in a Telegram group it is a NEGATIVE
+   number, and a positive id there is a user id, wrong. Only THIS chat's marker file is
+   ever written.
 2. **Curtain.** Narrate Scene 1 per the turn contract: 1–2 tight paragraphs, straight into
    a situation with stakes, ending on a numbered choice block. One line of orientation for
    first-timers above the scene: *"(Reply with a number, or type anything you want to do.
@@ -111,7 +114,7 @@ The full Session Zero ceremony, for tables that want it. Two doors:
 Dials (collect or roll, confirm as a compact summary): genre, tone, rating (ask hard
 lines), difficulty, dice visibility, permadeath, length (one-shot/feature/epic/infinite),
 art style, image cadence, living world. Then: seed write as in quick start (state +
-secrets stub + style), register `.active.json`, character build (guided: name/concept,
+secrets stub + style), register the chat's marker file, character build (guided: name/concept,
 +2/+1/+1/0/-1, 3 items — or quick-start with veto), title card via cutscene/scene-art
 (quality model), open Scene 1 with the choice block. World files still fill progressively
 — deep mode buys richer *dials*, not a 7-file upfront write.
@@ -126,10 +129,14 @@ everyone-at-once step. Party rules per party-mode/SKILL.md.
 - Rating: quick start defaults PG-13 without asking; honor `ooc:` changes immediately.
 - Slug collisions: append `-2`, never overwrite.
 - The specimen cards above are a SHAPE reference; shipping them verbatim is a bug.
-- `.active.json`: update the entry — a chat starting a second campaign points at the new
-  slug (the old campaign stays on the shelf for `/saves load`).
+- Registry: overwrite this chat's marker file — a chat starting a second campaign points
+  at the new slug (the old campaign stays on the shelf for `/saves load`). Never touch
+  any other chat's marker.
+- Card scratch art saves to `games/.cards-<chat_id>.png` using the SAME
+  metadata-derived chat id (a user id here is the tell that the id resolution went wrong
+  — fix it before writing anything).
 
 ## Verification
 After reply 2: `games/<slug>/` exists with seeded state/secrets/style + template stubs;
-`.active.json` maps this chat to the slug; journal has Turn 0 + Scene 1 entries; the
+`games/.active/<chat_id>` contains the slug; journal has Turn 0 + Scene 1 entries; the
 scene ended with a numbered choice block.

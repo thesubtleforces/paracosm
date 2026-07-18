@@ -15,6 +15,15 @@ Any campaign whose chat is a Telegram group (`meta.party_mode: true`). new-game 
 group chats and runs the Session Zero addendum here; every subsequent group message routes
 through these rules on top of the normal turn contract.
 
+## Platform requirement (one shared table)
+Party mode assumes every player in the group talks to the SAME GM context. Hermes's
+default gives each group member their OWN session (`group_sessions_per_user: true`),
+which desyncs the table — one player's GM doesn't know what another player just did
+except through the campaign files. The install guide (IMPLEMENTATION.md §5) requires
+`group_sessions_per_user: false` for this profile. Regardless of config, the file-first
+turn contract (read state/journal before every resolution) is what keeps a table
+coherent — never resolve a group turn from conversation memory alone.
+
 ## Procedure
 
 ### Session Zero addendum
