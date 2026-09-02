@@ -1,0 +1,27 @@
+{
+  "name": "paracosm-scene-walk",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@reactor-models/lingbot-world-2": "^1.0.1",
+    "@reactor-team/js-sdk": "^3.0.0",
+    "next": "15.5.9",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

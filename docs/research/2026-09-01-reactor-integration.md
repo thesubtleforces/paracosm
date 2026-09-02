@@ -4,8 +4,10 @@ Scope: what [reactor-team](https://github.com/reactor-team) actually ships, what
 actually needs, and the realistic pathways between the two — ranked by fit, effort, and
 risk. Sources are listed at the end. Note: `reactor.inc`, `docs.reactor.inc` and
 `api.reactor.inc` were unreachable from the research sandbox (egress-blocked), so pricing
-and a few command details below come from GitHub READMEs and search snippets of the docs.
-Verify against `GET https://api.reactor.inc/pricing` (public, no auth) before budgeting.
+comes from search snippets of the docs — verify against `GET https://api.reactor.inc/pricing`
+(public, no auth) before budgeting. Command names and payloads, however, were taken
+from the published packages themselves (`reactor-sdk` 1.2.0 wheel, `@reactor-models/*`
+typings), which is why the HappyOyster caveat below is stated with confidence.
 
 ---
 
@@ -39,10 +41,10 @@ files, never as a source of truth.
 
 | Model | Inputs | What it does | Paracosm fit |
 |---|---|---|---|
-| **HappyOyster** (Alibaba) — `happy-oyster-adventure` / `happy-oyster-director` | Text prompt + optional image (≤2 MB); Adventure: WASD + arrow look + world-advertised verbs (sprint/jump/crouch/attack/interact); Director: text `instruct()`, pause/resume/rewind (4 s steps), up to ~3 min | Build a world, then either *travel* it like a game or *direct* it like a film. Persistent `world_state` you can re-attach to later. Audio-video sync claimed. | **Best all-rounder.** Director mode = narrative-steered cutscenes; Adventure = explorable scenes; `attachWorld` = re-enter the same world next session. |
+| **HappyOyster** (Alibaba) — `reactor/happy-oyster-adventure` / `reactor/happy-oyster-director` | Text prompt + optional image (landscape 1.5–2.0, ≤2 MB); Adventure: WASD + arrow look + world-advertised verbs; Director: text `instruct()`, pause/rewind, up to ~3 min | Build a world, then *travel* it like a game or *direct* it like a film; persistent worlds you can re-attach to. | **Browser-only.** The typed package (`@reactor-models/happy-oyster`) shows the Reactor session only carries a `status_video` state frame; the actual world video streams from Alibaba's gateway via `aliyun-rtc-sdk` using travel credentials. So it **cannot be recorded server-side** through the Reactor SDK — no use for cutscene clips. Viable only for a browser walk (Pathway D). |
 | **LingBot World 2** (Ant Group) — `reactor/lingbot-world-2` | Seed image + layered prose prompt; `set_move_longitudinal/lateral`, `set_camera_pose`, hold-keys **1–9 fire "event" clauses**, jump/crouch/roll | Navigable world from a still; hour-long stability claimed. Prompt is composed from `base + camera + movement + heldEvents + vertical` layers. | Style-lock friendly (seed = our fal keyframe). The **1–9 event slots rhyme with Paracosm's numbered choice block.** Self-hostable (CC BY-NC-SA). |
 | **LingBot (v1)** | Seed image + WASD; dynamic overlays (rain, fog) | Simpler navigable world. | Cheaper cousin of the above. |
-| **Helios** (Peking U.) | Text (+ image); mid-stream prompt swaps | Infinite continuous video, 14B DiT, ~19.5 fps on one H100; multi-prompt "base state + one new action" continuation. | Ambient/establishing loops; scene-transition video. |
+| **Helios** (Peking U.) — `reactor/helios` | `set_conditioning {prompt, image}` (uploaded keyframe), `start`, hot-swap `set_prompt` / `schedule_prompt {chunk, prompt}`, `set_image_strength`, snapshots + `rewind`; video on `main_video` | Infinite continuous video, 14B DiT, ~19.5 fps on one H100; "base state + one new action" prompt continuation. | **The cutscene backend.** Keyframe-anchored, steerable by beats, recordable with `download_clip()` from Python. Cheapest per second of the bunch. |
 | **LongLive 2** | Text only (no image input); `set_shot` / `schedule_*` / `start`; **shots** (soft, spend a 48-chunk ≈ 58 s budget) vs **cuts** (hard, reset budget) | Multi-shot "director's storyboard" video. | `/chronicle` recap reel; title sequences. Weak on style lock (no seed image). |
 | **LTX2** | Face image + script + audio | Lip-synced talking-head avatar. | NPC "video letters" — a raven with a face. Niche. |
 | **SANA-Streaming**, **X2** | Source video + edit instruction (+ reference image) | Real-time video-to-video *editing* (restyle, swap, remove). | Restyle any clip into the campaign's style bible; low priority. |
@@ -98,14 +100,15 @@ From `AGENTS.md`, the skills, and the July design review:
 
 ## 3. Pathways, ranked
 
-### A. Reactor as a second cutscene backend — *do this first*
+### A. Reactor as a second cutscene backend — *implemented* (`hermes/skills/cutscene/scripts/reactor_clip.py`)
 
 **What:** The cutscene skill already builds a style-locked keyframe (fal quality tier,
 returns a local PNG and a fal.media URL) and then calls Kling image-to-video. Add a
-`scripts/reactor_clip.py` that: connects to `happy-oyster-director` (or Helios), uploads
-the keyframe as the seed image, sends the motion/narrative prompt, lets it run for N
-seconds (optionally sending 1–2 follow-up `instruct()` beats), calls `download_clip()`,
-writes the MP4, disconnects. The skill picks the backend via config
+`scripts/reactor_clip.py` that: connects to **Helios** (`reactor/helios`), uploads the
+keyframe with `upload_file`, sends `set_conditioning {prompt, image}`, `start`, lets it
+run for N seconds sending 1–3 `set_prompt` beats composed as "base prompt + beat", calls
+`download_clip(N)`, writes the MP4, disconnects. (HappyOyster was the first candidate
+but its video never touches the Reactor session — see the catalog note — so it is out.) The skill picks the backend via config
 (`paracosm.video_backend: fal | reactor`) with a degrade chain **reactor → fal →
 keyframe still**.
 
@@ -114,30 +117,16 @@ script under `scripts/`). Same three-beat budget. The seed image preserves the s
 bible. Gains over Kling: longer clips (director mode runs minutes, not 5–10 s), narrative
 steering mid-clip ("now the gate opens"), pause/rewind for retakes, and audio.
 
-**Sketch:**
-
-```python
-# scripts/reactor_clip.py "<prompt>" <keyframe.png> <out.mp4> [seconds]
-import asyncio, sys, os
-from reactor_sdk import Reactor, ReactorStatus
-
-prompt, keyframe, out, secs = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4] or 20)
-
-async def main():
-    async with Reactor(model_name="happy-oyster-director",
-                       api_key=os.environ["REACTOR_API_KEY"]) as r:
-        await r.connect()                      # raises AuthError on bad key
-        # exact command names per the hosted model's reference app:
-        await r.send_command("create_world", {"prompt": prompt, "image": open(keyframe,"rb").read()})
-        await r.send_command("start_travel", {})
-        await asyncio.sleep(secs)             # hard cap: billing is per connected second
-        await r.download_clip(out)            # MP4 on disk → MEDIA: tag
-asyncio.run(main())
-```
-
-(Command names above are illustrative; the cookbook's `happy-oyster` example and the
-`reactor-sdk` skill carry the exact payloads. The key-lookup walk from `fal_image.sh`
-should be reused so `REACTOR_API_KEY` lives in `~/.hermes/.env` like `FAL_KEY`.)
+**Verified wire contract** (read from the published `@reactor-models/helios` typings and
+the `reactor-sdk` 1.2.0 wheel, not from docs): `Reactor(model, api_key=…,
+max_session_duration_seconds=…)` → `connect()` → `upload_file(path) -> FileRef` →
+`send_command("set_conditioning", {"prompt", "image": FileRef})` → `send_command("start",
+{})` → messages `generation_started` / `chunk_complete` / `command_error` via
+`on_message` → `send_command("set_prompt", {"prompt"})` per beat → `download_clip(N,
+path)` (fragmented MP4; `ffmpeg -c copy -movflags +faststart` for a seekable file) →
+`disconnect()`. Token minting is `POST /tokens` with header `Reactor-API-Key`, body
+`{expires_after, authorization_details:[{type:"session", resources:{models:{match:[…]}},
+constraints:{max_sessions, max_session_duration_seconds}}]}`, response `{jwt}`.
 
 **Effort:** a weekend. **Risk:** low. **Cost:** cents per beat.
 
@@ -179,7 +168,7 @@ even if the live-world pathway never ships):
 
 **Effort:** hours. **Risk:** none. Prerequisite for D and E.
 
-### D. "Walk the scene" — an explorable link (spectacle, not mechanics)
+### D. "Walk the scene" — an explorable link (spectacle, not mechanics) — *implemented* (`web/scene-walk/`, `hermes/skills/scene-walk/`)
 
 **What:** On a big set piece, the GM offers *"step into the scene"*: a URL to a tiny web
 page (start from `npx create-reactor-app --model=lingbot-world-2` or the

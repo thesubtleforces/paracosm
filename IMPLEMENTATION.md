@@ -89,6 +89,51 @@ path.
 
 Skippable — Paracosm degrades to ASCII art and extra prose without a key.
 
+## 3b. Reactor (optional: cinematic cutscenes)
+
+[Reactor](https://reactor.inc) hosts real-time *world models* — video you can steer while
+it generates. With a key, the three cutscene beats per campaign become 20–45 s clips
+that open on the campaign's own keyframe and follow one or two narrative beats the GM
+writes ("the gate grinds open…"), instead of a 5–10 s Kling loop. Without a key nothing
+changes: cutscenes use fal.ai exactly as before.
+
+1. Create an account, mint an API key (`rk_…`) in the Reactor dashboard, and **set a
+   spend limit there** — Reactor bills per connected second.
+2. Add `REACTOR_API_KEY=rk_...` to `~/.hermes/.env`.
+3. Install the SDK for the `python3` the gateway's terminal uses:
+   `python3 -m pip install reactor-sdk` (Python ≥ 3.10; Linux needs glibc ≥ 2.34 —
+   Raspberry Pi OS Bookworm 64-bit, Ubuntu 22.04+, Debian 12 all qualify).
+4. Optional: `apt install ffmpeg` so clips carry a seekable duration bar in Telegram.
+5. Re-run `./install.sh` — it reports the key, the SDK import, and ffmpeg.
+6. Smoke test from the workspace: `python3 scripts/reactor_clip.py --probe` should
+   print a session id and a `main_video` track, then exit.
+
+Optional override: `REACTOR_VIDEO_MODEL` (default `reactor/helios`). Costs: see §8.
+The cutscene skill always tries Reactor → fal → keyframe still, so a missing SDK or a
+dead key just means the fal clip arrives instead.
+
+## 3c. Scene walks (optional: a web app)
+
+A walk is a link the GM drops on big moments: a real-time, navigable world seeded with
+the turn's keyframe that the player explores for a capped minute or so. It is the one
+hosted component in Paracosm — a small Next.js app in `web/scene-walk/` that keeps the
+Reactor key server-side and only serves links the GM has signed.
+
+1. Deploy `web/scene-walk` (Vercel free tier; see its README) with
+   `REACTOR_API_KEY`, a fresh `WALK_SIGNING_SECRET` (`openssl rand -hex 32`), and
+   `NEXT_PUBLIC_BOT_USERNAME`.
+2. On the box, add to `~/.hermes/.env`:
+   ```
+   PARACOSM_WALK_URL=https://<your-deployment>
+   WALK_SIGNING_SECRET=<the same secret>
+   ```
+3. Re-run `./install.sh` — "Scene walks: configured".
+
+Walks are spectacle: **nothing seen on a walk changes the game.** Each campaign has a
+`meta.walk_budget_seconds` (default 600) the GM charges against; in party mode one link
+serves the table and every opener is a separate session. Skip this section entirely
+and walks are simply never offered.
+
 ## 4. Install Paracosm
 
 ```bash
@@ -244,13 +289,28 @@ Run in order; each step assumes the previous passed.
     numbers, cast — and nothing from secrets.md.
 15. **Fourth Wall** — ask the bot to write you a Python script. Expect flavor, the
     one-sentence signpost, zero code.
+16. **Reactor cutscene** (if §3b) — the title card after Scene 1 arrives as an inline
+    video of ~20 s that clearly opens on the keyframe; `story_position.cutscenes_used.
+    title` is true and `art.reactor.clips.title` holds a session id. Then rename
+    `REACTOR_API_KEY` in `.env` and start another campaign: the Kling clip arrives
+    instead, with no error text in chat. Remove `FAL_KEY` too: the keyframe still
+    arrives. Restore both.
+17. **Scene walk** (if §3c) — on a set piece, the GM offers a link. Open it on a phone
+    from Telegram: video within ~10 s, the pad walks, an action button plays its beat,
+    the countdown ends on a "the story waits" screen. Open the same link again past
+    `max_sessions`: a polite refusal, not a session. `state.json →
+    art.reactor.walk_seconds_used` advanced by `cap_seconds × max_sessions`. Rerun
+    the concurrency drill (step 7) with a walk and a Reactor cutscene in two campaigns
+    at once — every id lands in the right `state.json`.
 
 ## 8. Costs & tuning
 
 | Lever | Effect |
 |---|---|
 | Per-turn art (default: most turns, fast tier) | Turn art runs on `FAL_IMAGE_MODEL_FAST` (flux/schnell ≈ fractions of a cent, 2–4s) — art-most-turns costs a few cents per session. Key moments (title, act breaks, chronicle cover) use the quality tier (flux/dev ≈ a few cents each). `ooc: fewer pictures` is the brake, stored per campaign. |
-| Video | 3 cutscenes/campaign hard cap ≈ tens of cents to ~$1 each depending on model. Skip by declining video when offered. |
+| Video (fal) | 3 cutscenes/campaign hard cap ≈ tens of cents to ~$1 each depending on model. Skip by declining video when offered. |
+| Video (Reactor) | Per connected second (Helios ≈ $6/hour at time of writing — verify at `GET https://api.reactor.inc/pricing`). A 30 s clip plus setup is a few cents; the risk is an *open* session, which is why `reactor_clip.py` caps every session both client- and server-side. |
+| Walks | LingBot World 2 ≈ $12/hour → a 90 s walk ≈ $0.30 per opener; a party of four is four sessions. Governed by `meta.walk_budget_seconds` (default 600 s per campaign) and the token's `max_sessions`. Set a dashboard spend limit as the backstop. |
 | Model tokens | Scale with campaign length: a one-shot is trivial; Epics re-read state+recap+journal-tail each turn (the recap discipline exists to keep this flat). Living-world ticks ≈ 1 short session/campaign/day. |
 | Living world off | Zero background spend; purely reactive. |
 
@@ -277,3 +337,10 @@ Run in order; each step assumes the previous passed.
 | `/saves load <name>` returns nothing at all | Known pre-2026-07-18 bug on fuzzy-miss; updated skill always replies with the shelf. If it persists, check gateway logs for a crashed turn. |
 | Same scene posted twice | Gateway resend after a stream stall — cosmetic, Hermes platform behavior. Play on. |
 | Tool cards / "⚠️ file verifier" text in the fiction | `display.tool_progress: off` and `display.file_mutation_verifier: false` not set (§5); restart the gateway after adding. |
+| Cutscenes still come from fal though `REACTOR_API_KEY` is set | Run `python3 scripts/reactor_clip.py --probe` from the workspace; the JSON error says why: `reactor-sdk not importable` → install it for *that* `python3` (§3b); `could not exchange the API key` → key/spend limit; old glibc (< 2.34) → the SDK wheel won't load on that box, stay on fal. |
+| Reactor clip plays but shows no duration / can't seek | Fragmented MP4 without ffmpeg on the box. `apt install ffmpeg`; the script remuxes automatically when it finds it. |
+| Reactor clip errors with `command_error` | The model rejected a prompt or image (rating filter, > 2000 chars, non-image keyframe). The skill falls back to fal; check the journal note for the reason. |
+| Walk link says "This link is not valid" | `WALK_SIGNING_SECRET` differs between the box's `.env` and the web app's env. They must be byte-identical. |
+| Walk link says "This walk has expired" | Links live 30 minutes from signing. Ask the GM for a fresh one (it re-signs the same manifest). |
+| Walk opens but "the fog closes" immediately | The token route failed: `REACTOR_API_KEY` missing on the web host, Reactor spend limit hit, or `max_sessions` already spent for that link. Check the deployment logs. |
+| Walk shows the curtain but no video ever forms | WebRTC blocked by the in-app browser or a corporate network. Open the link in Safari/Chrome; if it still fails, the Reactor status page is the next stop. |

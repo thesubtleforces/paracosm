@@ -15,7 +15,8 @@
     "created": "",
     "last_played": "",
     "party_mode": false,
-    "telegram_chat_id": null
+    "telegram_chat_id": null,
+    "walk_budget_seconds": 600
   },
   "players": [
     {
@@ -73,6 +74,11 @@
   "art": {
     "style_tokens": "",
     "character_descriptors": {},
-    "title_card": null
+    "title_card": null,
+    "reactor": {
+      "clips": {},
+      "walks": [],
+      "walk_seconds_used": 0
+    }
   }
 }

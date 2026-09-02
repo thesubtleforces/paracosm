@@ -36,6 +36,11 @@ what do you do?
   quality tier for the big moments), with a locked per-campaign style bible so turn 40
   looks like turn 1. Three cinematic video cutscenes per campaign: title, set piece,
   ending.
+- **🎥 Optional: living pictures** — with a [Reactor](https://github.com/reactor-team)
+  key, the three cutscenes become 20–45 s clips steered by the GM's narrative beats, and
+  on big moments the GM can hand you a link to *walk around the scene* for a minute —
+  a real-time world model seeded with the turn's art. Spectacle only; the story stays
+  in the files.
 - **💾 Real saves** — every campaign is a folder of readable files: world bible, character
   sheet, append-only journal, GM secrets. List, load, **branch into what-if timelines**,
   export as a zip.

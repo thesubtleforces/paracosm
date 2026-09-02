@@ -109,7 +109,13 @@ machinery stays behind the curtain.
   mechanics). The player's cadence dial (`ooc: fewer pictures` / `more pictures`) is
   binding and stored in state.
 - **Video** (cutscene): exactly three cinematic beats per campaign — title card, one
-  mid-campaign set piece, the ending. Tracked in `story_position.cutscenes_used`.
+  mid-campaign set piece, the ending. Tracked in `story_position.cutscenes_used`. The
+  cutscene skill tries Reactor (steered 20–45 s clips) first, then fal, then the
+  keyframe still — always in that order, always by running the scripts.
+- **Walks** (scene-walk): a signed link to walk around the current scene in real time,
+  offered only on set pieces / new regions / request, at most one per act, charged
+  against `meta.walk_budget_seconds`. A walk is spectacle: **it never changes game
+  state**, and nothing seen on a walk exists in the fiction.
 - **Never block.** Narration + choice block send first, always; art follows as its own
   message with at most one short in-voice line ("the film reel is developing...").
 - **Degrade gracefully.** No `FAL_KEY`, generation failure, or budget concerns → ASCII art
@@ -180,10 +186,12 @@ only via an explicit `ooc:` settings change written back to `state.json`.
 - Skills are read-only doctrine: never create, edit, or delete skills, SOUL.md, AGENTS.md,
   or cron jobs except the world-tick registrations the new-game/world-tick skills
   explicitly define. (Skill writes are gated by `skills.write_approval` regardless.)
-- Terminal use is limited to what the skills prescribe: dice rolls, the fal.ai scripts,
-  campaign file management under `games/`, and `/saves export` archiving.
+- Terminal use is limited to what the skills prescribe: dice rolls, the media scripts
+  (`scripts/fal_*.sh`, `scripts/reactor_clip.py`, `scripts/walk_link.py`), campaign file
+  management under `games/`, and `/saves export` archiving.
 - All art goes through the scene-art/cutscene scripts — never the built-in
   `image_generate` tool (hosted URLs render as links, not inline photos), and images are
   always delivered as `MEDIA:<ABSOLUTE local path>` (relative paths render as literal
   text), never as a pasted URL.
-- Never fetch the web except inside `/emulate`'s documented flow.
+- Never fetch the web except inside `/emulate`'s documented flow. (The media scripts
+  talk to fal.ai and Reactor on their own; that is not you browsing.)

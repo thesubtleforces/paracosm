@@ -84,8 +84,10 @@ act "create games/ directory"               mkdir -p "$WORKSPACE/games"
 act "install media scripts -> workspace"    mkdir -p "$WORKSPACE/scripts"
 act "  copy fal_image.sh"                   cp "$SRC_DIR/hermes/skills/scene-art/scripts/fal_image.sh" "$WORKSPACE/scripts/fal_image.sh"
 act "  copy fal_video.sh"                   cp "$SRC_DIR/hermes/skills/cutscene/scripts/fal_video.sh"  "$WORKSPACE/scripts/fal_video.sh"
+act "  copy reactor_clip.py"                cp "$SRC_DIR/hermes/skills/cutscene/scripts/reactor_clip.py" "$WORKSPACE/scripts/reactor_clip.py"
+act "  copy walk_link.py"                   cp "$SRC_DIR/hermes/skills/scene-walk/scripts/walk_link.py"  "$WORKSPACE/scripts/walk_link.py"
 if [ "$DRY_RUN" -eq 0 ]; then
-  chmod +x "$WORKSPACE/scripts/"*.sh 2>/dev/null
+  chmod +x "$WORKSPACE/scripts/"*.sh "$WORKSPACE/scripts/"*.py 2>/dev/null
 fi
 
 # --- environment check ---------------------------------------------------------
@@ -96,6 +98,30 @@ else
   say "FAL_KEY: NOT found. Paracosm still works (ASCII art fallback)."
   say "  To enable images/video: get a key at https://fal.ai/dashboard/keys and add"
   say "  FAL_KEY=... to $HERMES_HOME/.env"
+fi
+
+# Reactor (optional): steered cutscene clips + scene walks. Cutscenes fall back to fal
+# without it; walks are simply never offered.
+if [ -n "${REACTOR_API_KEY:-}" ] || grep -qs '^REACTOR_API_KEY=' "$HERMES_HOME/.env" 2>/dev/null; then
+  say "REACTOR_API_KEY: found — cinematic cutscenes via Reactor enabled."
+  if python3 -c 'import reactor_sdk' >/dev/null 2>&1; then
+    say "  reactor-sdk: ok"
+  else
+    say "  reactor-sdk: NOT importable by python3 — run: python3 -m pip install reactor-sdk"
+    say "  (until then cutscenes use fal.ai)"
+  fi
+  if command -v ffmpeg >/dev/null 2>&1; then
+    say "  ffmpeg: ok (clips get a seekable duration bar)"
+  else
+    say "  ffmpeg: not found (optional — clips still play, without a duration bar)"
+  fi
+else
+  say "REACTOR_API_KEY: not found — cutscenes use fal.ai (IMPLEMENTATION.md §3b to enable Reactor)."
+fi
+if grep -qs '^PARACOSM_WALK_URL=' "$HERMES_HOME/.env" 2>/dev/null && grep -qs '^WALK_SIGNING_SECRET=' "$HERMES_HOME/.env" 2>/dev/null; then
+  say "Scene walks: configured (PARACOSM_WALK_URL + WALK_SIGNING_SECRET)."
+else
+  say "Scene walks: not configured — optional, see IMPLEMENTATION.md §3c."
 fi
 
 say ""
