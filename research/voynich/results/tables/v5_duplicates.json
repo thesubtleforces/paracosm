@@ -1,0 +1,126 @@
+{
+ "same_plant_f39r_f95r2": {
+  "pages": [
+   "f39r",
+   "f95r2"
+  ],
+  "scribes": [
+   "2",
+   "3"
+  ],
+  "languages": [
+   "B",
+   "B"
+  ],
+  "words": [
+   157,
+   79
+  ],
+  "shared_word_forms": 16,
+  "shared_forms_rarest_first": [
+   "eeedy (7)",
+   "okam (33)",
+   "kar (59)",
+   "otal (137)",
+   "chckhy (141)",
+   "chdy (146)",
+   "cheol (172)",
+   "shol (186)",
+   "qokal (197)",
+   "chor (211)",
+   "y (306)",
+   "or (390)"
+  ],
+  "lsa": {
+   "similarity": 0.437,
+   "reference_pairs": 25,
+   "reference_median": 0.393,
+   "percentile": 56.0
+  },
+  "tfidf": {
+   "similarity": 0.104,
+   "reference_pairs": 25,
+   "reference_median": 0.107,
+   "percentile": 48.0
+  }
+ },
+ "labels_shared_between_pharmaceutical_pages": {
+  "pages_with_labels": 15,
+  "label_forms": 234,
+  "page_pairs": 105,
+  "pairs_sharing_any_label": 13,
+  "share_of_pairs": 0.124,
+  "f89v1_and_f102v2_share": [],
+  "frequency_of_those_forms_in_whole_text": {},
+  "all_shared": {
+   "f101v+f102v2": [
+    "okol"
+   ],
+   "f101v+f88r": [
+    "okol",
+    "otaldy"
+   ],
+   "f101v+f89r2": [
+    "okol"
+   ],
+   "f102v2+f88r": [
+    "okol"
+   ],
+   "f102v2+f89r2": [
+    "okol"
+   ],
+   "f102v2+f89v2": [
+    "otory"
+   ],
+   "f102v2+f99v": [
+    "chor"
+   ],
+   "f88r+f89r2": [
+    "okol"
+   ],
+   "f88r+f99v": [
+    "otaly",
+    "otoky",
+    "otor"
+   ],
+   "f88v+f89r1": [
+    "okaiin"
+   ],
+   "f89r1+f99r": [
+    "otoldy"
+   ],
+   "f89r1+f99v": [
+    "otoldy"
+   ],
+   "f99r+f99v": [
+    "dar",
+    "otoldy"
+   ]
+  }
+ },
+ "f101v_labels_in_f93r_text": {
+  "f101v_labels": [
+   "arom",
+   "dokor",
+   "dolary",
+   "dytolg",
+   "odor",
+   "okol",
+   "olaran",
+   "olkor",
+   "oraeep",
+   "orar",
+   "oraram",
+   "otaldy",
+   "otarar",
+   "otol",
+   "otoly",
+   "sairaly",
+   "soraly",
+   "ytal"
+  ],
+  "found_in_f93r_text": [
+   "otol"
+  ]
+ }
+}

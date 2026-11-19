@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Re-run every analysis and rebuild the report page. Needs ./fetch_sources.sh to have been run.
-# Takes about ten minutes on four cores. Scripts are run with `python -I` because they read
+# Takes about twenty-five minutes on four cores. Scripts are run with `python -I` because they read
 # downloaded files; nothing is executed from the downloaded directories.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -13,4 +13,8 @@ $PY src/a04b_vertical_geometry.py
 $PY src/a06_bifolio_order.py
 $PY src/a05_sections_scribes.py
 $PY src/a07_labels.py
+$PY src/a08_more_controls.py
+$PY src/a09_predictive_scoring.py
+$PY src/a10_second_transliteration.py
+$PY src/a11_corrections_and_duplicates.py
 $PY src/build_dossier.py

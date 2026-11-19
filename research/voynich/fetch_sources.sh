@@ -41,6 +41,17 @@ fetch mzattera v4j f3387f112402c3f724d1264aae24c69336c7daca \
 # upstream mirror of the transliterations (the copies in data/transliterations/ came from here)
 fetch noah-chelednik voynich-data ecd4c8145524d90373535ea3d1617d8190dc8208
 
+# validation round: verse, calendars, lists and recipes with native units (Tesserae), and 21 Latin
+# manuscripts of the 11th-15th centuries transcribed line by line (CREMMA Medieval LAT; text files only)
+fetch tesserae tesserae 5e0ae3043c0a5b0be6ab194df58518e48ee87547 \
+      '/texts/la/vergil.georgics.tess' '/texts/la/vergil.aeneid.tess' '/texts/la/lucretius.de_rerum_natura.tess' \
+      '/texts/la/ovid.fasti.tess' '/texts/la/walafrid_strabo.de_cultu_hortorum_carmen.tess' \
+      '/texts/la/wandalbertus.martyrologium.tess' '/texts/la/cato_the_elder.de_agricultura.tess' \
+      '/texts/la/jerome.vulgate/jerome.vulgate.part.4.numbers.tess' \
+      '/texts/la/jerome.vulgate/jerome.vulgate.part.12.1_chronicles.tess' \
+      '/texts/la/jerome.vulgate/jerome.vulgate.part.21.psalms.tess' '/README*' '/LICENSE*'
+fetch HTR-United CREMMA-Medieval-LAT 292525969ad98380b398e6606a9c2a36d51913ae '/README.md' '/data-registry.csv' '/htr-united.yml' '/data/**/*.txt'
+
 # Gaskell & Bowern's human gibberish and comparison texts ship as zip files
 mkdir -p "$ROOT/_controls/gaskell_gibberish" "$ROOT/_controls/gaskell_meaningful"
 unzip -q -o "$ROOT/danielgaskell/voynich/data/gibberish_transcriptions.zip" -d "$ROOT/_controls/gaskell_gibberish"

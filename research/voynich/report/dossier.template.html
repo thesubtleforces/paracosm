@@ -139,6 +139,24 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
 .st-scale i { position: absolute; font-style: normal; transform: translateX(-50%); }
 .st-title { font-size: 12px; color: var(--ink-2); text-align: center; line-height: 1.35; }
 
+/* gains: three panels on separate scales; class labels once on wide screens, per panel on phones */
+.gains { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 22px 28px; }
+.gain-panel { display: flex; flex-direction: column; min-width: 0; }
+.gain-panel h4 { margin-bottom: 6px; color: var(--ink); min-height: 2.9em; }
+.gain-panel h4 small { display: block; font-weight: 400; }
+.gain-row { display: grid; grid-template-columns: 9.6em minmax(0, 1fr); gap: 0 10px; align-items: center; height: 36px; }
+.gain-row .st-track { height: 36px; }
+.gain-row .st-val { display: none; }
+.gain-axis { height: 18px; }
+.gain-label { font-size: 12.5px; line-height: 1.2; }
+.gain-panel + .gain-panel .gain-label { display: none; }
+.gain-panel + .gain-panel .gain-row { grid-template-columns: minmax(0, 1fr); }
+.notice { font-family: var(--font-ui); font-size: 14px; line-height: 1.5; background: var(--wash); border-radius: 6px; padding: 14px 18px; max-width: var(--measure); }
+.notice b { font-weight: 600; }
+.twocol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 44px; max-width: 980px; }
+.twocol h3 { margin-top: 6px; }
+.twocol ol, .twocol ul { padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; font-size: 16px; }
+
 /* dumbbells: share of words with a glyph, elsewhere vs at the line edge */
 .dumbbells { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 44px; }
 .db-panel { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -227,6 +245,10 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
   .answer { grid-template-columns: 1fr; }
   .plates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dumbbells { grid-template-columns: 1fr; }
+  .gains, .twocol { grid-template-columns: 1fr; }
+  .gain-panel h4 { min-height: 0; }
+  .gain-row, .gain-panel + .gain-panel .gain-row { grid-template-columns: 8.4em minmax(0, 1fr) 5.6em; }
+  .gain-panel + .gain-panel .gain-label, .gain-row .st-val { display: block; }
   .plate { padding: 18px 16px 14px; }
   .iv-row, .bar-row { grid-template-columns: minmax(0, 1fr) 4.2em; row-gap: 4px; }
   .st-row, .st-axis { grid-template-columns: minmax(0, 1fr) 5.6em; }
@@ -247,9 +269,9 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
 <div class="page">
 
 <header class="masthead">
-  <p class="eyebrow">Beinecke MS 408 · working dossier · 19 November 2026</p>
+  <p class="eyebrow">Beinecke MS 408 · working dossier · 19 November 2026 · with validation round 1</p>
   <h1>The Voynich manuscript: what it most likely&nbsp;is, and how to check</h1>
-  <p class="standfirst">A primer checked against the sources, the full text gathered and parsed, first tests run against texts of known origin, and a method for turning rival explanations into scenarios that can fail.</p>
+  <p class="standfirst">A primer checked against the sources, the full text gathered and parsed, tests run against texts of known origin, a first validation round that overturned some of our own readings, and a method for turning rival explanations into scenarios that can fail.</p>
 </header>
 
 <section id="answer" style="margin-top:44px">
@@ -259,22 +281,30 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
       <p>Calf parchment made between 1404 and 1438, ordinary iron-gall ink and period pigments, five scribes working as a team, and imagery that points to the Alpine arc between southern Germany and northern Italy. The book is laid out like a medical and astrological compendium: plants, a pharmacy of roots and jars, a zodiac calendar, bathing women, short paragraphs marked with stars.</p>
     </div>
     <div>
-      <h3>The meaning is open, but narrower than it was</h3>
-      <p>Nobody can read a word. In our tests the text's strangest habits (words that echo their neighbours, lines that behave as units) are reproduced by a copy-and-modify writing routine, and by neither natural languages nor the best published cipher model. That does not show the text is empty. It lists what any meaningful reading still has to explain.</p>
+      <h3>A written word here does not stand for a word</h3>
+      <p>On sheets held back from training, knowing the previous word tells you almost nothing about the next: {{v_gram_voy_med}} bits, against at least {{v_gram_min}} in every one of {{v_n_meaningful}} meaningful texts we scored. That closes every word-for-word reading. What remains is a cipher that spends a whole written word on a letter or two, or text that carries no message.</p>
+    </div>
+    <div>
+      <h3>Neither published model fits yet</h3>
+      <p>The best cipher model has none of the manuscript's local habits. The best meaningless-text model has {{v_rep_gen_x}} times too much of them. And three habits we first read as signs of a copying routine turn up in real verse, lists and abbreviated manuscripts, so we have withdrawn them.</p>
+    </div>
+    <div>
+      <h3>The leading tableau keeps a narrow lead</h3>
+      <p>A book made to look learned, with no message in its text, stays in front at 35 to 40%. A real compendium whose meaning did not survive its own encoding is second. A true cipher is third, and it would have to be a kind more elaborate than any known from those decades.</p>
     </div>
     <div>
       <h3>The newest claim holds up in part</h3>
-      <p>We rebuilt the 2026 page-order analysis from its description and got the same result, down to the same top-ranked sheet sequences. The finding that each folded sheet is a unit survives a scribe control the authors did not run. The proposed re-ordering of the sheets does no better than chance in our null test.</p>
+      <p>We rebuilt the 2026 page-order analysis from its description and got the same result on three transliterations, down to the same top-ranked sheet sequences. Sheets as units survives a scribe control the authors did not run. The proposed re-ordering does no better than chance in our null test.</p>
     </div>
     <div>
-      <h3>The way forward is a scoreboard</h3>
-      <p>Write each explanation as a process that can be simulated. Fix the measurements in advance. Calibrate them on texts whose origin is known. Then check every text-based conclusion against physical evidence that the text analysis never saw.</p>
+      <h3>How the book was made is becoming answerable</h3>
+      <p>Sheet by sheet, in page order, by a team, drawing first. Whether it says anything is a separate question, and it may have no answer. The value of this exercise is in showing how one would know.</p>
     </div>
   </div>
   <nav class="contents" aria-label="Contents">
     <a href="#primer">Primer</a><a href="#attempts">A century of attempts</a><a href="#video">The video, checked</a>
-    <a href="#corpus">What we gathered</a><a href="#tests">First tests</a><a href="#tableaus">Five tableaus</a>
-    <a href="#method">How to validate one</a><a href="#next">What to do next</a><a href="#sources">Sources</a>
+    <a href="#corpus">What we gathered</a><a href="#tests">First tests</a><a href="#validation">Validation round 1</a><a href="#tableaus">Five tableaus</a>
+    <a href="#contribution">What this adds and takes away</a><a href="#method">How to validate one</a><a href="#next">What to do next</a><a href="#sources">Sources</a>
   </nav>
 </section>
 
@@ -431,6 +461,7 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
 <!-- ============================================================ TESTS -->
 <section id="tests">
   <h2>First tests, with controls</h2>
+  <p class="notice"><b>Round 1, as first run.</b> The validation round that follows withdrew or weakened three readings made in this section: that line effects, likeness to the word above, and exact repeats point to a copying routine. They are left here as written so the record shows what changed.</p>
   <div class="prose">
     <p>Each test asks one question of the manuscript and puts the same question to the control texts. The running text is cut into equal-sized samples so that numbers are comparable. Words are quoted in EVA, the standard transliteration alphabet; its letters are labels for shapes, not sounds.</p>
   </div>
@@ -505,58 +536,123 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
   </div>
 </section>
 
+<!-- ============================================================ VALIDATION -->
+<section id="validation">
+  <h2>Validation round 1</h2>
+  <div class="prose">
+    <p>The first round ended with five checks that needed only material already to hand. All five have now been run. Two of them changed our reading.</p>
+  </div>
+
+  <h3>The controls that were missing</h3>
+  <div class="prose">
+    <p>Round 1 compared the manuscript with continuous prose, where line breaks fall by accident. Three kinds of meaningful text were missing: verse, where the line is the unit by design; lists and recipes, which repeat themselves; and real manuscripts transcribed line by line with their abbreviations. We added six Latin verse texts (among them a calendar poem, a verse herbal and a verse list of saints' days), four list and recipe texts, and 21 Latin manuscripts of the eleventh to fifteenth centuries, including medical recipe collections and a prayer book.</p>
+  </div>
+  {{table_newcontrols}}
+  <div class="prose">
+    <ul>
+      <li><b>Line endings are ordinary.</b> At equal numbers of lines, the manuscript's line-end effect is {{v1_end_ratio}} times that of verse and lists. Text composed in lines ends its lines in particular ways.</li>
+      <li><b>Line starts are not.</b> The line-start effect is {{v1_start_ratio}} times larger than in any control of the same size. It is the same in kind as in verse and lists, and far stronger.</li>
+      <li><b>Likeness to the word above is commoner in real text.</b> Verse scores {{v1_above_verse}} and lists {{v1_above_list}}, against 1.08 for the manuscript. Parallel phrasing produces it. It is no sign of copying.</li>
+      <li><b>Real formulaic text echoes too.</b> In Cato's farm recipes a word is {{v1_cato_near}} times as likely as chance to be one letter off its neighbour, and {{v1_ms_near_over1}} of {{v1_ms_n}} abbreviated manuscripts exceed chance (up to {{v1_ms_near_max}}). Verse never does ({{v1_verse_near}}).</li>
+      <li><b>Predictable glyphs remain unique.</b> Every new text scores between {{v1_h2_min}} and {{v1_h2_max}} bits. Heavy abbreviation raises the figure.</li>
+    </ul>
+    <p>So three of the four habits that Round 1 read as signs of a copying routine are also habits of real texts written in lines, in formulas or in abbreviation. We withdraw them as evidence against meaning.</p>
+  </div>
+
+  <div class="plate">
+    <h3>Word order carries almost no information</h3>
+    <p class="sub">Every word on a held-out sheet is predicted by a mixture of simple predictors. The panels show how much each one helps. Grammar helps every meaningful text and does nothing for the manuscript, the cipher or the generator.</p>
+    {{chart_gains}}
+  </div>
+  <div class="prose">
+    <p>This is step 4 of the method below, run for the first time. Five folds of sheets are held out in turn. A unigram model is trained on the rest, and three predictors are added one at a time: the previous word (grammar), an exact copy of a word among the last forty on the page (repeat), and a one-glyph variation of such a word (vary).</p>
+    <p><b>Grammar.</b> The manuscript gains {{v_gram_voy}} bits per word across six samples. The lowest of {{v_n_meaningful}} meaningful texts is Virgil's Georgics at {{v_gram_min}}, and typical prose gains {{v_gram_prose_med}}. The Naibbe cipher ({{v_gram_cip}}) and the generator ({{v_gram_gen}}) sit with the manuscript. This excludes every reading in which a written word stands for a word: a plain language, a word-for-word code, an invented language with a syntax. A cipher survives only if it works below the word, as Naibbe does, spending a written word on one or two letters. On that reading the whole book would hold about ten thousand words of plain text, and a one-word label would hold a letter or two, which cannot be a name.</p>
+    <p><b>Repeat and vary.</b> The manuscript gains {{v_rep_voy}} and {{v_vary_voy}} bits. The cipher gains nothing on either. The generator gains {{v_rep_gen}} and {{v_vary_gen}}: {{v_rep_gen_x}} times too much repetition. Neither published simulator matches. Any future model of either kind now has three numbers to hit.</p>
+    <p>The predictors are deliberately crude, and a rule that sorts texts by these three numbers recovers the class of only about half our controls, so we do not use it to classify the manuscript. The grammar result does not depend on it.</p>
+  </div>
+
+  <h3>Three transliterations</h3>
+  {{table_translit}}
+  <div class="prose">
+    <p>The headline results hold on Takahashi's reading and on Claston's, which uses a different alphabet with about three times as many glyph types. One does not: exact repetition of the neighbouring word is {{v3_exact}} times chance in the three files, so in Claston's finer alphabet it sits at chance. We no longer count it.</p>
+  </div>
+
+  <h3>Corrections, and the same plant twice</h3>
+  <div class="prose">
+    <p>The transcribers flagged {{v4_total}} possible corrections, erasures or glyphs written above the line in {{n_tokens}} words, one per {{v4_words_per}} words, on {{v4_pages}} pages. That is a lower bound from notes made in passing, and we have no matched rate from ordinary copying to set beside it. A census from the photographs is still to do.</p>
+    <p>The 1998 interlinear file records that the plant on f39r is drawn again on f95r2, by scribes {{v5_scribes}}. If the text described the plant, the two pages should share wording. Their similarity sits at the {{v5_pct_lsa}}th percentile of {{v5_ref_n}} comparable page pairs, and at the {{v5_pct_tfidf}}th by a second measure. One pair proves little. Under a cipher with several symbols for each letter the same sentence would come out differently every time, so this test can speak only against word-level naming.</p>
+  </div>
+
+  <h3>What changed</h3>
+  <div class="scroll">
+  <table class="wide">
+    <thead><tr><th>Reading after round 1</th><th>After validation</th></tr></thead>
+    <tbody>
+      <tr><td>Predictable glyphs rule out a plainly written language</td><td class="verdict">Stands, against every new control</td></tr>
+      <tr><td>Sheets are units; dialect follows the scribe</td><td class="verdict">Stand on all three transliterations</td></tr>
+      <tr><td>Echo between neighbours separates generated from meaningful text</td><td class="verdict">Weakened: recipe prose and abbreviated manuscripts echo too</td></tr>
+      <tr><td>Line effects show a line-by-line routine</td><td class="verdict">Split: line ends ordinary, line starts still far too strong</td></tr>
+      <tr><td>Likeness to the word above suggests copying</td><td class="verdict">Withdrawn: stronger in verse and lists</td></tr>
+      <tr><td>Exact repeats exceed chance</td><td class="verdict">Withdrawn: not robust to transliteration</td></tr>
+      <tr><td>The manuscript sits with the generator</td><td class="verdict">Revised: between the cipher and the generator</td></tr>
+      <tr><td>(not tested)</td><td class="verdict">New: a written word does not stand for a word</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
 <!-- ============================================================ TABLEAUS -->
 <section id="tableaus">
   <h2>Five tableaus</h2>
   <div class="prose">
-    <p>A tableau here is a complete scene: who made the book, why, by what procedure, and what the text therefore is. All five share the same setting, because the evidence for the setting does not depend on reading the text. They differ in what the writing carries. The weights are our working judgement after the tests above. They are soft, they are not a consensus, and the method in the next section exists to replace them with scores.</p>
+    <p>A tableau here is a complete scene: who made the book, why, by what procedure, and what the text therefore is. All five share the same setting, because the evidence for the setting does not depend on reading the text. They differ in what the writing carries. The weights are our working judgement after the validation round. They are soft and they are not a consensus. The order did not change; the gaps did, and the cipher tableau is now much narrower in what it can be.</p>
   </div>
 
   <div>
   <div class="tableau">
-    <div class="weight"><b>30–40%</b>working weight</div>
+    <div class="weight"><b>35–40%</b>working weight<br>was 30–40%</div>
     <div class="body">
       <h3>A book made to look learned</h3>
-      <p>The text never encoded anything. A group produced an impressive illustrated book for a buyer, a patron or their own practice, and filled it with writing-like text by a simple routine: write a word, vary one already on the sheet, keep to the conventions of lines and paragraphs. The drawings imitate the kinds of book that carried authority.</p>
-      <p><b>Explains</b> every local habit we measured, the scribe-bound dialects, labels that are not tied to their text, and a century without a reading.</p>
-      <p><b>Has to explain</b> why five trained scribes sustained it for over two hundred pages, why vocabulary still shifts with subject within one scribe, and the passage-to-passage coherence that Layfield and Davis report as unlike the generator's.</p>
-      <p><b>Would rise if</b> a copy-and-modify model predicts held-out pages better than any cipher-plus-language model, scribal corrections turn out to be nearly absent, and no link between text and picture survives once the order of production is controlled.</p>
+      <p>The text never encoded anything. A group produced an impressive illustrated book for a patron or their own practice, and filled it with writing-like text by a simple routine: build a word from a few stock parts, vary one already on the sheet, open a paragraph with a tall glyph, start and end lines in set ways. The drawings imitate the kinds of book that carried authority.</p>
+      <p><b>Explains</b> the predictable glyphs, the absence of grammar, the echo, the heavily marked line starts, dialects that follow the scribe, labels untied to their text, and a century without a reading.</p>
+      <p><b>Has to explain</b> why five trained scribes sustained it for over two hundred pages, why vocabulary shifts with subject within one scribe, and why its best published simulator repeats itself {{v_rep_gen_x}} times more than the manuscript does.</p>
+      <p><b>Would rise if</b> a generator with weaker locality hits all three prediction numbers, a census finds scribal corrections nearly absent, and no link between text and picture survives a larger test.</p>
     </div>
   </div>
   <div class="tableau">
-    <div class="weight"><b>25–35%</b>working weight</div>
-    <div class="body">
-      <h3>A working compendium in cipher</h3>
-      <p>A small group with medical interests compiles herbal, pharmaceutical, astrological and bathing lore from ordinary sources and writes it in a devised script under a systematic, reversible encoding, for secrecy or for standing. Each scribe encodes sheet by sheet with personal habits or tables.</p>
-      <p><b>Explains</b> the genre layout, the team, and the subject effect within a scribe. It fits the period: secret writing was urged for exactly this material, and substitution ciphers with several symbols per letter were in use in north Italian chanceries by mid-century.</p>
-      <p><b>Has to explain</b> the echo between neighbouring words, the repeats, the line edges and the pull from the line above, none of which the Naibbe cipher produces; dialects that follow the scribe; and why a hand cipher of the 1420s has resisted every attack.</p>
-      <p><b>Would rise if</b> a cipher applied to real period text reproduces the whole table above, a mechanical decoding passes the gate below, or labels map to picture-appropriate words more often than shuffled labels do.</p>
-    </div>
-  </div>
-  <div class="tableau">
-    <div class="weight"><b>20–30%</b>working weight</div>
+    <div class="weight"><b>25–30%</b>working weight<br>was 20–30%</div>
     <div class="body">
       <h3>A compendium that lost its meaning in the making</h3>
-      <p>The makers worked from real sources and meant to record them, but the procedure cannot be run backwards: abbreviation past the point of ambiguity, a private memory notation, arbitrary padding, or copying by pattern in which each scribe rebuilt words from stock parts. The book is organised like its sources. The text no longer carries them. Zandbergen names this possibility: meaning "lost in the process of its creation".</p>
-      <p><b>Explains</b> at once the genre layout and the statistical likeness to generated text, the scribe-bound habits, the failure of decipherment and the untied labels.</p>
-      <p><b>Has to explain</b> what residue of the sources survives, and how to tell it from the first tableau at all.</p>
-      <p><b>Would rise if</b> rare words track pictures across distant pages (the same plant drawn twice, the same words) without any consistent decoding, or if errors typical of copying from an exemplar sit alongside generator-like statistics.</p>
+      <p>The makers worked from real sources and meant to record them, but the procedure cannot be run backwards: a private memory notation, arbitrary padding, or copying by pattern in which each scribe rebuilt words from stock parts. The book is organised like its sources. The text no longer carries them. Zandbergen names this possibility: meaning "lost in the process of its creation".</p>
+      <p><b>Explains</b> everything the first tableau explains, and the fidelity of the layout to real medical books.</p>
+      <p><b>Has to explain</b> what residue of the sources survives. The text statistics cannot tell it from the first tableau. Only links between text and picture, or evidence about the makers, can.</p>
+      <p><b>Would rise if</b> rare words track pictures across distant pages in a larger sample than our one pair, or errors typical of copying from an exemplar turn up in the photographs.</p>
     </div>
   </div>
   <div class="tableau">
-    <div class="weight"><b>5–10%</b>working weight</div>
+    <div class="weight"><b>20–25%</b>working weight<br>was 25–35%</div>
+    <div class="body">
+      <h3>A working compendium in a letter-level cipher</h3>
+      <p>A small group with medical interests writes real herbal, astrological and bathing lore under a reversible cipher that works below the word, each written word standing for a letter or two, with several alternatives for each. Secret writing was urged for exactly this material, and ciphers with more than one symbol per letter were in use in north Italian chanceries by mid-century.</p>
+      <p><b>Explains</b> the predictable glyphs and the absence of grammar, as Naibbe shows, and gives five people a reason to do the work.</p>
+      <p><b>Has to explain</b> the echo and the marked line starts, which Naibbe lacks entirely; vocabulary that shifts with scribe and with section, which a letter cipher cannot get from its content; and a design more elaborate than any cipher documented from those decades. It also makes the book short, about ten thousand words, and its labels a letter or two long.</p>
+      <p><b>Would rise if</b> a cipher run on real period text reproduces the three prediction numbers and the line starts, or a mechanical decoding passes the gate below.</p>
+    </div>
+  </div>
+  <div class="tableau">
+    <div class="weight"><b>about 5%</b>working weight<br>was 5–10%</div>
     <div class="body">
       <h3>An invented or revealed language</h3>
-      <p>A constructed vocabulary in which words are assembled from classifying prefixes and suffixes, as Friedman and Tiltman suspected, or visionary writing in the manner of Hildegard of Bingen's twelfth-century <i>Lingua Ignota</i>.</p>
-      <p><b>Explains</b> the rigid word structure and predictable glyphs. <b>Has to explain</b> five scribes sharing it in two dialects, and why word families are not tied to subjects or labels. Systematic languages of this kind are otherwise unknown before the seventeenth century.</p>
+      <p>A constructed vocabulary assembled from classifying prefixes and suffixes, as Friedman and Tiltman suspected, or visionary writing in the manner of Hildegard of Bingen's twelfth-century <i>Lingua Ignota</i>.</p>
+      <p><b>Explains</b> the rigid word structure. <b>Has to explain</b> a language whose word order carries no information, shared by five scribes in two dialects. If the words have no syntax, this tableau merges with the first.</p>
     </div>
   </div>
   <div class="tableau">
-    <div class="weight"><b>under 5%</b>working weight</div>
+    <div class="weight"><b>under 2%</b>working weight<br>was under 5%</div>
     <div class="body">
       <h3>An unknown language, plainly written</h3>
       <p>A spoken language set down in an invented alphabet with no concealment.</p>
-      <p><b>Explains</b> the word-frequency curve and the section vocabulary. <b>Has to explain</b> glyphs far more predictable than in any script we tested, neighbouring words that attract where in every language they repel, lines that act as units, and two dialects for one subject split by scribe.</p>
+      <p><b>Has to explain</b> glyphs far more predictable than in any of more than forty real texts, including verse, lists and abbreviated manuscripts, and a word order that carries a twentieth of the information of the least grammatical of them.</p>
     </div>
   </div>
   </div>
@@ -568,18 +664,20 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
   <ul class="ledger-key"><li><b>●</b>fits as it stands</li><li><b>◐</b>fits with an added assumption</li><li><b>○</b>strains</li></ul>
   <div class="scroll">
   <table class="wide ledger">
-    <thead><tr><th style="text-align:left">Observation</th><th>Made to look learned</th><th>Cipher</th><th>Meaning lost</th><th>Invented language</th><th>Plain language</th></tr></thead>
+    <thead><tr><th style="text-align:left">Observation</th><th>Made to look learned</th><th>Meaning lost</th><th>Letter-level cipher</th><th>Invented language</th><th>Plain language</th></tr></thead>
     <tbody>
       <tr><th scope="row">Early fifteenth-century materials; five scribes; written sheet by sheet</th><td>●</td><td>●</td><td>●</td><td>●</td><td>●</td></tr>
       <tr><th scope="row">Laid out like a herbal, pharmacy, zodiac and bathing treatise</th><td>◐</td><td>●</td><td>●</td><td>◐</td><td>●</td></tr>
-      <tr><th scope="row">Glyphs far more predictable than in any language</th><td>●</td><td>◐</td><td>●</td><td>●</td><td>○</td></tr>
-      <tr><th scope="row">Neighbouring words echo and repeat</th><td>●</td><td>○</td><td>●</td><td>◐</td><td>○</td></tr>
-      <tr><th scope="row">Lines act as units; paragraphs open with a tall glyph</th><td>●</td><td>◐</td><td>●</td><td>◐</td><td>○</td></tr>
-      <tr><th scope="row">Dialect follows the scribe more than the subject</th><td>●</td><td>◐</td><td>●</td><td>◐</td><td>○</td></tr>
-      <tr><th scope="row">Vocabulary still shifts with subject within one scribe</th><td>◐</td><td>●</td><td>●</td><td>●</td><td>●</td></tr>
-      <tr><th scope="row">Neighbouring passages cohere as in real books (Layfield and Davis)</th><td>◐</td><td>●</td><td>●</td><td>●</td><td>●</td></tr>
-      <tr><th scope="row">Labels are not tied to their page's text</th><td>●</td><td>◐</td><td>●</td><td>◐</td><td>○</td></tr>
-      <tr><th scope="row">No reading reproduced by a second person in a century</th><td>●</td><td>◐</td><td>●</td><td>●</td><td>○</td></tr>
+      <tr><th scope="row">Glyphs far more predictable than in any real text</th><td>●</td><td>●</td><td>◐</td><td>●</td><td>○</td></tr>
+      <tr><th scope="row">Word order carries no information (new)</th><td>●</td><td>●</td><td>◐</td><td>○</td><td>○</td></tr>
+      <tr><th scope="row">Neighbouring words echo, as in recipe prose</th><td>●</td><td>●</td><td>○</td><td>◐</td><td>◐</td></tr>
+      <tr><th scope="row">Line starts marked far more strongly than in verse or lists</th><td>●</td><td>●</td><td>◐</td><td>◐</td><td>○</td></tr>
+      <tr><th scope="row">Some local repetition, far less than the published generator's</th><td>◐</td><td>◐</td><td>◐</td><td>◐</td><td>◐</td></tr>
+      <tr><th scope="row">Dialect follows the scribe more than the subject</th><td>●</td><td>●</td><td>◐</td><td>◐</td><td>○</td></tr>
+      <tr><th scope="row">Vocabulary still shifts with subject within one scribe</th><td>◐</td><td>●</td><td>○</td><td>●</td><td>●</td></tr>
+      <tr><th scope="row">Neighbouring passages cohere as in real books (Layfield and Davis)</th><td>◐</td><td>●</td><td>◐</td><td>●</td><td>●</td></tr>
+      <tr><th scope="row">Labels untied to their page; the same plant twice shares no wording</th><td>●</td><td>●</td><td>◐</td><td>◐</td><td>○</td></tr>
+      <tr><th scope="row">No reading reproduced by a second person in a century</th><td>●</td><td>●</td><td>◐</td><td>●</td><td>○</td></tr>
     </tbody>
   </table>
   </div>
@@ -587,6 +685,47 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
   <h3>What all five agree on</h3>
   <div class="prose">
     <p>This is the part of the answer that does not wait on the text. The book was made in the first decades of the fifteenth century, most likely within a generation of the parchment. It was made by a small team, not a lone author, working one folded sheet at a time, drawing first and writing after. Its makers knew the illustrated medical and astrological books of their region and built this one on their plan. On Davis's evidence it was bound out of order within the century. It was in Prague by the early seventeenth century, and it has been unread for as long as there are records of anyone trying. Davis's own suggestion is "a book of women's folk knowledge that's being preserved", with the caution that "you cannot prove that yet".</p>
+  </div>
+</section>
+
+<!-- ============================================================ CONTRIBUTION -->
+<section id="contribution">
+  <h2>What this exercise adds, and what it takes away</h2>
+  <div class="prose">
+    <p>A fair account has to say both. Most of what is here confirms what specialists already knew or suspected. Some of it is new. Some of it removes things, including things we said ourselves a day earlier.</p>
+  </div>
+  <div class="twocol">
+    <div>
+      <h3>What it adds</h3>
+      <ol>
+        <li><b>An independent replication</b> of the 2026 page-order result, built from the paper's text alone, on three transliterations, reaching the same top-ranked sheet sequences.</li>
+        <li><b>A control and a null test for that result.</b> The claim that each sheet is a unit survives the scribe control. The proposed re-ordering does not survive the null. Both tell the authors which half to build on, and both agree with their own plan to test the order on physical evidence.</li>
+        <li><b>A new observation about production.</b> Within a sheet, likeness falls in page order: inner pair, then the two sides of a leaf, then the diagonals, then the outer pair. A folded sheet filled from first page to last predicts exactly that.</li>
+        <li><b>One table on one scale.</b> A cipher, a generator and more than forty real texts take the same tests. The field has many statistics and few calibrations.</li>
+        <li><b>Controls nobody had set beside the manuscript.</b> Real manuscripts transcribed line by line, verse and lists overturned three of our own first-round readings within a day.</li>
+        <li><b>A sharp negative.</b> A written word does not stand for a word. That closes at once the large family of word-for-word readings, to which most announced translations belong.</li>
+        <li><b>A numerical target.</b> Any model of how the text was made must now hit about {{v_gram_voy_med}}, 0.04 and 0.01 bits per word on grammar, repeat and vary, along with the line starts and the sheet gradient.</li>
+        <li><b>Everything reproducible</b> from pinned public sources, with the numbers in this page computed by the code beside it.</li>
+      </ol>
+    </div>
+    <div>
+      <h3>What it takes away</h3>
+      <ol>
+        <li><b>From the popular account:</b> that structure implies meaning; that the book is known to be bound in a recoverable wrong order; the fourteen calves; the villa at Frascati.</li>
+        <li><b>From the case for meaningless text:</b> the claim that the copy-and-modify generator matches the manuscript. It matches in kind and overshoots in amount.</li>
+        <li><b>From the case for a cipher:</b> any design that works word by word. And the comfort that Naibbe matches the text. It matches its look and none of its local habits.</li>
+        <li><b>From our own first report:</b> three readings withdrawn or weakened, listed in the table above.</li>
+      </ol>
+      <h3>What it does not do</h3>
+      <ul>
+        <li>It reads nothing. It names no language, place or maker. Nothing here should be cited as a solution.</li>
+        <li>It has not been reviewed by specialists. It was produced in a single working session by an AI system under one person's direction, with a handful of controls in each class, one cipher and one family of generator. The weights are judgement.</li>
+        <li>It joins a crowded field of machine-assisted analyses. The difference we would claim is method: controls, replication, null tests, and withdrawn claims left on the record.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="prose">
+    <p><b>Where that leaves the larger effort.</b> The question "what is this book?" has come apart into two. How it was made is now a question with accumulating answers: materials, hands, sheets, order of work. What it says may have no answer, and for the first time the two leading explanations have been put on one scale with the manuscript between them. The useful next result is no longer a reading. It is a model of the making, of either kind, that lands on the manuscript's numbers, or a physical finding that the text analysis could not have predicted.</p>
   </div>
 </section>
 
@@ -643,14 +782,22 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
 <section id="next">
   <h2>What to do next</h2>
   <div class="prose">
-    <p>In order of value for effort. The first group needs only the material already gathered.</p>
+    <p>Five desk checks were listed here after the first round. All were run; two remain incomplete because they need the photographs.</p>
+    <h3>Done in validation round 1</h3>
+    <ul>
+      <li>Added verse, list, recipe and line-by-line manuscript controls.</li>
+      <li>Scored simple predictors on held-out sheets.</li>
+      <li>Repeated the headline results on two more transliterations.</li>
+      <li>Counted transcriber-flagged corrections (a lower bound only).</li>
+      <li>Tested the one recorded pair of duplicate plant drawings.</li>
+    </ul>
     <h3>At the desk</h3>
     <ol>
-      <li><b>Add the missing controls.</b> Recipe collections, calendars, tables with Roman numerals, and line-by-line transcriptions of real fifteenth-century books. If lists and numerals echo their neighbours the way the manuscript does, the cipher tableau gains.</li>
-      <li><b>Fit and score the simulators.</b> A copy model, a cipher over a language model and their mixtures, compared on held-out sheets.</li>
-      <li><b>Count the corrections.</b> Go through the page images for erasures, overwriting and insertions. Copying a real text from an exemplar leaves characteristic slips; inventing text leaves few.</li>
-      <li><b>Test the repeated plants.</b> Match pharmacy drawings to herbal drawings by eye, blind to the text, then ask whether matched pages share rare words more than unmatched pages by the same scribe.</li>
-      <li><b>Repeat every result on a second transliteration.</b></li>
+      <li><b>Build the two missing simulators and score them.</b> A generator with adjustable locality, and a letter-level cipher with line-start rules and a scribe who drifts, each run through the full panel. Whichever lands on the manuscript's numbers with fewer free settings gains.</li>
+      <li><b>Census the corrections from the photographs</b>, page by page, with a matched count from the line-by-line manuscripts.</li>
+      <li><b>Match the pharmacy plants to the herbal plants</b> by eye, blind to the text, and repeat the shared-wording test on every pair.</li>
+      <li><b>Model the line start.</b> It is the one habit that is far stronger than in any real text. Find out which glyphs are added, by which scribe, and whether removing them restores ordinary words.</li>
+      <li><b>Seal a set of sheets</b> before any further modelling, so the next round has a true held-out test.</li>
     </ol>
     <h3>With the library</h3>
     <ol>
@@ -660,7 +807,7 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
     </ol>
     <h3>With the community</h3>
     <ol>
-      <li>Publish the fingerprint panel and the challenge set, and invite both sides to register predictions before the held-out sheets are opened.</li>
+      <li>Publish the panel and a blind challenge set, and invite both sides to register predictions before the sealed sheets are opened.</li>
     </ol>
   </div>
 </section>
@@ -680,7 +827,8 @@ svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-fa
     <li>Keagan Brewer and Michelle Lewis, <a href="https://doi.org/10.1093/shm/hkad099" target="_blank" rel="noopener">"The Voynich Manuscript, Dr Johannes Hartlieb and the Encipherment of Women's Secrets"</a>, <i>Social History of Medicine</i> 37(3), 2024.</li>
     <li>McCrone Associates, materials analysis of the Voynich manuscript (2009), and the Beinecke Library's <a href="https://beinecke.library.yale.edu/collections/highlights/voynich-manuscript" target="_blank" rel="noopener">page on MS 408</a>. Yale's catalogue still gives the Mondragone find-spot and an alternative date for Marci's letter; we follow Zandbergen on both.</li>
     <li>Data: transliterations via <a href="https://github.com/noah-chelednik/voynich-data" target="_blank" rel="noopener">voynich-data</a>; page images, word positions and collation via <a href="https://github.com/writtenbyalina/voynichviewer" target="_blank" rel="noopener">Voynich Viewer</a>; controls from <a href="https://github.com/lrozanova/voynich-units" target="_blank" rel="noopener">voynich-units</a>, <a href="https://github.com/TorstenTimm/SelfCitationTextgenerator" target="_blank" rel="noopener">SelfCitationTextgenerator</a>, <a href="https://github.com/danielgaskell/voynich" target="_blank" rel="noopener">Gaskell and Bowern's archive</a>, <a href="https://github.com/chirila/Voynich-public" target="_blank" rel="noopener">Lindemann and Bowern's corpora</a> and <a href="https://github.com/mzattera/v4j" target="_blank" rel="noopener">v4j</a>.</li>
-    <li>Analysis code, result tables and this page's source: <code>research/voynich/</code> in the project repository. Every number above is computed by the scripts there.</li>
+    <li>Validation controls: Latin verse, lists and recipe texts from the <a href="https://github.com/tesserae/tesserae" target="_blank" rel="noopener">Tesserae</a> corpus; 21 manuscripts transcribed line by line from <a href="https://github.com/HTR-United/CREMMA-Medieval-LAT" target="_blank" rel="noopener">CREMMA Medieval LAT</a> (CC BY 4.0).</li>
+    <li>Analysis code, result tables and this page's source are in the project repository. Every number above is computed by the scripts there.</li>
   </ol>
 </section>
 

@@ -1,0 +1,22 @@
+{
+ "source": "in-line notes in the ZL 3b transliteration; a lower bound, not a census",
+ "flags": {
+  "possible correction": 20,
+  "glyph written above the line": 4,
+  "glyph written below the line": 1,
+  "possible erasure": 1
+ },
+ "total": 26,
+ "pages_with_a_flag": 25,
+ "pages": 227,
+ "words": 39026,
+ "words_per_flag": 1501,
+ "per_10000_words_by_scribe": {
+  "1": 9.9,
+  "2": 6.2,
+  "3": 4.1,
+  "4": 8.3,
+  "5": 0.0
+ },
+ "uncertain_readings_marked_by_transcribers": 809
+}

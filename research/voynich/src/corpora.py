@@ -61,14 +61,23 @@ class Corpus:
 _cache: dict = {}
 
 
-def voynich_frames(path: Path = ZL, comma_is_space: bool = True):
+ACTIVE = ZL          # the transliteration analyses read by default; a10 switches it to test robustness
+
+
+def use_transliteration(path: Path) -> None:
+    global ACTIVE
+    ACTIVE = Path(path)
+
+
+def voynich_frames(path: Path | None = None, comma_is_space: bool = True):
+    path = Path(path) if path else ACTIVE
     key = (str(path), comma_is_space)
     if key not in _cache:
         _cache[key] = ivtff.to_frames(*ivtff.parse(path, comma_is_space=comma_is_space))
     return _cache[key]
 
 
-def voynich(subset: str = "all", path: Path = ZL, comma_is_space: bool = True,
+def voynich(subset: str = "all", path: Path | None = None, comma_is_space: bool = True,
             clean_only: bool = True) -> Corpus:
     """Paragraph text of the manuscript as lines of tokens, in current binding order.
 
@@ -93,7 +102,7 @@ def voynich(subset: str = "all", path: Path = ZL, comma_is_space: bool = True,
     return Corpus(f"Voynich {subset}", "voynich", lines, native_lines=True)
 
 
-def voynich_line_lengths(path: Path = ZL) -> list[int]:
+def voynich_line_lengths(path: Path | None = None) -> list[int]:
     return [len(line) for line in voynich("all", path).lines]
 
 

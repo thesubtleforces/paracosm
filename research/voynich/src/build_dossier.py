@@ -47,6 +47,11 @@ def load() -> dict:
         "svs": pd.read_csv(T / "scribe_vs_section.csv"),
         "labels": json.loads((T / "label_summary.json").read_text()),
         "corpus": json.loads((T / "corpus_summary.json").read_text()),
+        "v1": pd.read_csv(T / "v1_more_controls.csv"),
+        "v2": pd.read_csv(T / "v2_predictive_scores.csv"),
+        "v3": pd.read_csv(T / "v3_transliterations.csv", index_col=0),
+        "v4": json.loads((T / "v4_corrections.json").read_text()),
+        "v5": json.loads((T / "v5_duplicates.json").read_text()),
     }
     return d
 
@@ -263,6 +268,65 @@ def facts(d: dict) -> tuple[dict, pd.DataFrame]:
     f["open_known"] = f"{100 * po['without_first_glyph_is_a_known_word']:.0f}%"
     f["mid_known"] = f"{100 * mid['without_first_glyph_is_a_known_word']:.0f}%"
     f["linefirst_known"] = f"{100 * L['other_line_first_words']['without_first_glyph_is_a_known_word']:.0f}%"
+
+    # ---------------- validation round
+    v1, v2, v3, v4, v5 = d["v1"], d["v2"], d["v3"], d["v4"], d["v5"]
+    vv = v2[v2["class"] == "voynich"]
+    mean_txt = v2[v2["class"].isin(["prose", "verse", "list", "manuscript lines"])]
+    f["v_n_meaningful"] = str(len(mean_txt))
+    f["v_gram_voy"] = rng_txt(vv.gain_grammar, "{:.3f}")
+    f["v_gram_voy_med"] = f"{vv.gain_grammar.median():.3f}"
+    f["v_gram_min"] = f"{mean_txt.gain_grammar.min():.2f}"
+    f["v_gram_min_text"] = mean_txt.loc[mean_txt.gain_grammar.idxmin(), "text"]
+    f["v_gram_prose_med"] = f"{v2[v2['class'] == 'prose'].gain_grammar.median():.2f}"
+    f["v_gram_cip"] = rng_txt(v2[v2["class"] == "Naibbe cipher"].gain_grammar, "{:.3f}")
+    f["v_gram_gen"] = rng_txt(v2[v2["class"] == "copy-and-modify generator"].gain_grammar, "{:.3f}")
+    f["v_rep_voy"] = rng_txt(vv.gain_repeat, "{:.2f}")
+    f["v_rep_gen"] = rng_txt(v2[v2["class"] == "copy-and-modify generator"].gain_repeat, "{:.2f}")
+    f["v_rep_verse"] = rng_txt(v2[v2["class"] == "verse"].gain_repeat, "{:.2f}")
+    f["v_vary_voy"] = rng_txt(vv.gain_vary, "{:.3f}")
+    f["v_vary_gen"] = rng_txt(v2[v2["class"] == "copy-and-modify generator"].gain_vary, "{:.3f}")
+    gen_rep = v2[v2["class"] == "copy-and-modify generator"].gain_repeat
+    f["v_rep_gen_x"] = f"{gen_rep.min() / vv.gain_repeat.max():.0f} to {gen_rep.max() / vv.gain_repeat.min():.0f}"
+    f["v_bits_voy"] = f"{vv[vv.text == 'Voynich, whole text'].bits_unigram.iloc[0]:.1f}"
+
+    ctrl1 = v1[v1["class"] != "voynich"]
+    f["v1_n_texts"] = str(len(ctrl1[~ctrl1.text.str.contains("pooled")]) + 1)
+    f["v1_h2_min"] = f"{ctrl1.h2.min():.2f}"
+    f["v1_h2_max"] = f"{ctrl1.h2.max():.2f}"
+    cato = v1[v1.text.str.startswith("Cato")].iloc[0]
+    f["v1_cato_near"] = f"{cato.near_lag1:.2f}"
+    f["v1_cato_near26"] = f"{cato.near_lag2_6:.2f}"
+    mss = v1[(v1["class"] == "manuscript lines") & ~v1.text.str.contains("pooled")]
+    f["v1_ms_n"] = str(len(mss))
+    f["v1_ms_near_max"] = f"{mss.near_lag1.max():.2f}"
+    f["v1_ms_near_over1"] = str(int((mss.near_lag1 > 1).sum()))
+    f["v1_verse_near"] = rng_txt(v1[v1["class"] == "verse"].near_lag1)
+    r1 = (v1.voynich_jsd_first_z / v1.jsd_first_z).dropna()
+    f["v1_start_ratio"] = f"{r1.min():.0f} to {r1.max():.0f}"
+    vl = v1[v1["class"].isin(["verse", "list"])]
+    r2 = (vl.voynich_jsd_last_z / vl.jsd_last_z).dropna()
+    f["v1_end_ratio"] = f"{r2.min():.1f} to {r2.max():.1f}"
+    f["v1_above_verse"] = rng_txt(v1[v1["class"] == "verse"].above_ratio)
+    f["v1_above_list"] = rng_txt(v1[v1["class"] == "list"].above_ratio)
+    f["v1_exact_max_ctrl"] = f"{ctrl1[~ctrl1.text.str.contains('Latin 6395')].exact_lag1.max():.2f}"
+
+    def tr(row, col, fmt="{:.2f}"):
+        return fmt.format(float(v3.loc[row].iloc[col]))
+
+    f["v3_h2"] = ", ".join(tr("h2", i) for i in range(3))
+    f["v3_near"] = ", ".join(tr("near_lag1", i) for i in range(3))
+    f["v3_exact"] = ", ".join(tr("exact_lag1", i) for i in range(3))
+    f["v3_exact_gc"] = tr("exact_lag1", 2)
+    f["v3_inner"] = ", ".join(tr("inner_pair_excess", i, "{:+.3f}") for i in range(3))
+    f["v4_total"] = str(v4["total"])
+    f["v4_words_per"] = f"{v4['words_per_flag']:,}"
+    f["v4_pages"] = str(v4["pages_with_a_flag"])
+    dup = v5["same_plant_f39r_f95r2"]
+    f["v5_pct_lsa"] = f"{dup['lsa']['percentile']:.0f}"
+    f["v5_pct_tfidf"] = f"{dup['tfidf']['percentile']:.0f}"
+    f["v5_ref_n"] = str(dup["lsa"]["reference_pairs"])
+    f["v5_scribes"] = " and ".join(dup["scribes"])
 
     # calibration matrix: which measurements separate the known-answer controls?
     def row(label, voy_v, nat_v, cip_v, gen_v, note):
@@ -522,6 +586,90 @@ def chart_scribe_subject(d: dict) -> str:
     return "".join(out) + table_view(pd.DataFrame(rows_tv), "Mean LSA similarity between pages; 'kept' = similarity across the two groups as a share of similarity within them. Same-sheet pairs excluded.")
 
 
+def chart_gains(d: dict) -> str:
+    v2 = d["v2"]
+    classes = [("voynich", "Voynich manuscript"), ("prose", "Prose"), ("verse", "Verse"),
+               ("list", "Lists and recipes"), ("manuscript lines", "Manuscripts, line by line"),
+               ("Naibbe cipher", "Naibbe cipher"), ("copy-and-modify generator", "Copy-and-modify generator")]
+    panels = [("gain_grammar", "Grammar", "knowing the previous word", 1.6, (0, 0.5, 1.0, 1.5)),
+              ("gain_repeat", "Repeat", "the word occurred in the last 40", 0.8, (0, 0.25, 0.5, 0.75)),
+              ("gain_vary", "Vary", "one glyph off a word in the last 40", 0.10, (0, 0.03, 0.06, 0.09))]
+    # positions leave 8px at each end of the track so dots at zero are not cut in half
+    at = lambda frac: f"calc(8px + (100% - 16px) * {frac:.4f})"
+    out = ['<div class="gains">']
+    for col, title, sub, top, ticks in panels:
+        frac = lambda v, top=top: min(max(v, 0), top) / top
+        grid = "".join(f'<span class="st-grid" style="left:{at(frac(t))}"></span>' for t in ticks)
+        out.append(f'<div class="gain-panel"><h4>{esc(title)}<small>{esc(sub)}</small></h4>')
+        for key, name in classes:
+            g = v2[v2["class"] == key].sort_values(col)
+            if g.empty:
+                continue
+            placed, dots = [], []
+            for r in g.itertuples():
+                val = getattr(r, col)
+                x = frac(val) * 200
+                for dy in (0, -9, 9):
+                    if all((x - px) ** 2 + (dy - py) ** 2 >= 10.5 ** 2 for px, py in placed):
+                        break
+                placed.append((x, dy))
+                cls = "s1" if key == "voynich" else "ctx"
+                dots.append(f'<span class="st-dot {cls} hit" tabindex="0" style="left:{at(frac(val))};margin-top:{dy}px" '
+                            f'data-v="{val:+.3f} bits" data-tip="{esc(r.text)}: {esc(title.lower())}"></span>')
+            lo, hi = max(g[col].min(), 0), g[col].max()
+            fmt = "{:.3f}" if top <= 0.1 or hi < 0.02 else "{:.2f}"
+            label = fmt.format(lo) if abs(hi - lo) < 0.0005 else f"{fmt.format(lo)}–{fmt.format(hi)}"
+            out.append(f'<div class="gain-row"><span class="gain-label">{esc(name)}</span>'
+                       f'<div class="st-track">{grid}{"".join(dots)}</div><span class="st-val">{label}</span></div>')
+        out.append('<div class="gain-row gain-axis" aria-hidden="true"><span class="gain-label"></span><div class="st-scale">'
+                   + "".join(f'<i style="left:{at(frac(t))}">{t:g}</i>' for t in ticks) + '</div><span class="st-val"></span></div>')
+        out.append("</div>")
+    out.append("</div>")
+    rows_tv = [{"Text": r.text, "Kind": r._2, "Words scored": f"{r.n_tokens:,}", "Grammar": f"{r.gain_grammar:+.3f}",
+                "Repeat": f"{r.gain_repeat:+.3f}", "Vary": f"{r.gain_vary:+.3f}"} for r in v2.itertuples()]
+    note = ('<p class="chart-note">Bits saved per word, on sheets held out of training, when each predictor is added. '
+            'One dot per text. Each panel has its own scale, in bits.</p>')
+    return "".join(out) + note + table_view(pd.DataFrame(rows_tv), "Gain in bits per word from adding each predictor; five-fold cross-validation")
+
+
+def table_newcontrols(d: dict) -> str:
+    v1 = d["v1"]
+
+    def rr(g, col, fmt="{:.2f}"):
+        vals = g[col].dropna()
+        return rng_txt(vals, fmt) if len(vals) else "n/a"
+
+    mss = v1[(v1["class"] == "manuscript lines") & ~v1.text.str.contains("pooled")]
+    pooled = v1[v1.text.str.contains("rejoined")]
+    groups = [("Voynich manuscript", v1[v1["class"] == "voynich"], True), ("Latin verse (6 texts)", v1[v1["class"] == "verse"], False),
+              ("Lists and recipes (4)", v1[v1["class"] == "list"], False),
+              (f"Single manuscripts, line by line ({len(mss)})", mss, False), ("All 21 manuscripts pooled", pooled, False)]
+    head = "".join(f"<th>{esc(c)}</th>" for c in ["Kind of text", "Bits per glyph", "Next word one glyph off (× chance)", "Next word identical (× chance)",
+                                                    "Line-start difference (bits)", "Line-end difference (bits)", "Matches the word above (× chance)"])
+    body = ""
+    for name, g, hl in groups:
+        cls = ' class="num hl"' if hl else ' class="num"'
+        cells = [rr(g, "h2"), rr(g, "near_lag1"), rr(g, "exact_lag1"), rr(g, "jsd_first", "{:.3f}"), rr(g, "jsd_last", "{:.3f}"), rr(g, "above_ratio")]
+        body += f'<tr><th scope="row">{esc(name)}</th>' + "".join(f"<td{cls}>{esc(c)}</td>" for c in cells) + "</tr>"
+    return f'<div class="scroll"><table class="data wide"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
+
+
+def table_translit(d: dict) -> str:
+    v3 = d["v3"]
+    rows = [("h2", "Bits per glyph, given the one before", "{:.2f}"), ("near_lag1", "Next word one glyph off (× chance)", "{:.2f}"),
+            ("exact_lag1", "Next word identical (× chance)", "{:.2f}"), ("line_start_jsd", "Line-start difference (bits)", "{:.3f}"),
+            ("line_end_jsd", "Line-end difference (bits)", "{:.3f}"), ("above_ratio", "Matches the word above (× chance)", "{:.2f}"),
+            ("inner_pair_excess", "Inner pair of a sheet, extra similarity", "{:+.3f}"),
+            ("facing_other_sheet_excess", "Facing pages on different sheets, extra similarity", "{:+.3f}"),
+            ("kept_scribe1_to_2_herbal", "Similarity kept: scribe 1 to scribe 2, herbal", "{:.0%}"),
+            ("kept_scribe2_herbal_to_bathing", "Similarity kept: scribe 2, herbal to bathing", "{:.0%}")]
+    head = "<th>Measurement</th>" + "".join(f"<th>{esc(c)}</th>" for c in v3.columns)
+    body = ""
+    for key, name, fmt in rows:
+        body += f'<tr><th scope="row">{esc(name)}</th>' + "".join(f'<td class="num">{fmt.format(float(v))}</td>' for v in v3.loc[key]) + "</tr>"
+    return f'<div class="scroll"><table class="data wide"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
+
+
 def calibration_table(cal: pd.DataFrame) -> str:
     head = "".join(f"<th>{esc(c)}</th>" for c in ["Measurement", "Voynich", "Natural languages", "Naibbe cipher", "Copy-and-modify generator", "What it separates"])
     body = ""
@@ -544,6 +692,7 @@ def main() -> None:
     charts = {
         "chart_h2": chart_h2(d), "chart_lag": chart_lag(d), "chart_edges": chart_edges(d),
         "chart_pairs": chart_pairs(d), "chart_scribe_subject": chart_scribe_subject(d), "diagram_sheet": diagram_sheet(d),
+        "chart_gains": chart_gains(d), "table_newcontrols": table_newcontrols(d), "table_translit": table_translit(d),
         "calibration_table": calibration_table(cal),
     }
     tpl = (REPORT / "dossier.template.html").read_text(encoding="utf-8")
