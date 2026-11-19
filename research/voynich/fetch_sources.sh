@@ -13,7 +13,11 @@ mkdir -p "$ROOT"
 fetch() {   # owner repo commit [sparse paths...]
   local owner=$1 repo=$2 sha=$3; shift 3
   local dest="$ROOT/$owner/$repo"
-  if [ "$(git -C "$dest" rev-parse HEAD 2>/dev/null || true)" = "$sha" ]; then echo "ok   $owner/$repo"; return; fi
+  if [ "$(git -C "$dest" rev-parse HEAD 2>/dev/null || true)" = "$sha" ]; then
+    # already at the pinned commit: re-apply the path list, so that a later --images run adds the photographs
+    if [ $# -gt 0 ]; then GIT_LFS_SKIP_SMUDGE=1 git -C "$dest" sparse-checkout set --no-cone "$@"; fi
+    echo "ok   $owner/$repo"; return
+  fi
   rm -rf "$dest"; mkdir -p "$dest"
   git -C "$dest" init -q
   git -C "$dest" remote add origin "https://github.com/$owner/$repo"

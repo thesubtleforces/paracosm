@@ -29,9 +29,10 @@
   "ar",
   "am"
  ],
+ "n_tokens": 34863,
  "coverage": 0.43756991653041905,
  "attested": 253,
- "possible": 312,
+ "possible": 311,
  "rows": {
   "": {
    "y": 258,
@@ -207,6 +208,133 @@
    "al": 10,
    "ar": 33,
    "am": 5
+  },
+  "yt": {
+   "y": 20,
+   "edy": 23,
+   "eedy": 27,
+   "ey": 11,
+   "eey": 26,
+   "aiin": 39,
+   "ain": 13,
+   "ol": 15,
+   "or": 14,
+   "al": 13,
+   "ar": 22,
+   "am": 12
+  },
+  "l": {
+   "y": 12,
+   "dy": 24,
+   "aiin": 13,
+   "ain": 4,
+   "ol": 37,
+   "or": 38,
+   "al": 6,
+   "ar": 8,
+   "am": 5
+  },
+  "qo": {
+   "y": 8,
+   "dy": 16,
+   "edy": 5,
+   "eedy": 19,
+   "eey": 14,
+   "aiin": 22,
+   "ain": 6,
+   "ol": 4,
+   "or": 10,
+   "al": 5,
+   "ar": 8
+  },
+  "o": {
+   "y": 6,
+   "dy": 40,
+   "edy": 2,
+   "eedy": 6,
+   "eey": 6,
+   "aiin": 24,
+   "ain": 11,
+   "or": 2,
+   "al": 2,
+   "ar": 10,
+   "am": 1
+  },
+  "chk": {
+   "y": 15,
+   "edy": 5,
+   "eedy": 2,
+   "ey": 7,
+   "eey": 13,
+   "aiin": 18,
+   "ain": 12,
+   "ol": 3,
+   "or": 3,
+   "al": 11,
+   "ar": 10,
+   "am": 2
+  },
+  "cht": {
+   "y": 12,
+   "edy": 2,
+   "ey": 1,
+   "eey": 2,
+   "aiin": 3,
+   "ain": 4,
+   "ol": 5,
+   "or": 2,
+   "al": 6,
+   "ar": 3
+  },
+  "shk": {
+   "y": 13,
+   "eedy": 1,
+   "eey": 3,
+   "aiin": 5,
+   "ain": 2,
+   "ol": 2,
+   "al": 1,
+   "ar": 2
+  },
+  "lt": {
+   "y": 2,
+   "edy": 5,
+   "eedy": 6,
+   "eey": 2,
+   "aiin": 1,
+   "ain": 2,
+   "al": 3,
+   "ar": 1,
+   "am": 1
+  },
+  "y": {
+   "y": 1,
+   "dy": 6,
+   "ey": 1,
+   "aiin": 5,
+   "ol": 2,
+   "or": 3,
+   "ar": 1
+  },
+  "sht": {
+   "y": 4,
+   "aiin": 1,
+   "ol": 2,
+   "or": 1,
+   "al": 2,
+   "ar": 1
+  },
+  "dk": {
+   "y": 1,
+   "edy": 2,
+   "eey": 1,
+   "aiin": 1,
+   "ain": 1,
+   "ol": 1,
+   "ar": 1
+  },
+  "dt": {
+   "al": 1
   }
  },
  "order": [
@@ -223,8 +351,5 @@
   "lk",
   "yk"
  ],
- "n_tokens": 34863,
- "coverage_wider": 0.5245675931503313,
- "attested_wider": 566,
- "possible_wider": 1144
+ "note": "attested and possible count distinct words; dy can be built two ways (d+y, or the ending dy alone) and is shown in both cells"
 }

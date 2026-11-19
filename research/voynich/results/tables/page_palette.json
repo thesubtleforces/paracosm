@@ -1,11 +1,11 @@
 {
- "parchment": "#c9b6a5",
- "parchment_shadow": "#9f8f7b",
- "ink": "#534030",
- "ink_faded": "#75604d",
- "blue": "#415a6c",
- "green": "#517d67",
- "green_yellow": "#58623e",
- "red": "#a25443",
- "ochre": "#997751"
+ "parchment": "#c8b4a1",
+ "parchment_shadow": "#a79078",
+ "ink": "#57412f",
+ "ink_faded": "#7a624c",
+ "blue": "#425868",
+ "green": "#557e67",
+ "green_yellow": "#64714d",
+ "red": "#a35847",
+ "ochre": "#93714f"
 }

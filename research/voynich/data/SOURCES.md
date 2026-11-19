@@ -47,8 +47,16 @@ written.
 
 ### `report/img/`
 
-Five reduced crops of Yale's photographs (ff. 33v, 71r, 78v, 88r, 116v) used in the report.
-Credit: Beinecke Rare Book & Manuscript Library, Yale University.
+Reduced crops of Yale's photographs, embedded in the two pages. Credit: Beinecke Rare Book &
+Manuscript Library, Yale University.
+
+- Five page thumbnails for the dossier (ff. 33v, 71r, 78v, 88r, 116v), from `src/make_thumbs.py`.
+- One strip of writing per scribe (`hand1`–`hand5`: ff. 88r, 78v, 103r, 71r, 48v), the inner side
+  of sheet 78|81 as one image, and ten storyboard frames at 1.37:1 (`fr_*`), from
+  `src/make_story_images.py`.
+- Two measure plates (`m_parts` on f75r, `m_echo` on f108v): the photographs with computed marks
+  drawn on them, from `src/make_measure_plates.py`. The marks use the word positions of The
+  Voynichese Project (Apache-2.0).
 
 ### `notes/`
 
@@ -56,6 +64,8 @@ Credit: Beinecke Rare Book & Manuscript Library, Yale University.
   decipherment history and internal evidence, each with its source and a verified/unverified tag.
 - `layfield_davis_2026_singulion.md`: the text of Layfield and Davis, "Singulion Structure and
   the Voynich Manuscript", *Digital Medievalist* 19 (2026), which is published under CC BY 4.0.
+- `story-background.md`: the period sources behind the reconstruction in
+  `report/five-hands.html`, each with what was read and where.
 
 ## What is fetched on demand (`./fetch_sources.sh`, into `sources/`, not committed)
 
@@ -68,7 +78,9 @@ Each repository is fetched at the exact commit used for the committed results.
 | [danielgaskell/voynich](https://github.com/danielgaskell/voynich) | `d076a7d` | Modified MIT for code and gibberish data | 38 samples of meaningless text written by volunteers; abbreviated-Latin comparison texts |
 | [chirila/Voynich-public](https://github.com/chirila/Voynich-public) | `decc4ca` | Not stated | Lindemann & Bowern's historical comparison texts (*Secreta Secretorum*, Brunetto Latini, *Science of Cirurgie*, Hebrew Genesis, Trithemius) |
 | [mzattera/v4j](https://github.com/mzattera/v4j) | `f3387f1` | GPL-3.0 (code) | Bible texts in Latin, Italian and German; the IVTFF specification |
-| [writtenbyalina/voynichviewer](https://github.com/writtenbyalina/voynichviewer) | `c4117bb` | Images: Yale. Word boxes: The Voynichese Project (2014), Apache-2.0 | 236 page panels in two sizes; pixel boxes for about 37,000 words; collation and scribe table after Davis |
+| [writtenbyalina/voynichviewer](https://github.com/writtenbyalina/voynichviewer) | `c4117bb` | Images: Yale. Word boxes: The Voynichese Project (2014), Apache-2.0 | 236 page panels in two sizes; boxes for about 37,000 words, given in thousandths of the image width and height; collation and scribe table after Davis |
+| [tesserae/tesserae](https://github.com/tesserae/tesserae) | `5e0ae30` | None stated in the files fetched | Latin verse (Virgil's *Georgics* and *Aeneid*, Lucretius, Ovid's *Fasti*, Walafrid Strabo's *Hortulus*, Wandalbert's martyrology), Cato's *De agricultura*, and Vulgate Numbers, 1 Chronicles and Psalms, each with its own verse or chapter divisions |
+| [HTR-United/CREMMA-Medieval-LAT](https://github.com/HTR-United/CREMMA-Medieval-LAT) | `2925259` | CC BY 4.0 | CREMMA Medii Aevi (Clérice, Chagué, Vlachou-Efstathiou): 21 Latin manuscripts of the twelfth to sixteenth centuries transcribed line by line with their abbreviations, used as controls that keep original line breaks |
 | [noah-chelednik/voynich-data](https://github.com/noah-chelednik/voynich-data) | `ecd4c81` | MIT (code), CC0 (transliterations) | Upstream of `data/transliterations/`; IIIF canvas list for Yale's images |
 
 Because some of these carry their own terms or none, none of their files are redistributed in
@@ -81,6 +93,9 @@ this repository. Only numbers computed from them appear in `results/`.
 - The 2014 multispectral images of ten pages that Lisa Fagin Davis released in 2024.
 - The Aberdeen Bestiary and *Speculum Humanae Salvationis* transcriptions that Layfield and Davis
   used as their baseline manuscripts.
-- Transcriptions of fifteenth-century manuscripts that preserve original line breaks, and
-  list-like texts (recipe collections, calendars, tables). Both are named in the report as the
-  most useful controls still missing.
+- Line-by-line transcriptions of fifteenth-century manuscripts in German, and of herbals, bath
+  books and house books of medical astrology in particular. The line-preserving controls used
+  here are Latin and mostly literary or theological.
+- A photograph of Georg Baresch's letter of 1639 (Rome, Gregorian University archive, APUG 557,
+  f. 353). Its Latin text was read in Philip Neal's transcription.
+- Any generated imagery. The reconstruction frames in the film treatment are briefs only.

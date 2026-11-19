@@ -1,0 +1,18 @@
+{
+ "parts": {
+  "page": "f75r",
+  "words_in_frame": 209,
+  "built_from_stock_parts": 117,
+  "share": 0.5598086124401914,
+  "lines_marked": 45,
+  "lines_on_page": 53
+ },
+ "echo": {
+  "page": "f108v",
+  "words_in_frame": 200,
+  "identical_neighbours": 1,
+  "one_glyph_apart": 10,
+  "lines_marked": 43,
+  "lines_on_page": 53
+ }
+}

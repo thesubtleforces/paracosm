@@ -101,6 +101,8 @@ section{display:flex;flex-direction:column;gap:2.2rem;min-width:0}
 .ground li em{font-style:italic;color:var(--text)}
 .plate{margin:0;display:flex;flex-direction:column;gap:.8rem;min-width:0}
 .plate>img{display:block;width:100%;height:auto;border-radius:2px;max-width:52rem}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:2rem 1.6rem;align-items:start}
+.pair .plate>img{max-width:100%}
 .plate figcaption{font:400 .78rem/1.55 var(--mono);color:var(--soft);max-width:44rem}
 .kind{font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-size:.66rem;color:var(--text);margin-right:.7em;white-space:nowrap}
 .kind::before{content:"";display:inline-block;width:.62em;height:.62em;margin-right:.5em;vertical-align:-.02em}
@@ -266,7 +268,7 @@ footer{border-top:1px solid var(--rule);padding-top:1.4rem;font:400 .76rem/1.6 v
     <p class="note">Beside each scene is a list of what it rests on. Every item carries one of these.</p>
   </div>
   <ul class="marks">
-    <li><span class="tag doc">Documented</span><span>A catalogue, a laboratory report, a letter or a published study says so, and we read it there.</span></li>
+    <li><span class="tag doc">Documented</span><span>A catalogue, a laboratory report, a letter or a published study says so. The notes in the repository record which we read at the source and which we took from a summary.</span></li>
     <li><span class="tag meas">Measured</span><span>We computed it from the transliteration or the page images. The code is in the repository.</span></li>
     <li><span class="tag inf">Inferred</span><span>A conclusion drawn from documented or measured facts. New evidence could overturn it.</span></li>
     <li><span class="tag imag">Imagined</span><span>Invented to make a scene. It suits the period and is tied to no evidence about this book.</span></li>
@@ -307,7 +309,7 @@ footer{border-top:1px solid var(--rule);padding-top:1.4rem;font:400 .76rem/1.6 v
     <header class="slate"><span class="no">Scene 2</span><h3>The buyer</h3><p class="where">A bath town in the German-speaking south · about 1420</p></header>
     <div class="scene-body">
       <div class="prose">
-        <p>Nothing in the book names a town. The staging needs one, so take a place that lives on hot water. In the spring of 1416 a papal secretary rode from the church council at Constance to the baths at Baden and wrote down what he saw. There were about thirty pools. People leaned on galleries above the water and talked. The women bathed in linen shifts cut away at the neck and shoulders, and meals were served on tables that floated. Visitors came from two hundred miles away.</p>
+        <p>Nothing in the book names a town. The staging needs one, so take a place that lives on hot water. In the spring of 1416 a papal secretary travelled from the church council at Constance to the baths at Baden and wrote down what he saw. There were about thirty pools. People leaned on galleries above the water and talked. The women bathed in linen shifts cut away at the neck and shoulders, and meals were served on tables that floated. Visitors came from two hundred miles away.</p>
         <p>Our buyer makes a living in such a place from women who come for cures. The work is herbs, bleeding by the calendar, and advice on when to bathe and when to conceive. These are the common cures of the time and the buyer believes in them.</p>
         <p>The buyer has also seen what a university physician carries. There is a herbal with a plant on every page. There is a calendar of the twelve signs with the rules for each. There is a book of the baths in which naked figures stand in every pool. These books are in Latin, they are costly, and every doctor has the same ones.</p>
         <p>So the buyer decides to own a book that no rival can match and no patient can check. It will have every kind of page the real ones have. It will be written in letters that belong to no country. It does not have to say anything. It has to be opened at the right moment, in front of the right person, by someone who seems to be reading.</p>
@@ -354,6 +356,16 @@ footer{border-top:1px solid var(--rule);padding-top:1.4rem;font:400 .76rem/1.6 v
       {{word_grid}}
       <figcaption><span class="kind measure">Measure</span>How often each beginning (rows) meets each ending (columns) in the running text. Brighter cells are commoner words. The commonest single word in the book is <em>{{top1}}</em>, written {{top1_n}} times. Point at a cell to see the word it makes.</figcaption>
     </figure>
+    <div class="pair">
+      <figure class="plate">
+        <img src="{{img:m_parts}}" width="907" height="662" alt="A page of script around a drawing of women in a green pool. More than half of the words are tinted blue.">
+        <figcaption><span class="kind measure">Measure</span>f75r, second hand. Tinted words are built from the stock beginnings and endings in the table: {{mp_parts_hit}} of the {{mp_parts_n}} words in this frame.</figcaption>
+      </figure>
+      <figure class="plate">
+        <img src="{{img:m_echo}}" width="827" height="603" alt="A page of script with stars in the margin. Pairs of neighbouring words are boxed in blue and joined by a line.">
+        <figcaption><span class="kind measure">Measure</span>f108v, third hand. Boxed and joined: neighbours on a line that are identical ({{mp_echo_same}}) or one glyph apart ({{mp_echo_near}}), among {{mp_echo_n}} words in this frame.</figcaption>
+      </figure>
+    </div>
   </article>
 
   <!-- 4 -->
@@ -679,7 +691,7 @@ footer{border-top:1px solid var(--rule);padding-top:1.4rem;font:400 .76rem/1.6 v
     <li><div class="frame todo"><p>A calfskin laced to a frame. The curved knife comes down it.</p></div><p class="slug"><span>02</span>Workshop · skins</p><p>Shavings fall. The skin drums under the blade. Cut to a flick of a finger and the ring of a dry sheet.</p><p class="how">50 mm, then 100 mm macro · overcast yard</p></li>
     <li><div class="frame todo"><p>A sloped desk at a north window. Two hands and a quill.</p></div><p class="slug"><span>03</span>Workshop · the writing room</p><p>We see hands, sleeves, the edge of a hood. The face stays above the frame. The sheet is blank.</p><p class="how">50 mm · sticks at desk height · window light from the left</p></li>
     <li><div class="frame todo"><p>One wet stroke of ink, grey, turning brown.</p></div><p class="slug"><span>04</span>Workshop · ink</p><p>A single curved stroke on bare skin. The bead of ink sinks and darkens as it dries.</p><p class="how">100 mm macro · 48 fps, then time-lapse · quill scratch</p></li>
-    <li><div class="frame"><img src="{{img:fr_jars}}" alt="Painted jars beside rows of roots and leaves with short labels."></div><p class="slug"><span>05</span>Object, then measure · f88r</p><p>Track along one line. In blue, the same few beginnings and endings light up word after word, and the grid assembles beside them.</p><p class="how">lateral track · word grid builds</p></li>
+    <li><div class="frame"><img src="{{img:m_parts_s}}" alt="A page of script with more than half its words tinted blue."></div><p class="slug"><span>05</span>Object, then measure · f75r</p><p>The page as it is. Then, in blue, every word built from the same few beginnings and endings lights up, line by line, and the grid assembles beside them.</p><p class="how">locked off · tint draws on at reading pace</p></li>
     <li><div class="frame todo"><p>From above: a rectangle of skin is folded once and opened.</p></div><p class="slug"><span>06</span>Workshop · the fold</p><p>Four dissolves. Page one fills, the leaf turns, page two fills, the sheet opens, pages two and three lie side by side.</p><p class="how">overhead · locked off · the only top shot in the film</p></li>
     <li><div class="frame"><img src="{{img:fr_plant}}" alt="A plant with three dark blue flowers and green fern-like leaves, with lines of script beside it."></div><p class="slug"><span>07</span>Object · f17r</p><p>A plant page. Text breaks where the leaves are. Tilt up to the faint note in the top margin, written by the hand of the last page.</p><p class="how">tilt up · quill fades out</p></li>
     <li><div class="frame"><img src="{{img:fr_two_hands}}" alt="A page of dense script with stars in the margin."></div><p class="slug"><span>08</span>Object, then measure · f115r</p><p>Twelve lines in one hand, then another takes over. A blue rule marks the change. Two people sat at this page.</p><p class="how">push to line 12 · rule draws on</p></li>
@@ -718,6 +730,8 @@ footer{border-top:1px solid var(--rule);padding-top:1.4rem;font:400 .76rem/1.6 v
     <tbody>
       <tr><th scope="row">Five hands</th><td>One strip of writing per scribe, stacked. The opening image of this page.</td><td>f88r, f78v, f103r, f71r, f48v</td></tr>
       <tr><th scope="row">The word grid</th><td>Beginnings against endings, with counts.</td><td>The transliteration, computed</td></tr>
+      <tr><th scope="row">Stock parts on a page</th><td>Every word built from the grid, tinted on the photograph.</td><td>f75r, word positions, computed</td></tr>
+      <tr><th scope="row">Echo on a page</th><td>Neighbouring words that repeat or differ by one glyph, joined.</td><td>f108v, word positions, computed</td></tr>
       <tr><th scope="row">The open sheet</th><td>f78v and f81r as one surface, the pipe crossing the fold.</td><td>Two page photographs</td></tr>
       <tr><th scope="row">Written and bound</th><td>Five sheets side by side, then nested.</td><td>The collation, drawn</td></tr>
       <tr><th scope="row">Likeness within a sheet</th><td>Four page pairs and the facing pages that share no sheet.</td><td>Computed, nine gatherings</td></tr>
@@ -781,6 +795,7 @@ footer{border-top:1px solid var(--rule);padding-top:1.4rem;font:400 .76rem/1.6 v
   <ul class="src">
     <li>Page photographs: Beinecke Rare Book and Manuscript Library, Yale University, MS 408. Public domain.</li>
     <li>Transliteration: Zandbergen and Landini, version 3b, with Davis's scribe attributions; Takahashi; Glen Claston's v101; the 1998 interlinear file.</li>
+    <li>Word positions on the page: The Voynichese Project, 2014, as fitted to Yale's photographs by the Voynich Viewer project.</li>
     <li>René Zandbergen, voynich.nu: radiocarbon, materials, history, letters, marginal writing, illustrations.</li>
     <li>McCrone Associates, report on inks and pigments, 2009.</li>
     <li>Lisa Fagin Davis, "How Many Glyphs and How Many Scribes?", <i>Manuscript Studies</i> 5, 2020; "Voynich Codicology", 2025; lecture, Toronto, September 2025.</li>
