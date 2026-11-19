@@ -1,0 +1,79 @@
+{
+ "source": "ZL transliteration v3b (13 May 2025), EVA, uncertain spaces counted as spaces",
+ "pages": 227,
+ "folios_extant": 102,
+ "tokens": 39026,
+ "tokens_clean": 38718,
+ "types_clean": 8048,
+ "hapax_types": 5563,
+ "tokens_by_locus_kind": {
+  "C": 2398,
+  "L": 1199,
+  "P": 35075,
+  "R": 354
+ },
+ "paragraphs": 742,
+ "paragraph_lines": 4130,
+ "tokens_by_language": {
+  "A": 11620,
+  "B": 24070,
+  "nan": 3336
+ },
+ "tokens_by_scribe": {
+  "1": 11065,
+  "2": 11302,
+  "3": 12102,
+  "4": 3628,
+  "5": 929
+ },
+ "tokens_by_illustration": {
+  "A": 883,
+  "B": 6387,
+  "C": 2255,
+  "H": 11588,
+  "P": 2589,
+  "S": 11646,
+  "T": 2362,
+  "Z": 1316
+ },
+ "pages_by_illustration": {
+  "A": 8,
+  "B": 19,
+  "C": 11,
+  "H": 129,
+  "P": 16,
+  "S": 25,
+  "T": 7,
+  "Z": 12
+ },
+ "pages_by_scribe": {
+  "1": 113,
+  "2": 46,
+  "3": 33,
+  "4": 27,
+  "5": 7,
+  "@": 1
+ },
+ "top20": {
+  "daiin": 849,
+  "ol": 561,
+  "chedy": 507,
+  "aiin": 504,
+  "shedy": 434,
+  "ar": 403,
+  "chol": 395,
+  "or": 390,
+  "chey": 352,
+  "s": 350,
+  "dar": 323,
+  "qokeey": 307,
+  "qokeedy": 307,
+  "y": 306,
+  "qokain": 279,
+  "shey": 278,
+  "qokedy": 276,
+  "dy": 275,
+  "qokaiin": 265,
+  "al": 261
+ }
+}

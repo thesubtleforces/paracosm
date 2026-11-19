@@ -1,0 +1,55 @@
+{
+ "label_tokens": 1036,
+ "label_types": 803,
+ "share_of_label_types_never_in_running_text": 0.5280199252801993,
+ "share_of_label_types_unique_in_whole_manuscript": 0.5168119551681195,
+ "share_of_running_types_unique_in_whole_manuscript(len>=3)": 0.6803616540353676,
+ "labels_first_glyph": {
+  "o": 0.582,
+  "d": 0.095,
+  "c": 0.077,
+  "y": 0.073,
+  "s": 0.064,
+  "a": 0.047
+ },
+ "running_first_glyph": {
+  "o": 0.219,
+  "c": 0.184,
+  "q": 0.143,
+  "s": 0.12,
+  "d": 0.094,
+  "a": 0.055
+ },
+ "label_binding_pages": 33,
+ "label_binding_own": 0.06657191749730056,
+ "label_binding_other": 0.05562276835247971,
+ "label_binding_diff_ci": [
+  0.010949149144820838,
+  -0.0036568234562739652,
+  0.028386599487866614
+ ],
+ "paragraph_opening_words": {
+  "n": 715,
+  "unique_in_manuscript": 0.4853146853146853,
+  "without_first_glyph_is_a_known_word": 0.7118881118881119,
+  "unique_but_known_once_first_glyph_dropped": 0.23356643356643356
+ },
+ "other_line_first_words": {
+  "n": 3169,
+  "unique_in_manuscript": 0.18049857999368887,
+  "without_first_glyph_is_a_known_word": 0.8122436099715998,
+  "unique_but_known_once_first_glyph_dropped": 0.09435153045124645
+ },
+ "mid_line_words": {
+  "n": 24074,
+  "unique_in_manuscript": 0.11410650494309213,
+  "without_first_glyph_is_a_known_word": 0.583534103181856,
+  "unique_but_known_once_first_glyph_dropped": 0.03684472875301155
+ },
+ "herbal_page_first_word": {
+  "n": 116,
+  "unique_in_manuscript": 0.5948275862068966,
+  "without_first_glyph_is_a_known_word": 0.6120689655172413,
+  "unique_but_known_once_first_glyph_dropped": 0.25862068965517243
+ }
+}

@@ -1,0 +1,750 @@
+<title>Voynich Dossier</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: one reading column (about 68 characters) with wider plates for charts, tables and page images. */
+:root {
+  --plane: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --ink-3: #898781;
+  --rule: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,.10); --wash: rgba(42,120,214,.07);
+  --accent: #1c5cab;            /* azurite, the manuscript's own blue pigment */
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --tip-bg: #0b0b0b; --tip-fg: #f9f9f7; --tip-fg-2: #c3c2b7;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --measure: 68ch;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --plane: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #898781;
+    --rule: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,.10); --wash: rgba(57,135,229,.10);
+    --accent: #86b6ef; --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --tip-bg: #f0efec; --tip-fg: #0d0d0d; --tip-fg-2: #52514e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --plane: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #898781;
+  --rule: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,.10); --wash: rgba(57,135,229,.10);
+  --accent: #86b6ef; --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --tip-bg: #f0efec; --tip-fg: #0d0d0d; --tip-fg-2: #52514e; color-scheme: dark;
+}
+
+body { background: var(--plane); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.6; }
+.page { max-width: 1040px; margin: 0 auto; padding-block: 40px 96px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.page > * { min-width: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, summary:focus-visible, .hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+p, ul, ol, dl { margin: 0; }
+.prose { max-width: var(--measure); display: flex; flex-direction: column; gap: 14px; }
+.prose ul, .prose ol { padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+section { display: flex; flex-direction: column; gap: 22px; margin-top: 72px; }
+h1, h2, h3, h4 { font-family: var(--font-ui); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.1; font-weight: 600; max-width: 20ch; }
+h2 { font-size: 27px; line-height: 1.2; font-weight: 600; padding-top: 22px; border-top: 1px solid var(--axis); }
+h3 { font-size: 19px; line-height: 1.3; font-weight: 600; margin-top: 14px; }
+h4 { font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.eyebrow { font-family: var(--font-ui); font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.standfirst { font-size: 20px; line-height: 1.5; color: var(--ink-2); max-width: 56ch; }
+.masthead { display: flex; flex-direction: column; gap: 16px; }
+code, .eva { font-family: var(--font-mono); font-size: .86em; }
+.eva { background: var(--wash); padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+small { font-size: .82em; color: var(--ink-2); }
+
+/* the short answer */
+.answer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
+.answer > div { padding: 18px 0 20px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 8px; }
+.answer h3 { margin: 0; font-size: 17px; }
+.answer p { font-size: 16px; line-height: 1.55; color: var(--ink-2); }
+.contents { font-family: var(--font-ui); font-size: 14px; display: flex; flex-wrap: wrap; gap: 6px 20px; padding: 14px 0; border-block: 1px solid var(--rule); margin-top: 40px; }
+.contents a { text-decoration: none; }
+.contents a:hover { text-decoration: underline; }
+
+/* plates */
+.plates { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px 18px; align-items: start; }
+.plates figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.plates img { width: 100%; height: auto; display: block; border: 1px solid var(--border); border-radius: 2px; }
+.plates .wide { grid-column: span 2; }
+figcaption, .credit { font-family: var(--font-ui); font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+figcaption b { color: var(--ink); font-weight: 600; font-family: var(--font-mono); font-size: 12px; }
+
+/* tables */
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-family: var(--font-ui); font-size: 14px; line-height: 1.45; }
+th, td { text-align: left; vertical-align: top; padding: 9px 14px 9px 0; border-bottom: 1px solid var(--rule); }
+thead th { font-weight: 600; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); border-bottom: 1px solid var(--axis); white-space: nowrap; }
+tbody th { font-weight: 600; }
+td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.hl { color: var(--ink); font-weight: 600; }
+table.wide { min-width: 720px; }
+table.data caption { caption-side: bottom; text-align: left; font-size: 12.5px; color: var(--ink-2); padding-top: 8px; }
+.verdict { font-weight: 600; white-space: nowrap; }
+.ledger td, .ledger thead th { text-align: center; padding-right: 8px; }
+.ledger tbody th { font-weight: 400; min-width: 15em; }
+.ledger td { font-size: 17px; line-height: 1.2; }
+.ledger-key { font-family: var(--font-ui); font-size: 13px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 20px; padding: 0; list-style: none; }
+.ledger-key b { font-size: 16px; color: var(--ink); font-weight: 400; margin-right: 6px; }
+
+/* timeline */
+.timeline { list-style: none; padding: 0; display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 0; font-size: 16px; max-width: 820px; }
+.timeline dt { font-family: var(--font-ui); font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; padding: 10px 14px 10px 0; border-top: 1px solid var(--rule); }
+.timeline dd { margin: 0; padding: 9px 0 11px; border-top: 1px solid var(--rule); line-height: 1.5; }
+
+/* chart plates */
+.plate { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 22px 24px 18px; display: flex; flex-direction: column; gap: 14px; font-family: var(--font-ui); min-width: 0; }
+.plate > h3 { margin: 0; font-size: 17px; }
+.plate > .sub { font-size: 14px; line-height: 1.45; color: var(--ink-2); max-width: 78ch; }
+.chart-scroll { overflow-x: auto; }
+svg.chart { display: block; width: 100%; min-width: 560px; height: auto; font-family: var(--font-ui); }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .baseline { stroke: var(--axis); stroke-width: 1; }
+.chart .tick, .chart .axis-title, .chart .note, .chart .row-sub { fill: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.chart .axis-title { fill: var(--ink-2); }
+.chart .row-label { fill: var(--ink); font-size: 13.5px; font-weight: 600; }
+.chart .value { fill: var(--ink); font-size: 12.5px; font-weight: 500; font-variant-numeric: tabular-nums; paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.chart .dot { stroke: var(--surface); stroke-width: 2; }
+.chart .dot.ctx { fill: var(--ink-3); }
+.chart .s1 { --c: var(--s1); } .chart .s2 { --c: var(--s2); } .chart .s3 { --c: var(--s3); } .chart .s4 { --c: var(--s4); }
+.chart .dot.s1, .chart .dot.s2, .chart .dot.s3, .chart .dot.s4 { fill: var(--c); }
+.chart .line { fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .whisker { stroke: var(--c); stroke-width: 1; opacity: .45; }
+.chart .cross { stroke: var(--ink-3); stroke-width: 1; }
+.chart .hit { cursor: default; }
+.chart circle.hit:hover, .chart circle.hit:focus { stroke: var(--ink); outline: none; }
+.legend { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 13px; color: var(--ink-2); }
+.legend li { display: flex; align-items: center; gap: 8px; }
+.key { display: inline-block; flex: none; }
+.line-key { width: 18px; height: 3px; border-radius: 2px; background: var(--c, var(--ink-3)); }
+.line-key.s1 { --c: var(--s1); } .line-key.s2 { --c: var(--s2); } .line-key.s3 { --c: var(--s3); } .line-key.s4 { --c: var(--s4); }
+.dot-key { width: 10px; height: 10px; border-radius: 50%; background: var(--ink-3); }
+.dot-key.s1 { background: var(--s1); }
+.chart-note { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); max-width: 82ch; }
+.tableview summary { font-size: 13px; color: var(--accent); cursor: pointer; width: fit-content; }
+.tableview[open] summary { margin-bottom: 10px; }
+.tableview table { font-size: 13px; }
+
+/* strip plot: one dot per text on a shared scale */
+.strip { display: flex; flex-direction: column; }
+.st-row, .st-axis { display: grid; grid-template-columns: minmax(9em, 16em) minmax(0, 1fr) 6.4em; gap: 0 14px; align-items: center; }
+.st-label { font-size: 13.5px; font-weight: 600; line-height: 1.3; }
+.st-label small { display: block; font-weight: 400; }
+.st-track { position: relative; height: 62px; }
+.st-grid { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--rule); }
+.st-dot { position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%, -50%); background: var(--ink-3); box-shadow: 0 0 0 2px var(--surface); }
+.st-dot::after { content: ""; position: absolute; inset: -7px; border-radius: 50%; }
+.st-dot.s1 { background: var(--s1); }
+.st-dot:hover, .st-dot:focus-visible { box-shadow: 0 0 0 2px var(--ink); outline: none; z-index: 1; }
+.st-val { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; text-align: right; }
+.st-scale { position: relative; height: 18px; font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.st-scale i { position: absolute; font-style: normal; transform: translateX(-50%); }
+.st-title { font-size: 12px; color: var(--ink-2); text-align: center; line-height: 1.35; }
+
+/* dumbbells: share of words with a glyph, elsewhere vs at the line edge */
+.dumbbells { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 44px; }
+.db-panel { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.db-panel h4 { margin-bottom: 4px; }
+.db-row, .db-axis { display: grid; grid-template-columns: 1.8em minmax(0, 1fr) 6.2em; gap: 0 12px; align-items: center; }
+.db-row { padding: 5px 0; border-radius: 3px; }
+.db-row:hover, .db-row:focus-visible { background: var(--wash); }
+.glyph { font-family: var(--font-mono); font-size: 15px; font-weight: 500; text-align: center; }
+.db-track { position: relative; height: 18px; }
+.db-track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--rule); }
+.db-link { position: absolute; top: 50%; height: 2px; margin-top: -1px; background: var(--axis); }
+.db-dot { position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px var(--surface); background: var(--ink-3); }
+.db-dot.s1 { background: var(--s1); }
+.db-val { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.db-val small { margin-left: 8px; font-weight: 400; }
+.db-scale, .iv-scale, .bar-scale { position: relative; height: 16px; font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.db-scale i, .iv-scale i, .bar-scale i { position: absolute; font-style: normal; transform: translateX(-50%); white-space: nowrap; }
+.db-scale i:first-child, .bar-scale i:first-child { transform: none; }
+.db-scale i:last-child, .bar-scale i:last-child { transform: translateX(-100%); }
+
+/* dot and interval rows */
+.intervals { display: flex; flex-direction: column; gap: 2px; }
+.iv-row, .iv-axis { display: grid; grid-template-columns: minmax(10em, 17em) minmax(0, 1fr) 4.2em; gap: 0 14px; align-items: center; }
+.iv-row { padding: 7px 0; border-radius: 3px; }
+.iv-row:hover, .iv-row:focus-visible { background: var(--wash); }
+.iv-label { font-size: 13.5px; font-weight: 500; line-height: 1.3; }
+.iv-label small { display: block; font-weight: 400; }
+.iv-track { position: relative; height: 20px; }
+.iv-track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--rule); }
+.iv-zero { position: absolute; top: -4px; bottom: -4px; width: 1px; background: var(--axis); }
+.iv-ci { position: absolute; top: 50%; height: 2px; margin-top: -1px; background: var(--s1); border-radius: 1px; }
+.iv-dot { position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%, -50%); background: var(--s1); box-shadow: 0 0 0 2px var(--surface); }
+.iv-val { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; text-align: right; }
+
+/* bars */
+.bars { display: flex; flex-direction: column; gap: 2px; }
+.bars h4 { margin: 12px 0 4px; }
+.bars h4:first-child { margin-top: 0; }
+.bar-row, .bar-axis { display: grid; grid-template-columns: minmax(10em, 19em) minmax(0, 1fr) 3.4em; gap: 0 14px; align-items: center; }
+.bar-row { padding: 6px 0; border-radius: 3px; }
+.bar-row:hover, .bar-row:focus-visible { background: var(--wash); }
+.bar-label { font-size: 13.5px; line-height: 1.3; }
+.bar-track { position: relative; height: 10px; border-left: 1px solid var(--axis); }
+.bar-fill { display: block; height: 10px; background: var(--s1); border-radius: 0 4px 4px 0; }
+.bar-val { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; text-align: right; }
+
+/* sheet diagram */
+.sheet { display: block; width: 100%; max-width: 540px; min-width: 300px; height: auto; font-family: var(--font-ui); }
+.sheet .pg { fill: var(--plane); stroke: var(--axis); stroke-width: 1; }
+.sheet .pg-next { fill: none; stroke: var(--axis); stroke-width: 1; }
+.sheet .arc { fill: none; stroke: var(--s1); stroke-width: 2; stroke-linecap: round; }
+.sheet .arc.weak { stroke: var(--ink-3); }
+.sheet text { fill: var(--ink-2); font-size: 12px; }
+.sheet .pn { fill: var(--ink); font-family: var(--font-mono); font-size: 13px; font-weight: 500; }
+.sheet .val { fill: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.sheet .fold { stroke: var(--axis); stroke-width: 1; }
+
+/* tableaus */
+.tableau { display: grid; grid-template-columns: 11em minmax(0, 1fr); gap: 6px 28px; padding: 22px 0; border-top: 1px solid var(--rule); }
+.tableau .weight { font-family: var(--font-ui); font-size: 13px; color: var(--ink-2); }
+.tableau .weight b { display: block; font-size: 24px; line-height: 1.2; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tableau h3 { margin: 0 0 8px; }
+.tableau .body { display: flex; flex-direction: column; gap: 10px; max-width: var(--measure); }
+.tableau .body p b { font-family: var(--font-ui); font-size: 13.5px; font-weight: 600; }
+
+/* method steps */
+.steps { list-style: none; padding: 0; counter-reset: step; display: flex; flex-direction: column; max-width: 860px; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: 2.6em minmax(0, 1fr); gap: 0 10px; padding: 16px 0; border-top: 1px solid var(--rule); }
+.steps > li::before { content: counter(step); font-family: var(--font-ui); font-size: 15px; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.steps h3 { margin: 0 0 6px; font-size: 17px; }
+.steps p { font-size: 16px; }
+.gate { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 20px 24px; max-width: 860px; display: flex; flex-direction: column; gap: 10px; }
+.gate h3 { margin: 0; font-size: 17px; }
+.gate ol { padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; font-size: 16px; }
+.sources { font-family: var(--font-ui); font-size: 13.5px; line-height: 1.5; color: var(--ink-2); padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; max-width: 900px; overflow-wrap: anywhere; }
+
+.tip { position: fixed; z-index: 30; max-width: 300px; pointer-events: none; background: var(--tip-bg); color: var(--tip-fg); font-family: var(--font-ui); font-size: 12.5px; line-height: 1.4; padding: 8px 10px; border-radius: 5px; display: flex; flex-direction: column; gap: 3px; }
+.tip-row { display: flex; align-items: baseline; gap: 7px; }
+.tip-row strong { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tip-row span:last-child { color: var(--tip-fg-2); }
+.tip .line-key { align-self: center; }
+
+@media (max-width: 720px) {
+  body { font-size: 16px; }
+  section { margin-top: 56px; }
+  .answer { grid-template-columns: 1fr; }
+  .plates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dumbbells { grid-template-columns: 1fr; }
+  .plate { padding: 18px 16px 14px; }
+  .iv-row, .bar-row { grid-template-columns: minmax(0, 1fr) 4.2em; row-gap: 4px; }
+  .st-row, .st-axis { grid-template-columns: minmax(0, 1fr) 5.6em; }
+  .st-row .st-label { grid-column: 1 / -1; padding-top: 8px; }
+  .st-axis > span:first-child { display: none; }
+  .st-track { height: 54px; }
+  .iv-row .iv-label, .bar-row .bar-label { grid-column: 1 / -1; }
+  .iv-axis, .bar-axis { grid-template-columns: minmax(0, 1fr) 4.2em; }
+  .iv-axis > span:first-child, .bar-axis > span:first-child { display: none; }
+  .tableau { grid-template-columns: 1fr; }
+  .timeline { grid-template-columns: 1fr; }
+  .timeline dd { border-top: 0; padding-top: 0; }
+  .timeline dt { padding-bottom: 2px; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="page">
+
+<header class="masthead">
+  <p class="eyebrow">Beinecke MS 408 · working dossier · 19 November 2026</p>
+  <h1>The Voynich manuscript: what it most likely&nbsp;is, and how to check</h1>
+  <p class="standfirst">A primer checked against the sources, the full text gathered and parsed, first tests run against texts of known origin, and a method for turning rival explanations into scenarios that can fail.</p>
+</header>
+
+<section id="answer" style="margin-top:44px">
+  <div class="answer">
+    <div>
+      <h3>The setting is fairly firm</h3>
+      <p>Calf parchment made between 1404 and 1438, ordinary iron-gall ink and period pigments, five scribes working as a team, and imagery that points to the Alpine arc between southern Germany and northern Italy. The book is laid out like a medical and astrological compendium: plants, a pharmacy of roots and jars, a zodiac calendar, bathing women, short paragraphs marked with stars.</p>
+    </div>
+    <div>
+      <h3>The meaning is open, but narrower than it was</h3>
+      <p>Nobody can read a word. In our tests the text's strangest habits (words that echo their neighbours, lines that behave as units) are reproduced by a copy-and-modify writing routine, and by neither natural languages nor the best published cipher model. That does not show the text is empty. It lists what any meaningful reading still has to explain.</p>
+    </div>
+    <div>
+      <h3>The newest claim holds up in part</h3>
+      <p>We rebuilt the 2026 page-order analysis from its description and got the same result, down to the same top-ranked sheet sequences. The finding that each folded sheet is a unit survives a scribe control the authors did not run. The proposed re-ordering of the sheets does no better than chance in our null test.</p>
+    </div>
+    <div>
+      <h3>The way forward is a scoreboard</h3>
+      <p>Write each explanation as a process that can be simulated. Fix the measurements in advance. Calibrate them on texts whose origin is known. Then check every text-based conclusion against physical evidence that the text analysis never saw.</p>
+    </div>
+  </div>
+  <nav class="contents" aria-label="Contents">
+    <a href="#primer">Primer</a><a href="#attempts">A century of attempts</a><a href="#video">The video, checked</a>
+    <a href="#corpus">What we gathered</a><a href="#tests">First tests</a><a href="#tableaus">Five tableaus</a>
+    <a href="#method">How to validate one</a><a href="#next">What to do next</a><a href="#sources">Sources</a>
+  </nav>
+</section>
+
+<!-- ============================================================ PRIMER -->
+<section id="primer">
+  <h2>Primer: the object and its history</h2>
+  <div class="prose">
+    <p>The manuscript is a small parchment book, about 225 by 160 mm, kept at Yale's Beinecke Library as MS 408. {{n_folios}} leaves survive of an original 116 or so, and several fold out into large sheets. Almost every page has drawings. Every page with writing uses the same script, which is found nowhere else. In the standard transliteration the running text comes to {{n_tokens}} words in {{n_types}} distinct forms, and {{hapax_pct}} of those forms occur only once.</p>
+  </div>
+
+  <h3>What is in it</h3>
+  <div class="plates">
+    <figure><img src="{{img:f33v}}" alt="Folio 33v: a plant with two large blue and yellow flower heads, green star-shaped leaves and roots ending in brown discs, with text fitted around it" width="380" height="555"><figcaption><b>f33v</b> Herbal. One plant fills the page and the text is fitted around it.</figcaption></figure>
+    <figure><img src="{{img:f88r}}" alt="Folio 88r: three ornate red and green jars down the left margin, rows of labelled roots and leaves, and three paragraphs of text" width="380" height="552"><figcaption><b>f88r</b> Pharmaceutical. Rows of roots and leaves, each with a one-word label, beside three jars.</figcaption></figure>
+    <figure><img src="{{img:f71r}}" alt="Folio 71r: a ram in the centre of two rings of women standing in tubs, each holding a star, with a label beside each" width="380" height="419"><figcaption><b>f71r</b> Zodiac. Aries ringed by fifteen women in tubs, each holding a star and carrying a label. The word under the ram is a month name added in a later hand.</figcaption></figure>
+    <figure><img src="{{img:f78v}}" alt="Folio 78v: two blocks of text around a drawing of naked women standing in a green pool fed by a stream of water" width="380" height="593"><figcaption><b>f78v</b> Bathing section. Women in a green pool; the water runs on toward the fold and continues on the page that shares this sheet.</figcaption></figure>
+    <figure class="wide"><img src="{{img:f116v}}" alt="Top of folio 116v: three lines of faded writing in Latin letters with crosses between the words, and small sketches at the left edge" width="520" height="242"><figcaption><b>f116v</b> The last page. A few lines in a fifteenth-century hand that mix Latin letters, German words and two words of the manuscript's own script. Unread.</figcaption></figure>
+  </div>
+  <p class="credit">Images: Beinecke Rare Book &amp; Manuscript Library, Yale University. Cropped and reduced.</p>
+  <div class="scroll">
+  <table class="wide">
+    <thead><tr><th>Section</th><th class="num">Pages</th><th>What the pages show</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Herbal</th><td class="num">{{pages_H}}</td><td>One plant to a page, drawn before the text was written. A few resemble real species; most do not match any.</td></tr>
+      <tr><th scope="row">Stars</th><td class="num">{{pages_S}}</td><td>Dense short paragraphs, each marked with a star in the margin. Often called recipes.</td></tr>
+      <tr><th scope="row">Bathing (also called biological)</th><td class="num">{{pages_B}}</td><td>Naked women in pools and tubs joined by pipes and streams.</td></tr>
+      <tr><th scope="row">Astronomical and cosmological</th><td class="num">{{pages_AC}}</td><td>Circular diagrams with suns, moons and stars, and the six-panel foldout of nine linked circles with castles and walls known as the Rosettes page.</td></tr>
+      <tr><th scope="row">Pharmaceutical</th><td class="num">{{pages_P}}</td><td>Plant parts in rows beside jars, each with a short label.</td></tr>
+      <tr><th scope="row">Zodiac</th><td class="num">{{pages_Z}}</td><td>A sign at the centre of rings of labelled women holding stars.</td></tr>
+      <tr><th scope="row">Text only</th><td class="num">{{pages_T}}</td><td>Pages without drawings.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="credit">Page counts are photographed panels ({{n_pages}} in all) as classed in the ZL transliteration; foldouts count once per panel.</p>
+
+  <h3>What the materials say</h3>
+  <div class="prose">
+    <ul>
+      <li><b>Date.</b> Four leaves were radiocarbon dated at the University of Arizona in 2009: 1404 to 1438 with 95% probability. The result was announced but never published as a paper, and it dates the skins, not the writing.</li>
+      <li><b>Parchment.</b> Calf, identified in 2014 by protein analysis at the University of York.</li>
+      <li><b>Ink and paint.</b> McCrone Associates (2009) found iron-gall ink for both text and drawings, which were most likely made together, with azurite blue, a copper green and red ochre. Nothing is out of period. The inks of the folio numbers, the quire marks and the alphabet columns on the first page each differ from the text ink, so those are later additions.</li>
+      <li><b>Hands.</b> Lisa Fagin Davis (2020) distinguishes five scribes. With two exceptions, each folded sheet is the work of a single scribe. Our page table from the transliteration agrees: 49 of 52 surviving sheets have one scribe.</li>
+      <li><b>Binding.</b> Quire marks are fifteenth-century. Folio numbers came later (sixteenth or seventeenth century; the sources disagree). The present cover was added by the Roman Jesuits in the nineteenth century.</li>
+    </ul>
+  </div>
+
+  <h3>Where and by whom</h3>
+  <div class="prose">
+    <p>No author, place or patron is recorded. The internal clues point in one broad direction without settling it.</p>
+    <ul>
+      <li>The zodiac figures, including a crossbowman for Sagittarius, have their closest parallels in German-language manuscripts of the fifteenth century, especially from southern Germany.</li>
+      <li>The castle on the Rosettes foldout has swallowtail battlements, a feature found mostly in northern Italy.</li>
+      <li>Colour notes in the first scribe's hand are German (<i>rot</i>, red). The note on the last page contains German words. The month names on the zodiac pages are in a Romance dialect and a later hand; northern French, Occitan and Catalan have all been proposed.</li>
+      <li>Dress and hairstyles fit 1400 to 1430.</li>
+    </ul>
+    <p>René Zandbergen, who maintains the standard reference site, puts it this way: the manuscript "was almost certainly created in the early 15th Century", and "at the very best the location where the MS was created remains speculation".</p>
+  </div>
+
+  <h3>Who owned it</h3>
+  <dl class="timeline">
+    <dt>1404–1438</dt><dd>The calves are slaughtered and the parchment made.</dd>
+    <dt>15th century</dt><dd>Quire marks are added and the book is sewn between wooden boards. On Davis's reading this first binding already put the sheets in the wrong order.</dd>
+    <dt>1599</dt><dd>Emperor Rudolf II pays 600 florins to the Augsburg physician Carl Widemann for a small group of alchemical manuscripts (Guzy 2022). The sum matches the later story; the record does not name this book.</dd>
+    <dt>after 1608</dt><dd>Jacobus Horčický de Tepenec, a chemist at Rudolf's court, signs the first page. The signature was later erased and shows under ultraviolet light. He is the first owner who can be positively identified, and he died in 1622.</dd>
+    <dt>1637–1639</dt><dd>Georg Baresch, a Prague alchemist, approaches the Jesuit scholar Athanasius Kircher about a book he cannot read. His letter of April 1639 is the earliest surviving description.</dd>
+    <dt>1665</dt><dd>Johannes Marcus Marci, who inherited the book from Baresch, sends it to Kircher on 19 August with a letter passing on hearsay, by then twenty years old, that Rudolf II paid 600 ducats for it and thought it the work of Roger Bacon.</dd>
+    <dt>1665–1911</dt><dd>Jesuit custody in Rome. In 1873 the book is hidden with others under labels marking the private library of the order's general, Petrus Beckx.</dd>
+    <dt>1911 or 1912</dt><dd>Wilfrid Voynich buys it in secret. The books were at Villa Torlonia in Castel Gandolfo, not at Villa Mondragone as long repeated.</dd>
+    <dt>1961</dt><dd>After the deaths of Voynich (1930) and his widow Ethel (1960), Anne Nill sells it to the dealer H. P. Kraus for $24,500. Kraus asks $100,000, then $160,000, and finds no buyer.</dd>
+    <dt>1969</dt><dd>Kraus gives it to Yale.</dd>
+  </dl>
+</section>
+
+<!-- ============================================================ ATTEMPTS -->
+<section id="attempts">
+  <h2>A century of attempts</h2>
+  <div class="prose">
+    <p>Explanations fall into three families: an unknown language written plainly, a known language hidden by a cipher, or no language at all. The table lists the attempts that shaped the field. No reading has ever been reproduced by a second person working independently, and that remains the test nobody has passed.</p>
+  </div>
+  <div class="scroll">
+  <table class="wide">
+    <thead><tr><th class="num">Year</th><th>Who</th><th>Claim or contribution</th><th>Where it stands</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1921</td><th scope="row">William Newbold</th><td>Roger Bacon's cipher, hidden in microscopic strokes inside the letters</td><td>Refuted by John Manly in 1931: the strokes are cracks in the ink</td></tr>
+      <tr><td class="num">1944–46, 1962–63</td><th scope="row">William Friedman's study groups</th><td>Full machine transcription and analysis by professional cryptanalysts</td><td>No solution. Friedman came to suspect "an early attempt to construct an artificial or universal language"</td></tr>
+      <tr><td class="num">1976</td><th scope="row">Prescott Currier</th><td>Two statistical "languages", A and B, in different hands; the line behaves as a unit</td><td>Confirmed many times, including here</td></tr>
+      <tr><td class="num">1978–87</td><th scope="row">Brumbaugh, Stojko, Levitov</th><td>A forgery by Dee and Kelley; vowelless Ukrainian; a Cathar liturgy</td><td>Rejected</td></tr>
+      <tr><td class="num">1998–2000</td><th scope="row">Landini, Zandbergen, Takahashi, Stolfi</th><td>The EVA alphabet, a complete transliteration, and a grammar of word structure</td><td>The foundation of all later statistical work</td></tr>
+      <tr><td class="num">2004</td><th scope="row">Gordon Rugg</th><td>A table of syllables and a card with holes can produce similar text</td><td>Shows a hoax is feasible. The device is more than a century younger than the parchment</td></tr>
+      <tr><td class="num">2013</td><th scope="row">Montemurro and Zanette</th><td>Key words cluster by section, as in meaningful texts</td><td>Stands as an observation. Whether meaningless text can do the same is disputed</td></tr>
+      <tr><td class="num">2013–19</td><th scope="row">Tucker and Talbert; Bax; Hauer and Kondrak; Gibbs; Ardıç; Cheshire</th><td>Nahuatl; a handful of plant names; Hebrew by algorithm; Latin abbreviations; Old Turkic; "proto-Romance"</td><td>None accepted. The University of Bristol withdrew its announcement of the last</td></tr>
+      <tr><td class="num">2019</td><th scope="row">Timm and Schinner</th><td>A copy-and-modify ("self-citation") routine reproduces many of the text's statistics</td><td>The leading model of meaningless text</td></tr>
+      <tr><td class="num">2020</td><th scope="row">Lisa Fagin Davis</th><td>Five scribes, identified by letter forms</td><td>Widely accepted</td></tr>
+      <tr><td class="num">2021</td><th scope="row">Bowern and Lindemann</th><td>Survey arguing the text "looks like encoded natural language rather than gibberish"</td><td>The leading statement of the meaningful-text view; "no consensus on the language"</td></tr>
+      <tr><td class="num">2022</td><th scope="row">Gaskell and Bowern</th><td>Meaningless text written by 42 volunteers shares many of the same statistics</td><td>Removes the argument that the text is too regular to be meaningless</td></tr>
+      <tr><td class="num">2024</td><th scope="row">Brewer and Lewis</th><td>Context: fifteenth-century calls to hide women's medicine in "secret letters"</td><td>A hypothesis about purpose, not a reading</td></tr>
+      <tr><td class="num">2025</td><th scope="row">Michael Greshko</th><td>The Naibbe cipher turns Latin or Italian into Voynich-like text with dice and playing cards</td><td>Proof that a period cipher could do it. Not offered as the method used</td></tr>
+      <tr><td class="num">2026</td><th scope="row">Layfield and Davis</th><td>Neighbouring passages cohere as in real books; each sheet was meant to be read on its own and the book is bound out of order</td><td>New. Tested below</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="prose">
+    <p>One more development belongs here. A search of GitHub on the day this was written returned dozens of repositories from 2025 and 2026 announcing complete decipherments, as Sinhala, as a Latin and Occitan pharmacy book, as a midwives' manual, each with high claimed coverage and each excluding the others. Language models make it cheap to produce a fluent "translation" of anything. Readings are now abundant. What is scarce is a way to tell a right one from a wrong one, and that is the subject of the rest of this page.</p>
+  </div>
+</section>
+
+<!-- ============================================================ VIDEO -->
+<section id="video">
+  <h2>The video, checked</h2>
+  <div class="prose">
+    <p>The starting point was <a href="https://www.youtube.com/watch?v=7SPquufK2VI" target="_blank" rel="noopener">"NOBODY Can Read This Book!"</a> (LIT, 24 October 2026, 13 minutes). It is a careful summary and most of it holds. These are the points worth correcting or sharpening.</p>
+  </div>
+  <div class="scroll">
+  <table class="wide">
+    <thead><tr><th>What the video says</th><th>Verdict</th><th>What the sources say</th></tr></thead>
+    <tbody>
+      <tr><td>Vellum carbon-dated to 1404–1438; that is the age of the material, not necessarily the writing</td><td class="verdict">Right</td><td>Four leaves, University of Arizona, 2009. Never formally published.</td></tr>
+      <tr><td>Protein tests in 2014 showed calfskin; making it took at least 14 calves</td><td class="verdict">Half right</td><td>The species test is right. The skin count traces to a 2017 book review. We could not confirm it in the conservators' report, and Layfield and Davis estimate eight ordinary sheets to a skin, which on our arithmetic implies fewer.</td></tr>
+      <tr><td>About 240 pages and 38,000 words; 20 to 25 characters do almost all the work</td><td class="verdict">Right, with a caveat</td><td>We count {{n_pages}} photographed panels and {{n_tokens}} words. The character count depends on the transliteration: about 24 symbols in EVA, about 70 in the v101 alphabet.</td></tr>
+      <tr><td>Baresch's 1639 letter is the earliest confirmed mention</td><td class="verdict">Right</td><td>It is the earliest that survives. A first approach in 1637 is lost.</td></tr>
+      <tr><td>Marci's letter says Rudolf II paid 600 ducats; never proven</td><td class="verdict">Right</td><td>The letter is dated 19 August 1665 and reports hearsay. A 1599 payment of 600 florins for several books has since been found; it is suggestive only.</td></tr>
+      <tr><td>Kraus bought it for $24,500, tried to sell it for $160,000, and gave it to Yale in 1969</td><td class="verdict">Right</td><td>He first asked $100,000.</td></tr>
+      <tr><td>Friedman led a group in the 1940s and another in the early 1950s</td><td class="verdict">Mostly right</td><td>The groups met in 1944–46 and 1962–63.</td></tr>
+      <tr><td>Word frequencies follow the pattern of real languages, with the commonest word about twice as frequent as the next</td><td class="verdict">True, but no evidence either way</td><td>The commonest word, <span class="eva">{{top1}}</span>, occurs {{top1_n}} times and the next, <span class="eva">{{top2}}</span>, {{top2_n}} ({{top_ratio}} to 1). Meaningless text written by people follows the same law.</td></tr>
+      <tr><td>Gordon Rugg, 2003: a table and a card with holes</td><td class="verdict">Right</td><td>Published January 2004. The card is a sixteenth-century device.</td></tr>
+      <tr><td>Multispectral images from 2014, released in 2024, show three columns on page one in Marci's hand</td><td class="verdict">Right</td><td>Ten pages were imaged. The rest of the book has not been.</td></tr>
+      <tr><td>This month Davis and Colin Wakefield showed the book was bound in the wrong order</td><td class="verdict">Substance right</td><td>The co-author is Colin Layfield. The journal lists the article as online since 10 July 2026; the press coverage came in October.</td></tr>
+      <tr><td>The meaningless-text option is getting harder to believe, because every new tool finds structure</td><td class="verdict">Does not follow</td><td>Scribes, sections and sheet order are facts about how the book was made. A meaningless text written sheet by sheet by five people would have all three. The tests below show which measurements can tell the difference and which cannot.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ CORPUS -->
+<section id="corpus">
+  <h2>What we gathered</h2>
+  <div class="prose">
+    <p>Everything needed to work on the text is now in one place, with sources and checksums recorded. The transliterations are in the repository; the larger third-party material is fetched by script at pinned versions.</p>
+  </div>
+  <div class="scroll">
+  <table class="wide">
+    <thead><tr><th>Material</th><th>What it is</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Eight transliterations</th><td>The full text as typed out by different people and teams since the 1940s, in four alphabets: Zandbergen and Landini's ZL (version 3b, May 2025), Takahashi, Claston's v101, Currier, Friedman's study group, and three composites. Public domain, from voynich.nu, each with a pinned SHA-256.</td><td>The manuscript's text exists for analysis only through these. They differ: ZL and Takahashi give a different reading on about half of all lines, usually by a glyph or a space. Any result should hold on more than one.</td></tr>
+      <tr><th scope="row">Page table</th><td>For each of {{n_pages}} panels: section, Currier language, scribe, quire, and which folded sheet it belongs to. Built from the ZL headers and checked against an independent compilation of Davis's attributions (225 of 226 pages identical; the last is a notation difference).</td><td>Lets every test be split by scribe, subject and sheet.</td></tr>
+      <tr><th scope="row">Page images</th><td>All 236 photographed panels from Yale's scans, plus pixel positions for about 37,000 words.</td><td>Checking drawings first-hand; testing where words sit on the page.</td></tr>
+      <tr><th scope="row">Texts of known origin</th><td>Fifteen natural-language texts (Pliny on plants, Celsus on medicine, a medieval <i>Secreta Secretorum</i>, abbreviated Latin, Middle English surgery, Italian, German, unvowelled Hebrew); two Naibbe ciphertexts with Latin underneath; four outputs of the copy-and-modify generator; 38 samples of meaningless text written by volunteers.</td><td>These are the controls. A measurement tells us something only if it separates texts whose origin we know.</td></tr>
+      <tr><th scope="row">Literature</th><td>The full text of the 2026 page-order paper, and a fact sheet of about a hundred dated claims, each with its source.</td><td>The primer above.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ TESTS -->
+<section id="tests">
+  <h2>First tests, with controls</h2>
+  <div class="prose">
+    <p>Each test asks one question of the manuscript and puts the same question to the control texts. The running text is cut into equal-sized samples so that numbers are comparable. Words are quoted in EVA, the standard transliteration alphabet; its letters are labels for shapes, not sounds.</p>
+  </div>
+
+  <div class="plate">
+    <h3>The next glyph is far easier to guess than in any language</h3>
+    <p class="sub">How many bits of surprise each glyph carries once you know the one before it. One dot per text. The manuscript sits with the cipher and the generator, far from every language.</p>
+    {{chart_h2}}
+  </div>
+  <div class="prose">
+    <p>The manuscript scores {{h2_voy}} bits against {{h2_nat}} for the {{n_nat}} language samples. The gap survives a change of alphabet: {{h2_merged}} bits when EVA's strokes are merged into whole glyphs, {{h2_currier}} in Currier's alphabet, {{h2_v101}} in v101. Naibbe ciphertext ({{h2_cip}}) and the generator ({{h2_gen}}) both match. So this famous property rules out ordinary writing of any language we tried, including an unvowelled and an abbreviated one, and says nothing about cipher against meaningless text.</p>
+  </div>
+
+  <div class="plate">
+    <h3>Words echo the words just before them</h3>
+    <p class="sub">How much more likely two words are to differ by exactly one glyph (as <span class="eva">qokedy</span> and <span class="eva">qokeedy</span> do) than they would be if the words of the page were shuffled. Thin vertical lines show the spread across texts in each group.</p>
+    <div class="chart-scroll">{{chart_lag}}</div>
+  </div>
+  <div class="prose">
+    <p>A word in the manuscript is {{near1_voy_pct}} more likely than chance to be a one-glyph variant of the word before it. In all {{n_nat_lag}} language controls and both cipher texts the opposite holds: neighbouring words are less alike than chance ({{near1_nat}} and {{near1_cip}} times), because grammar alternates kinds of word. The generator behaves like the manuscript ({{near1_gen}}). Exact repeats show the same split. They make up {{rep_voy}} of adjacent pairs in the manuscript. That is {{rep_voy_x}} times the rate in a shuffled sample, and still {{exact1_voy}} times the rate when only the words within each page are shuffled. Every language and cipher sample falls well below both.</p>
+  </div>
+
+  <div class="plate">
+    <h3>The line is a unit</h3>
+    <p class="sub">Share of words that begin (left) or end (right) with a given glyph, for the word at the edge of a line and for all other words.</p>
+    {{chart_edges}}
+  </div>
+  <div class="prose">
+    <p>Words at the edges of lines are different words. <span class="eva">p</span> begins {{edge_p_at}} of line-first words and {{edge_p_else}} of the rest. <span class="eva">m</span> ends {{edge_m_at}} of line-last words and {{edge_m_else}} of the rest. {{gallows_open}} of paragraphs open with one of four tall "gallows" glyphs, which begin {{gallows_all}} of words overall. Against a null that shuffles words within each line, the line-start effect has a z-score of {{line_z_first}}. Language and cipher controls given the same line lengths show nothing (largest z-score {{line_nat_maxz}}). The generator shows the effect because its authors built it in.</p>
+    <p>Ordinary prose copied onto a page does not do this, because where a line breaks is an accident of word widths. Whatever produced the text worked line by line. One caution: our controls had their line breaks imposed, so they are null by construction. Transcriptions of real fifteenth-century books that keep the original line breaks would be the fairer comparison.</p>
+    <p>There is also a weak pull from the line above. Using the pixel positions of words, a word is {{geo_pct}} more likely to match a word sitting within a word-width and a half of it in the line above than a word further along that line ({{geo_near}} against {{geo_far}}, z = {{geo_z}}). Counting by word position instead, which lets us run the controls too, the manuscript shows {{vert_voy}} (z = {{vert_voy_z}}), the language and cipher controls show nothing, and the generator shows up to {{vert_gen_max_pct}}. The effect is small, and it points the same way as the echo between neighbours: words resemble words already written nearby.</p>
+  </div>
+
+  <div class="plate">
+    <h3>Each folded sheet is a unit, read 1r, 1v, 2r, 2v</h3>
+    <p class="sub">A sheet folded once gives four pages. The numbers are how much more alike two pages are than two pages by the same scribe elsewhere in the quire. Similarity falls with distance in the order a folded sheet would be read, and vanishes between sheets.</p>
+    <div class="chart-scroll">
+    {{diagram_sheet}}
+    </div>
+    {{chart_pairs}}
+  </div>
+  <div class="prose">
+    <p>This is our check on the 2026 paper by Layfield and Davis. They measured how alike pages are with latent semantic analysis and found that the two inner pages of a sheet are as alike as the two sides of a leaf, while facing pages on different sheets are less alike. In two Latin manuscripts with ordinary nested quires the pattern is the reverse. They conclude each sheet was written to be read on its own.</p>
+    <p><b>The result replicates.</b> We wrote the pipeline again from the paper's description, on a newer version of the transliteration. Our averages are {{lsa_conf}}, {{lsa_face}} and {{lsa_conj}} for the two sides of a leaf, facing pages and inner pairs; theirs are 0.383, 0.298 and 0.433. Searching all orders of the sheets in quires 13 and 20, we get the same top-ranked sequence as they do in both.</p>
+    <p><b>It survives a control they did not run.</b> In the herbal quires, sheets by different scribes are interleaved, so {{face_h_diff_n}} of the {{face_h_n}} facing pairs there are by two different scribes, and those pairs score {{face_h_diff}} against {{face_h_same}} for same-scribe pairs. That alone would make facing pages look unrelated. So we compared each pair with other pages by the same scribe in the same quire. The inner pair of a sheet is still {{ex_conj}} more alike ({{ex_conj_ci}}), in the herbal quires ({{ex_conj_h}}), quire 13 ({{ex_conj_q13}}) and quire 20 ({{ex_conj_q20}}) alike. Facing pages on different sheets are exactly at baseline ({{ex_face}}).</p>
+    <p><b>The proposed new order is not yet supported.</b> In our replication the best of the 120 possible orders of the sheets in quire 13 scores {{ro13_best}}, against {{ro13_bound}} as bound (they report 0.517 against 0.461). But a search always finds something. When we scramble the table of sheet-to-sheet scores and run the same search, it finds an order at least that good {{ro13_pct}} of the time in quire 13 and {{ro20_pct}} of the time in quire 20. The text alone cannot yet say which sheet followed which. The authors' planned comparison of water stains across sheets is the right next test, because it is independent of the text.</p>
+    <p>This establishes a fact about production. The book was written sheet by sheet, each sheet folded and filled in page order. It does not by itself show the pages carry a continuous meaning, since a scribe varying words already on the sheet would produce the same gradient.</p>
+  </div>
+
+  <div class="plate">
+    <h3>The two "languages" follow the scribe more than the subject</h3>
+    <p class="sub">How much vocabulary similarity survives when one thing changes. 100% would mean the two groups of pages are as alike as pages within each group.</p>
+    {{chart_scribe_subject}}
+  </div>
+  <div class="prose">
+    <p>Currier's languages A and B differ sharply: the sequence <span class="eva">ed</span> appears in {{ed_B}} of B words and {{ed_A}} of A words. Holding the subject fixed (herbal pages) and moving from scribe 1 to another scribe keeps {{scribe_keep}} of the similarity. Holding the scribe fixed and changing the subject keeps {{subject_keep}}. Scribes 2 and 3, who both write B, are nearly interchangeable ({{s2s3_keep}}). So the dialect is mostly a property of who was writing. Subject matters too, but less.</p>
+  </div>
+
+  <h3>Labels and opening words do not yet behave like names</h3>
+  <div class="prose">
+    <p>If the one-word labels beside drawings are names, and the text on the page discusses the things drawn, a page's labels should turn up in its own text. They barely do: {{lab_own}} of a page's labels appear in a sample of its own text, against {{lab_other}} in the text of a sister page by the same scribe (difference {{lab_diff}} points, 95% interval {{lab_ci}}, {{lab_pages}} pages). Labels do have a shape of their own: {{lab_o}} begin with <span class="eva">o</span>, against {{run_o}} of running words.</p>
+    <p>The first word of a paragraph is unique in the whole book {{open_unique}} of the time, against {{mid_unique}} for words in mid-line, which has encouraged the idea that herbal pages open with the plant's name. But {{open_known}} of opening words become an ordinary attested word when their first glyph is removed ({{mid_known}} for mid-line words, {{linefirst_known}} for other line-first words). Much of their uniqueness is an added glyph.</p>
+  </div>
+
+  <h3>Which measurements can tell the candidates apart</h3>
+  <div class="prose">
+    <p>This table is the point of running controls. A row is useful only where the control columns differ. The first row cannot separate a cipher from meaningless text. The others can, and on each of them the manuscript sits with the generator or beyond it.</p>
+  </div>
+  {{calibration_table}}
+  <div class="prose">
+    <p>Two limits on what this shows. The cipher column is one cipher, built as a proof of concept; a different design might reproduce more. And every meaningful control is continuous prose. Lists, recipe collections and tables of numbers repeat themselves in ways prose does not, and nobody has yet run them as controls.</p>
+  </div>
+</section>
+
+<!-- ============================================================ TABLEAUS -->
+<section id="tableaus">
+  <h2>Five tableaus</h2>
+  <div class="prose">
+    <p>A tableau here is a complete scene: who made the book, why, by what procedure, and what the text therefore is. All five share the same setting, because the evidence for the setting does not depend on reading the text. They differ in what the writing carries. The weights are our working judgement after the tests above. They are soft, they are not a consensus, and the method in the next section exists to replace them with scores.</p>
+  </div>
+
+  <div>
+  <div class="tableau">
+    <div class="weight"><b>30–40%</b>working weight</div>
+    <div class="body">
+      <h3>A book made to look learned</h3>
+      <p>The text never encoded anything. A group produced an impressive illustrated book for a buyer, a patron or their own practice, and filled it with writing-like text by a simple routine: write a word, vary one already on the sheet, keep to the conventions of lines and paragraphs. The drawings imitate the kinds of book that carried authority.</p>
+      <p><b>Explains</b> every local habit we measured, the scribe-bound dialects, labels that are not tied to their text, and a century without a reading.</p>
+      <p><b>Has to explain</b> why five trained scribes sustained it for over two hundred pages, why vocabulary still shifts with subject within one scribe, and the passage-to-passage coherence that Layfield and Davis report as unlike the generator's.</p>
+      <p><b>Would rise if</b> a copy-and-modify model predicts held-out pages better than any cipher-plus-language model, scribal corrections turn out to be nearly absent, and no link between text and picture survives once the order of production is controlled.</p>
+    </div>
+  </div>
+  <div class="tableau">
+    <div class="weight"><b>25–35%</b>working weight</div>
+    <div class="body">
+      <h3>A working compendium in cipher</h3>
+      <p>A small group with medical interests compiles herbal, pharmaceutical, astrological and bathing lore from ordinary sources and writes it in a devised script under a systematic, reversible encoding, for secrecy or for standing. Each scribe encodes sheet by sheet with personal habits or tables.</p>
+      <p><b>Explains</b> the genre layout, the team, and the subject effect within a scribe. It fits the period: secret writing was urged for exactly this material, and substitution ciphers with several symbols per letter were in use in north Italian chanceries by mid-century.</p>
+      <p><b>Has to explain</b> the echo between neighbouring words, the repeats, the line edges and the pull from the line above, none of which the Naibbe cipher produces; dialects that follow the scribe; and why a hand cipher of the 1420s has resisted every attack.</p>
+      <p><b>Would rise if</b> a cipher applied to real period text reproduces the whole table above, a mechanical decoding passes the gate below, or labels map to picture-appropriate words more often than shuffled labels do.</p>
+    </div>
+  </div>
+  <div class="tableau">
+    <div class="weight"><b>20–30%</b>working weight</div>
+    <div class="body">
+      <h3>A compendium that lost its meaning in the making</h3>
+      <p>The makers worked from real sources and meant to record them, but the procedure cannot be run backwards: abbreviation past the point of ambiguity, a private memory notation, arbitrary padding, or copying by pattern in which each scribe rebuilt words from stock parts. The book is organised like its sources. The text no longer carries them. Zandbergen names this possibility: meaning "lost in the process of its creation".</p>
+      <p><b>Explains</b> at once the genre layout and the statistical likeness to generated text, the scribe-bound habits, the failure of decipherment and the untied labels.</p>
+      <p><b>Has to explain</b> what residue of the sources survives, and how to tell it from the first tableau at all.</p>
+      <p><b>Would rise if</b> rare words track pictures across distant pages (the same plant drawn twice, the same words) without any consistent decoding, or if errors typical of copying from an exemplar sit alongside generator-like statistics.</p>
+    </div>
+  </div>
+  <div class="tableau">
+    <div class="weight"><b>5–10%</b>working weight</div>
+    <div class="body">
+      <h3>An invented or revealed language</h3>
+      <p>A constructed vocabulary in which words are assembled from classifying prefixes and suffixes, as Friedman and Tiltman suspected, or visionary writing in the manner of Hildegard of Bingen's twelfth-century <i>Lingua Ignota</i>.</p>
+      <p><b>Explains</b> the rigid word structure and predictable glyphs. <b>Has to explain</b> five scribes sharing it in two dialects, and why word families are not tied to subjects or labels. Systematic languages of this kind are otherwise unknown before the seventeenth century.</p>
+    </div>
+  </div>
+  <div class="tableau">
+    <div class="weight"><b>under 5%</b>working weight</div>
+    <div class="body">
+      <h3>An unknown language, plainly written</h3>
+      <p>A spoken language set down in an invented alphabet with no concealment.</p>
+      <p><b>Explains</b> the word-frequency curve and the section vocabulary. <b>Has to explain</b> glyphs far more predictable than in any script we tested, neighbouring words that attract where in every language they repel, lines that act as units, and two dialects for one subject split by scribe.</p>
+    </div>
+  </div>
+  </div>
+
+  <h3>The evidence ledger</h3>
+  <div class="prose">
+    <p>Each row is an observation; each cell is our judgement of how comfortably a tableau accommodates it. Rows where every cell is the same tell us about the setting and nothing about the text.</p>
+  </div>
+  <ul class="ledger-key"><li><b>●</b>fits as it stands</li><li><b>◐</b>fits with an added assumption</li><li><b>○</b>strains</li></ul>
+  <div class="scroll">
+  <table class="wide ledger">
+    <thead><tr><th style="text-align:left">Observation</th><th>Made to look learned</th><th>Cipher</th><th>Meaning lost</th><th>Invented language</th><th>Plain language</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Early fifteenth-century materials; five scribes; written sheet by sheet</th><td>●</td><td>●</td><td>●</td><td>●</td><td>●</td></tr>
+      <tr><th scope="row">Laid out like a herbal, pharmacy, zodiac and bathing treatise</th><td>◐</td><td>●</td><td>●</td><td>◐</td><td>●</td></tr>
+      <tr><th scope="row">Glyphs far more predictable than in any language</th><td>●</td><td>◐</td><td>●</td><td>●</td><td>○</td></tr>
+      <tr><th scope="row">Neighbouring words echo and repeat</th><td>●</td><td>○</td><td>●</td><td>◐</td><td>○</td></tr>
+      <tr><th scope="row">Lines act as units; paragraphs open with a tall glyph</th><td>●</td><td>◐</td><td>●</td><td>◐</td><td>○</td></tr>
+      <tr><th scope="row">Dialect follows the scribe more than the subject</th><td>●</td><td>◐</td><td>●</td><td>◐</td><td>○</td></tr>
+      <tr><th scope="row">Vocabulary still shifts with subject within one scribe</th><td>◐</td><td>●</td><td>●</td><td>●</td><td>●</td></tr>
+      <tr><th scope="row">Neighbouring passages cohere as in real books (Layfield and Davis)</th><td>◐</td><td>●</td><td>●</td><td>●</td><td>●</td></tr>
+      <tr><th scope="row">Labels are not tied to their page's text</th><td>●</td><td>◐</td><td>●</td><td>◐</td><td>○</td></tr>
+      <tr><th scope="row">No reading reproduced by a second person in a century</th><td>●</td><td>◐</td><td>●</td><td>●</td><td>○</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>What all five agree on</h3>
+  <div class="prose">
+    <p>This is the part of the answer that does not wait on the text. The book was made in the first decades of the fifteenth century, most likely within a generation of the parchment. It was made by a small team, not a lone author, working one folded sheet at a time, drawing first and writing after. Its makers knew the illustrated medical and astrological books of their region and built this one on their plan. On Davis's evidence it was bound out of order within the century. It was in Prague by the early seventeenth century, and it has been unread for as long as there are records of anyone trying. Davis's own suggestion is "a book of women's folk knowledge that's being preserved", with the caution that "you cannot prove that yet".</p>
+  </div>
+</section>
+
+<!-- ============================================================ METHOD -->
+<section id="method">
+  <h2>How to validate a tableau</h2>
+  <div class="prose">
+    <p>The field has plenty of ideas and no agreed way for one of them to lose. These steps make each tableau a claim that the evidence can score. They are in order, because the later ones depend on the earlier.</p>
+  </div>
+  <ol class="steps">
+    <li><div><h3>Write each tableau as a process you can run</h3><p>A scenario becomes testable when it is a procedure that takes inputs (a source text or none, a set of rules, five scribes with their habits, sheets written in page order) and emits pages. The copy-and-modify generator and the Naibbe cipher are the first two such simulators. The meaning-lost tableau needs one. A tableau that cannot be simulated cannot be scored.</p></div></li>
+    <li><div><h3>Fix the measurements before looking</h3><p>Agree on a panel of fingerprints in advance: the six rows of the table above, word structure, the sheet gradient, section and scribe effects. Set aside a share of the sheets that nobody examines until the end. Without this, every analyst tunes until something appears, and the text is small enough ({{n_tokens}} words) to be overfitted by hand.</p></div></li>
+    <li><div><h3>Calibrate every measurement on texts of known origin</h3><p>Before a statistic is trusted on the manuscript it must separate known cases: real languages in period subjects, period ciphers over real text, generated text, and gibberish written by people. Add the classes still missing, above all lists, recipe collections, calendars and tables, and transcriptions that keep original line breaks. Require the result to hold across transliterations.</p></div></li>
+    <li><div><h3>Score the tableaus by prediction</h3><p>Fit each simulator on most of the sheets and ask how well it predicts the words on the held-out ones, in bits per word. Compare a copy model (the next word is a variant of one nearby), a cipher over a language model, and mixtures. This gives a likelihood ratio between tableaus in place of an argument, and it shows how much of the text each one leaves unexplained.</p></div></li>
+    <li><div><h3>Control for who, what and when</h3><p>Scribe, subject and order of writing are tangled together. Compare like with like, as in the same-scribe baseline above. For any result found by searching, such as a best page order or a best key, run the same search on scrambled data to learn what it finds by chance.</p></div></li>
+    <li><div><h3>Check text against evidence the text never touched</h3><p>The strongest validation is agreement between independent kinds of evidence. Physical: the water stain, paint offsets, sewing holes, which sheets were cut from the same skin, which were written with the same batch of ink. Visual: drawings matched to dated traditions by people who have not seen the text results. If the sheet order from stains agrees with the order from text similarity, both gain. If rare words follow a plant from the herbal pages to the pharmacy pages once scribe and order are controlled, the text refers to something.</p></div></li>
+    <li><div><h3>Hold every claimed reading to one gate</h3><p>See the box below. The same gate applies to a scholar's proposal and to a language model's.</p></div></li>
+    <li><div><h3>Qualify methods on a blind challenge set</h3><p>Build a public set of documents made by known processes, some enciphered, some generated, some real languages in invented scripts, all in the same transliteration style, with the answers sealed. A method earns the right to pronounce on the manuscript by classifying these correctly first.</p></div></li>
+  </ol>
+
+  <div class="gate">
+    <h3>The gate for a claimed decipherment</h3>
+    <ol>
+      <li>The mapping from script to language is written down in full and can be applied by someone else without judgement calls.</li>
+      <li>It has fewer free choices than the text has information. Count the choices; a key with thousands of entries for {{n_types}} word forms explains nothing.</li>
+      <li>It was fixed before the held-out sheets were opened, and it yields grammatical text there.</li>
+      <li>Applied to scrambled manuscript text and to generated text, it fails. A method that "reads" gibberish reads nothing.</li>
+      <li>Run forward on real period text, it reproduces the fingerprints: predictable glyphs, echoing neighbours, line edges, two dialects.</li>
+      <li>Labels come out as words that suit their pictures more often than labels shuffled between pictures do.</li>
+      <li>Two people using the key independently produce the same reading of the same page.</li>
+    </ol>
+  </div>
+
+  <h3>What each kind of evidence can settle</h3>
+  <div class="scroll">
+  <table class="wide">
+    <thead><tr><th>Evidence</th><th>What it constrains</th><th>State today</th><th>Next step</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Radiocarbon, ink and pigment chemistry</th><td>Date, authenticity, later additions</td><td>Done on a few leaves; consistent</td><td>Ink batches by sheet and scribe, to order the work</td></tr>
+      <tr><th scope="row">Parchment proteins and DNA</th><td>Which sheets share a skin; how many animals; scale and batches of production</td><td>Species only</td><td>Non-destructive sampling across all sheets</td></tr>
+      <tr><th scope="row">Multispectral imaging</th><td>Erased text, corrections, paint offsets between pages</td><td>Ten pages, 2014</td><td>The whole book</td></tr>
+      <tr><th scope="row">Stains, offsets, sewing holes</th><td>The original order of the sheets, independent of the text</td><td>Described; not yet mapped</td><td>Map and match across all sheets, blind to text results</td></tr>
+      <tr><th scope="row">Handwriting</th><td>Number of scribes, who wrote what, in what sequence</td><td>Five scribes; attribution per page</td><td>Blind machine replication; pen-dip and correction census</td></tr>
+      <tr><th scope="row">Drawings</th><td>Region, date, the kinds of book imitated</td><td>Many parallels, mostly argued case by case</td><td>Retrieval across digitised fifteenth-century books with blind expert rating</td></tr>
+      <tr><th scope="row">Text statistics</th><td>The procedure that produced the text</td><td>Rich, and newly calibrated by controls</td><td>Fitted simulators scored on held-out sheets</td></tr>
+      <tr><th scope="row">Text against picture</th><td>Whether the text refers to anything</td><td>No positive result yet</td><td>Repeated plants, label and nymph attributes, star and paragraph counts</td></tr>
+      <tr><th scope="row">Archives</th><td>Ownership before 1600; purpose</td><td>Nothing before Rudolf's court</td><td>Inventories and letters from the Alpine region, 1430–1600</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ NEXT -->
+<section id="next">
+  <h2>What to do next</h2>
+  <div class="prose">
+    <p>In order of value for effort. The first group needs only the material already gathered.</p>
+    <h3>At the desk</h3>
+    <ol>
+      <li><b>Add the missing controls.</b> Recipe collections, calendars, tables with Roman numerals, and line-by-line transcriptions of real fifteenth-century books. If lists and numerals echo their neighbours the way the manuscript does, the cipher tableau gains.</li>
+      <li><b>Fit and score the simulators.</b> A copy model, a cipher over a language model and their mixtures, compared on held-out sheets.</li>
+      <li><b>Count the corrections.</b> Go through the page images for erasures, overwriting and insertions. Copying a real text from an exemplar leaves characteristic slips; inventing text leaves few.</li>
+      <li><b>Test the repeated plants.</b> Match pharmacy drawings to herbal drawings by eye, blind to the text, then ask whether matched pages share rare words more than unmatched pages by the same scribe.</li>
+      <li><b>Repeat every result on a second transliteration.</b></li>
+    </ol>
+    <h3>With the library</h3>
+    <ol>
+      <li>Map the water stain, offsets and sewing holes across all sheets to reconstruct their order without the text.</li>
+      <li>Image the whole book multispectrally.</li>
+      <li>Sample parchment and ink sheet by sheet to recover skins and ink batches.</li>
+    </ol>
+    <h3>With the community</h3>
+    <ol>
+      <li>Publish the fingerprint panel and the challenge set, and invite both sides to register predictions before the held-out sheets are opened.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ SOURCES -->
+<section id="sources">
+  <h2>Sources</h2>
+  <ol class="sources">
+    <li>René Zandbergen, <a href="https://www.voynich.nu/" target="_blank" rel="noopener">voynich.nu</a>: history, origin, letters, radiocarbon, analysis of the writing and illustrations, and the transliteration files.</li>
+    <li>Colin Layfield and Lisa Fagin Davis, <a href="https://journals.openedition.org/digitalmedievalist/2331" target="_blank" rel="noopener">"Singulion Structure and the Voynich Manuscript"</a>, <i>Digital Medievalist</i> 19 (2026); and "The Application of Latent Semantic Analysis to the Voynich Manuscript", <i>Digital Humanities Quarterly</i> 20(1), 2026.</li>
+    <li>Lisa Fagin Davis, "How Many Glyphs and How Many Scribes?", <i>Manuscript Studies</i> 5(1), 2020; <a href="https://manuscriptroadtrip.wordpress.com/2024/09/08/multispectral-imaging-and-the-voynich-manuscript/" target="_blank" rel="noopener">"Multispectral Imaging and the Voynich Manuscript"</a> (2024); <a href="https://manuscriptroadtrip.wordpress.com/2025/01/19/voynich-codicology/" target="_blank" rel="noopener">"Voynich Codicology"</a> (2025).</li>
+    <li>Michael Greshko, <a href="https://www.tandfonline.com/doi/full/10.1080/01611194.2025.2566408" target="_blank" rel="noopener">"The Naibbe cipher"</a>, <i>Cryptologia</i> (2025).</li>
+    <li>Torsten Timm and Andreas Schinner, <a href="https://www.tandfonline.com/doi/abs/10.1080/01611194.2019.1596999" target="_blank" rel="noopener">"A possible generating algorithm of the Voynich manuscript"</a>, <i>Cryptologia</i> 44(1), 2020.</li>
+    <li>Claire Bowern and Luke Lindemann, <a href="https://www.annualreviews.org/content/journals/10.1146/annurev-linguistics-011619-030613" target="_blank" rel="noopener">"The Linguistics of the Voynich Manuscript"</a>, <i>Annual Review of Linguistics</i> 7 (2021).</li>
+    <li>Daniel Gaskell and Claire Bowern, <a href="https://ceur-ws.org/Vol-3313/paper4.pdf" target="_blank" rel="noopener">"Gibberish after all?"</a>, and Stefan Guzy, <a href="https://ceur-ws.org/Vol-3313/paper16.pdf" target="_blank" rel="noopener">"Book Transactions of Emperor Rudolf II"</a>, both in the proceedings of the 2022 Voynich conference (CEUR-WS 3313).</li>
+    <li>Marcelo Montemurro and Damián Zanette, <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0066344" target="_blank" rel="noopener">"Keywords and Co-Occurrence Patterns in the Voynich Manuscript"</a>, <i>PLoS ONE</i> 8(6), 2013.</li>
+    <li>Keagan Brewer and Michelle Lewis, <a href="https://doi.org/10.1093/shm/hkad099" target="_blank" rel="noopener">"The Voynich Manuscript, Dr Johannes Hartlieb and the Encipherment of Women's Secrets"</a>, <i>Social History of Medicine</i> 37(3), 2024.</li>
+    <li>McCrone Associates, materials analysis of the Voynich manuscript (2009), and the Beinecke Library's <a href="https://beinecke.library.yale.edu/collections/highlights/voynich-manuscript" target="_blank" rel="noopener">page on MS 408</a>. Yale's catalogue still gives the Mondragone find-spot and an alternative date for Marci's letter; we follow Zandbergen on both.</li>
+    <li>Data: transliterations via <a href="https://github.com/noah-chelednik/voynich-data" target="_blank" rel="noopener">voynich-data</a>; page images, word positions and collation via <a href="https://github.com/writtenbyalina/voynichviewer" target="_blank" rel="noopener">Voynich Viewer</a>; controls from <a href="https://github.com/lrozanova/voynich-units" target="_blank" rel="noopener">voynich-units</a>, <a href="https://github.com/TorstenTimm/SelfCitationTextgenerator" target="_blank" rel="noopener">SelfCitationTextgenerator</a>, <a href="https://github.com/danielgaskell/voynich" target="_blank" rel="noopener">Gaskell and Bowern's archive</a>, <a href="https://github.com/chirila/Voynich-public" target="_blank" rel="noopener">Lindemann and Bowern's corpora</a> and <a href="https://github.com/mzattera/v4j" target="_blank" rel="noopener">v4j</a>.</li>
+    <li>Analysis code, result tables and this page's source: <code>research/voynich/</code> in the project repository. Every number above is computed by the scripts there.</li>
+  </ol>
+</section>
+
+</div>
+
+<div id="tip" class="tip" role="status" hidden></div>
+<script>
+(function () {
+  var tip = document.getElementById('tip');
+  function place(x, y) {
+    var pad = 10, r = tip.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+    var left = Math.min(Math.max(pad, x + 14), vw - r.width - pad);
+    var top = y - r.height - 12;
+    if (top < pad) top = y + 18;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+  function fillTip(rows) {
+    tip.textContent = '';
+    rows.forEach(function (row) {
+      var line = document.createElement('div');
+      line.className = 'tip-row';
+      if (row.cls) { var k = document.createElement('span'); k.className = 'key line-key ' + row.cls; line.appendChild(k); }
+      var v = document.createElement('strong'); v.textContent = row.v; line.appendChild(v);
+      var l = document.createElement('span'); l.textContent = row.label; line.appendChild(l);
+      tip.appendChild(line);
+    });
+    tip.hidden = false;
+  }
+  function hide() { tip.hidden = true; }
+  document.querySelectorAll('.hit').forEach(function (el) {
+    if (el.id === 'lag-hit') return;
+    function rows() { return [{ v: el.dataset.v || '', label: el.dataset.tip || '' }]; }
+    el.addEventListener('pointermove', function (e) { fillTip(rows()); place(e.clientX, e.clientY); });
+    el.addEventListener('pointerleave', hide);
+    el.addEventListener('focus', function () { var b = el.getBoundingClientRect(); fillTip(rows()); place(b.left + b.width / 2, b.top); });
+    el.addEventListener('blur', hide);
+  });
+  var dataEl = document.getElementById('lag-data'), svg = document.getElementById('lag-svg');
+  if (dataEl && svg) {
+    var D = JSON.parse(dataEl.textContent), hit = document.getElementById('lag-hit'), cross = document.getElementById('lag-cross'), idx = 0;
+    function showAt(i, cx, cy) {
+      idx = i;
+      cross.setAttribute('x1', D.xs[i]); cross.setAttribute('x2', D.xs[i]); cross.setAttribute('visibility', 'visible');
+      var rows = [{ v: D.bands[i] + (D.bands[i] === '1' ? ' word apart' : ' words apart'), label: '' }];
+      Object.keys(D.series).forEach(function (k) { var s = D.series[k]; rows.push({ v: s.mean[i].toFixed(2) + '×', label: s.name, cls: s.cls }); });
+      fillTip(rows); place(cx, cy);
+    }
+    function nearest(clientX) {
+      var b = svg.getBoundingClientRect(), x = (clientX - b.left) / b.width * D.w, best = 0;
+      D.xs.forEach(function (v, i) { if (Math.abs(v - x) < Math.abs(D.xs[best] - x)) best = i; });
+      return best;
+    }
+    function atIndex(i) { var b = svg.getBoundingClientRect(); showAt(i, b.left + D.xs[i] / D.w * b.width, b.top + 60); }
+    function off() { hide(); cross.setAttribute('visibility', 'hidden'); }
+    hit.addEventListener('pointermove', function (e) { showAt(nearest(e.clientX), e.clientX, e.clientY); });
+    hit.addEventListener('pointerleave', off);
+    hit.addEventListener('focus', function () { atIndex(idx); });
+    hit.addEventListener('blur', off);
+    hit.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      atIndex(Math.max(0, Math.min(D.bands.length - 1, idx + (e.key === 'ArrowRight' ? 1 : -1))));
+    });
+  }
+})();
+</script>
