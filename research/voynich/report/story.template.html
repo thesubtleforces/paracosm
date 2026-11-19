@@ -1,0 +1,802 @@
+<title>Five Hands</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  /* Layout: a screening-room page. One reading column; each scene keeps its evidence in the margin beside it;
+     plates and storyboard frames break wider. One dark look by choice: the page is a film treatment and its
+     plates are graded for a dark surround. Colours are the book's own pigments, lifted for a dark ground. */
+  --ground:#14110e;      /* iron-gall ink at full strength */
+  --panel:#1d1915;
+  --panel-2:#28221b;
+  --rule:#3d342a;
+  --text:#ece3d4;        /* new parchment */
+  --soft:#bfb19d;        /* handled parchment */
+  --dim:#968873;
+  --azurite:#8fb1cb;     /* measured */
+  --verdigris:#8cbfa5;   /* inferred */
+  --ochre:#e39c84;       /* imagined */
+  --gilt:#d6ad76;        /* slate numbers, links */
+  --display:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --body:"Spectral",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--text);font-family:var(--body);font-size:1.125rem;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.wrap{max-width:74rem;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:1.5rem 5rem}
+.inner{padding-inline:clamp(0rem,3vw,2rem);display:flex;flex-direction:column;gap:5.5rem}
+a{color:var(--gilt);text-underline-offset:.18em;text-decoration-thickness:1px}
+a:hover{color:var(--text)}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--gilt);outline-offset:3px;border-radius:2px}
+p{margin:0}
+h1,h2,h3,h4{margin:0;font-weight:500;text-wrap:balance}
+h2{font:500 clamp(2.1rem,5vw,3.1rem)/1.05 var(--display);letter-spacing:-.005em}
+.mono{font-family:var(--mono)}
+.eyebrow{font:500 .72rem/1.5 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.lede{font-size:1.3rem;line-height:1.5;max-width:40rem}
+.prose{display:flex;flex-direction:column;gap:1.05em;max-width:38rem;min-width:0}
+.prose.wide{max-width:42rem}
+.note{font-size:.95rem;color:var(--soft);max-width:42rem}
+section{display:flex;flex-direction:column;gap:2.2rem;min-width:0}
+.sec-head{display:flex;flex-direction:column;gap:.9rem}
+
+/* ---------- hero */
+.hero{display:flex;flex-direction:column;gap:1.6rem;padding-top:1.5rem}
+.hero h1{font:italic 500 clamp(3.6rem,13vw,8.4rem)/.86 var(--display);letter-spacing:-.02em;margin-left:-.04em}
+.hero .sub{font:500 clamp(1.25rem,2.6vw,1.7rem)/1.3 var(--display);color:var(--soft);max-width:34rem}
+.hands{display:flex;flex-direction:column;gap:3px;max-width:60rem}
+.hand{display:grid;grid-template-columns:11.5rem minmax(0,1fr);gap:1rem;align-items:center;margin:0}
+.hand img{display:block;width:100%;height:5.6rem;object-fit:cover;object-position:left center;border-radius:1px}
+.hand figcaption{font:400 .74rem/1.45 var(--mono);color:var(--soft);display:flex;flex-direction:column}
+.hand figcaption b{font-weight:500;color:var(--text);letter-spacing:.12em;text-transform:uppercase}
+.contents{display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;font:400 .8rem var(--mono);padding:0;margin:0;list-style:none;border-top:1px solid var(--rule);padding-top:1rem}
+.contents a{text-decoration:none}
+.contents a:hover{text-decoration:underline}
+
+/* ---------- the four marks */
+.tag{display:inline-block;font:500 .64rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.34em .5em .28em;border:1px solid currentColor;border-radius:2px;white-space:nowrap}
+.tag.doc{color:var(--text)} .tag.meas{color:var(--azurite)} .tag.inf{color:var(--verdigris)} .tag.imag{color:var(--ochre)}
+.marks{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1.2rem 2rem;padding:0;margin:0;list-style:none}
+.marks li{display:flex;flex-direction:column;gap:.5rem;font-size:.95rem;color:var(--soft);align-items:flex-start}
+
+/* ---------- brief + trust */
+.brief{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,25rem);gap:3rem 4rem;align-items:start}
+.brief ol{margin:0;padding:0;list-style:none;counter-reset:b;display:flex;flex-direction:column;gap:1rem;max-width:38rem}
+.brief ol li{counter-increment:b;display:grid;grid-template-columns:2rem minmax(0,1fr);gap:.4rem}
+.brief ol li::before{content:counter(b);font:500 .8rem/2.1 var(--mono);color:var(--gilt)}
+.trust{background:var(--panel);border-radius:3px;padding:1.5rem 1.5rem 1.6rem;display:flex;flex-direction:column;gap:1.1rem}
+.trust h3{font:500 .72rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.trust .big{font:500 3.4rem/1 var(--display);font-variant-numeric:lining-nums}
+.trust p{font-size:.95rem;color:var(--soft)}
+.bars{display:flex;flex-direction:column;gap:.7rem}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) 4.6rem;grid-template-areas:"lab val" "track track";gap:.3rem .8rem;font:400 .78rem/1.35 var(--mono);color:var(--soft);position:relative}
+.bar .lab{grid-area:lab;min-width:0}
+.bar .val{grid-area:val;text-align:right;color:var(--text);font-variant-numeric:tabular-nums}
+.bar .track{grid-area:track;height:8px;background:var(--panel-2);border-radius:0 4px 4px 0;position:relative;overflow:hidden}
+.bar .track i{position:absolute;inset:0 auto 0 0;background:var(--azurite);border-radius:0 4px 4px 0}
+.bar .track i.span{background:color-mix(in srgb,var(--azurite) 45%,var(--panel-2))}
+.bar.lead .track i{background:var(--gilt)}
+.bar.lead .track i.span{background:color-mix(in srgb,var(--gilt) 45%,var(--panel-2))}
+.plate .bars{max-width:40rem}
+.plate .bar{grid-template-columns:3.4rem minmax(0,1fr) 4.6rem;grid-template-areas:"pp lab val" "pp track track";align-items:center}
+.pp{grid-area:pp;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;width:3rem}
+.pp b{height:1.05rem;border:1px solid var(--dim);border-radius:1px}
+.pp b.on{background:var(--azurite);border-color:var(--azurite)}
+.pp.far{grid-template-columns:repeat(2,1fr);width:1.5rem;margin-inline:auto}
+
+/* ---------- scenes */
+.scenes{gap:4.5rem}
+.scene{display:flex;flex-direction:column;gap:1.8rem;min-width:0}
+.slate{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:1.4rem;align-items:baseline;border-top:1px solid var(--rule);padding-top:1.2rem}
+.slate .no{font:500 .76rem var(--mono);letter-spacing:.14em;color:var(--gilt);text-transform:uppercase}
+.slate h3{font:500 clamp(1.9rem,4vw,2.5rem)/1.05 var(--display)}
+.slate .where{grid-column:2;font:400 .78rem/1.5 var(--mono);color:var(--soft);margin-top:.45rem}
+.scene-body{display:grid;grid-template-columns:minmax(0,38rem) minmax(0,25rem);gap:2.2rem 4rem;align-items:start}
+.ground{display:flex;flex-direction:column;gap:.9rem}
+.ground h4{font:500 .7rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.ground ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.85rem}
+.ground li{display:flex;flex-direction:column;gap:.35rem;align-items:flex-start;font-size:.9rem;line-height:1.5;color:var(--soft)}
+.ground li span.t{color:var(--soft)}
+.ground li em{font-style:italic;color:var(--text)}
+.plate{margin:0;display:flex;flex-direction:column;gap:.8rem;min-width:0}
+.plate>img{display:block;width:100%;height:auto;border-radius:2px;max-width:52rem}
+.plate figcaption{font:400 .78rem/1.55 var(--mono);color:var(--soft);max-width:44rem}
+.kind{font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-size:.66rem;color:var(--text);margin-right:.7em;white-space:nowrap}
+.kind::before{content:"";display:inline-block;width:.62em;height:.62em;margin-right:.5em;vertical-align:-.02em}
+.kind.object::before{background:var(--text)}
+.kind.measure::before{background:var(--azurite);transform:rotate(45deg)}
+.kind.workshop::before{border:1.5px solid var(--ochre);border-radius:50%}
+.kind.archive::before{border:1.5px solid var(--text)}
+
+/* ---------- word grid */
+.scroll{overflow-x:auto;padding-bottom:2.6rem;max-width:100%}
+table.grid{border-collapse:separate;border-spacing:2px;font:400 .76rem/1 var(--mono);font-variant-numeric:tabular-nums}
+table.grid th{font-weight:500;color:var(--soft);padding:.4rem .5rem;text-align:right;white-space:nowrap}
+table.grid thead th{text-align:center;padding-bottom:.5rem}
+table.grid th.corner{text-align:left;color:var(--dim);font-weight:400}
+table.grid td{min-width:3rem;text-align:right;padding:.42rem .5rem;border-radius:2px;background:color-mix(in srgb,var(--azurite) calc(var(--a,0)*100%),var(--panel));color:var(--text)}
+table.grid td.hi{color:var(--ground)}
+table.grid td.zero{color:var(--dim);text-align:center}
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;z-index:5;top:calc(100% + 5px);left:50%;transform:translateX(-50%);white-space:nowrap;background:var(--text);color:var(--ground);font:500 .72rem/1 var(--mono);padding:.5rem .6rem;border-radius:3px;pointer-events:none}
+table.grid td:nth-child(-n+4)[data-tip]:hover::after{left:0;transform:none}
+table.grid td:nth-child(n+10)[data-tip]:hover::after{left:auto;right:0;transform:none}
+.bar[data-tip]:hover::after{top:auto;bottom:calc(100% + 4px);left:0;transform:none}
+
+/* ---------- diagrams */
+.dg{max-width:46rem;min-width:34rem;width:100%;height:auto;display:block}
+.dg text{font:400 11px var(--mono);fill:var(--soft)}
+.dg text.h{fill:var(--text);font-weight:500;letter-spacing:.08em}
+.dg .s{fill:none;stroke:var(--dim);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.dg .s.on{stroke:var(--azurite);stroke-width:2.4}
+.dg text.on{fill:var(--azurite)}
+.dgscroll{overflow-x:auto}
+
+/* ---------- timeline */
+.time{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;max-width:44rem}
+.time li{display:grid;grid-template-columns:6.6rem minmax(0,1fr);gap:1.2rem;padding:.7rem 0;border-top:1px solid var(--rule);font-size:.98rem;color:var(--soft)}
+.time li b{font:500 .82rem/1.9 var(--mono);color:var(--text);font-variant-numeric:tabular-nums}
+.time li.gap{color:var(--dim);font-style:italic}
+
+/* ---------- rivals */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));gap:2.2rem 3rem}
+.cols>div{display:flex;flex-direction:column;gap:.7rem;min-width:0}
+.cols h3,.h3{font:500 1.55rem/1.15 var(--display)}
+.cols p,.cols li{font-size:.98rem;color:var(--soft)}
+.cols ul,.plain{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.5rem}
+table.led{border-collapse:collapse;width:100%;min-width:40rem;font-size:.92rem}
+table.led th,table.led td{text-align:left;vertical-align:top;padding:.75rem 1rem .75rem 0;border-top:1px solid var(--rule);color:var(--soft)}
+table.led thead th{font:500 .7rem var(--mono);letter-spacing:.12em;text-transform:uppercase;border-top:0;color:var(--soft)}
+table.led tbody th{font-weight:400;color:var(--text);width:34%}
+
+/* ---------- film */
+.film{gap:3.4rem}
+.kinds{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:1.6rem 2.4rem;padding:0;margin:0;list-style:none}
+.kinds li{display:flex;flex-direction:column;gap:.55rem;font-size:.98rem;color:var(--soft);border-top:1px solid var(--rule);padding-top:1rem}
+.kinds li .kind{font-size:.72rem}
+.spec{margin:0;display:grid;grid-template-columns:minmax(0,11rem) minmax(0,1fr);gap:0 2rem;max-width:56rem}
+.spec dt{font:500 .74rem/1.9 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--text);border-top:1px solid var(--rule);padding:.8rem 0}
+.spec dd{margin:0;font-size:.98rem;color:var(--soft);border-top:1px solid var(--rule);padding:.8rem 0}
+.swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(5.4rem,1fr));gap:.8rem;padding:0;margin:0;list-style:none;max-width:56rem}
+.swatches li{display:flex;flex-direction:column;gap:.45rem;font:400 .7rem/1.4 var(--mono);color:var(--soft)}
+.swatches i{display:block;height:3.6rem;border-radius:2px;background:var(--c)}
+.swatches b{font-weight:500;color:var(--text)}
+.acts{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;max-width:50rem}
+.acts li{display:grid;grid-template-columns:4.4rem 11rem minmax(0,1fr);gap:1.2rem;padding:.8rem 0;border-top:1px solid var(--rule);font-size:.98rem;color:var(--soft)}
+.acts li b{font:500 .8rem/1.9 var(--mono);color:var(--gilt);font-variant-numeric:tabular-nums}
+.acts li strong{font:500 1.25rem/1.3 var(--display);color:var(--text)}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(17rem,1fr));gap:2rem 1.4rem;padding:0;margin:0;list-style:none}
+.board li{display:flex;flex-direction:column;gap:.6rem;min-width:0}
+.frame{aspect-ratio:1.37;max-width:100%;border-radius:2px;overflow:hidden;background:var(--panel);display:flex;align-items:flex-end;position:relative}
+.frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.frame.todo{border:1px solid var(--rule);padding:1rem 1.1rem;align-items:center}
+.frame.todo p{font:italic 500 1.3rem/1.25 var(--display);color:var(--text)}
+.frame.todo::after{content:"";position:absolute;right:.8rem;bottom:.8rem;width:.8rem;height:.8rem;border:1.5px solid var(--ochre);border-radius:50%}
+.board .slug{font:500 .68rem/1.5 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--text)}
+.board .slug span{color:var(--gilt);margin-right:.7em}
+.board p{font-size:.9rem;line-height:1.45;color:var(--soft)}
+.board .how{font:400 .72rem/1.5 var(--mono);color:var(--dim)}
+.script{background:var(--panel);border-radius:3px;padding:1.6rem 1.6rem 1.7rem;display:flex;flex-direction:column;gap:1.1rem;max-width:46rem}
+.script .cue{font:500 .68rem/1.5 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.script .vo{font-size:1.12rem;line-height:1.5;max-width:36rem}
+.script .title{font:italic 500 2.2rem/1 var(--display);padding-top:.4rem}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));gap:2rem 3.4rem}
+.rules>div{display:flex;flex-direction:column;gap:.8rem}
+.rules ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.5rem;font-size:.98rem;color:var(--soft)}
+.prompts{display:flex;flex-direction:column;gap:1rem;max-width:52rem}
+.prompts p{font:400 .8rem/1.6 var(--mono);color:var(--soft);background:var(--panel);border-radius:3px;padding:1rem 1.1rem}
+.prompts p b{color:var(--text);font-weight:500}
+details>summary{cursor:pointer;font:500 .8rem var(--mono);letter-spacing:.06em;color:var(--gilt);width:fit-content}
+details[open]>summary{margin-bottom:1.2rem}
+.src{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.45rem;font-size:.9rem;color:var(--soft);max-width:52rem}
+footer{border-top:1px solid var(--rule);padding-top:1.4rem;font:400 .76rem/1.6 var(--mono);color:var(--dim);display:flex;flex-direction:column;gap:.5rem;max-width:52rem}
+
+@media (max-width:62rem){
+  .scene-body,.brief{grid-template-columns:minmax(0,1fr)}
+  .ground{background:var(--panel);border-radius:3px;padding:1.2rem 1.2rem 1.3rem}
+}
+@media (max-width:40rem){
+  body{font-size:1.06rem}
+  .inner{gap:4rem}
+  .hand{grid-template-columns:minmax(0,1fr);gap:.35rem;padding-bottom:.6rem}
+  .hand img{height:4.4rem}
+  .hand figcaption{flex-direction:row;flex-wrap:wrap;gap:0 .8em}
+  .slate{grid-template-columns:minmax(0,1fr)}
+  .slate .where{grid-column:1}
+  .spec{grid-template-columns:minmax(0,1fr)}
+  .spec dd{border-top:0;padding-top:0}
+  .acts li{grid-template-columns:3.6rem minmax(0,1fr)}
+  .acts li span{grid-column:2}
+  .time li{grid-template-columns:4.6rem minmax(0,1fr);gap:.8rem}
+}
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
+</style>
+
+<div class="wrap"><div class="inner">
+
+<!-- ====================================================== HERO -->
+<header class="hero">
+  <p class="eyebrow">Beinecke MS 408 · a reconstruction, for filming</p>
+  <h1>Five Hands</h1>
+  <p class="sub">How the Voynich manuscript may have come to exist, told in nine scenes and set up for a film.</p>
+  <div class="hands" role="group" aria-label="A strip of writing by each of the five scribes">
+    <figure class="hand"><figcaption><b>Hand 1</b><span>{{sheets_1}} of {{n_sheets}} sheets</span><span>plants, jars · f88r</span></figcaption><img src="{{img:hand1}}" alt="Four lines of brown script in the first scribe's hand, upright and evenly spaced."></figure>
+    <figure class="hand"><figcaption><b>Hand 2</b><span>{{sheets_2}} sheets</span><span>baths, plants · f78v</span></figcaption><img src="{{img:hand2}}" alt="Six tighter lines of the same script in the second scribe's hand."></figure>
+    <figure class="hand"><figcaption><b>Hand 3</b><span>{{sheets_3}} sheets</span><span>starred paragraphs · f103r</span></figcaption><img src="{{img:hand3}}" alt="Dense lines in the third scribe's hand with red and plain stars in the left margin."></figure>
+    <figure class="hand"><figcaption><b>Hand 4</b><span>{{sheets_4}} sheets</span><span>zodiac, sky · f71r</span></figcaption><img src="{{img:hand4}}" alt="Script written in an arc above small figures of women holding stars, in the fourth scribe's hand."></figure>
+    <figure class="hand"><figcaption><b>Hand 5</b><span>{{sheets_5}} sheets</span><span>plants · f48v</span></figcaption><img src="{{img:hand5}}" alt="Lines of script broken around a blue flower, in the fifth scribe's hand."></figure>
+  </div>
+  <p class="lede">Somewhere in the German-speaking south, in the first decades of the fifteenth century, five people filled more than two hundred pages of calfskin with plants, stars, bathing women and {{n_tokens}} words that nobody has read. This is our best account of how and why.</p>
+  <ul class="contents">
+    <li><a href="#brief">The account in brief</a></li>
+    <li><a href="#scenes">Nine scenes</a></li>
+    <li><a href="#wrong">How it could be wrong</a></li>
+    <li><a href="#film">For the documentarian</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ul>
+</header>
+
+<!-- ====================================================== BRIEF -->
+<section id="brief">
+  <div class="sec-head"><h2>The account in brief</h2></div>
+  <div class="brief">
+    <ol>
+      <li><span>Between about 1404 and 1438 a healer who served women at a bath town wanted a book that looked like a physician's whole shelf and could not be checked.</span></li>
+      <li><span>A professional scribe invented an alphabet and a manner of writing word-like strings. He filled the plant and pharmacy pages one folded sheet at a time.</span></li>
+      <li><span>Four more scribes, taught the letters and the manner, added the zodiac, the baths and the pages that look like remedies. Their shared habits drifted away from his.</span></li>
+      <li><span>The loose sheets served as a prop of authority. They got wet, and were later sewn together by their pictures, in an order they had never had.</span></li>
+      <li><span>Every owner since has taken the book for what it was built to resemble.</span></li>
+    </ol>
+    <aside class="trust" aria-label="How far to trust this account">
+      <h3>How far to trust this</h3>
+      <p class="big">35–40%</p>
+      <p>That is the working weight our analysis gives to this kind of explanation: a book made to look learned, with no message in its text. Two rivals hold most of the rest, so the account is more likely wrong than right in kind. It is certainly wrong in particulars, because the evidence names no town, no trade and no person. We chose each particular as the most ordinary way to satisfy the evidence.</p>
+      <div class="bars" role="img" aria-label="Working weights: made to look learned 35 to 40 percent; meaning lost in the making 25 to 30 percent; letter-level cipher 20 to 25 percent; invented language about 5 percent; plain unknown language under 2 percent.">
+        <div class="bar lead" data-tip="35 to 40%"><span class="lab">Made to look learned</span><span class="val">35–40%</span><span class="track"><i class="span" style="width:80%"></i><i style="width:70%"></i></span></div>
+        <div class="bar" data-tip="25 to 30%"><span class="lab">Real compendium, meaning lost in the making</span><span class="val">25–30%</span><span class="track"><i class="span" style="width:60%"></i><i style="width:50%"></i></span></div>
+        <div class="bar" data-tip="20 to 25%"><span class="lab">Real compendium in a letter-level cipher</span><span class="val">20–25%</span><span class="track"><i class="span" style="width:50%"></i><i style="width:40%"></i></span></div>
+        <div class="bar" data-tip="about 5%, and under 2%"><span class="lab">Invented language, or a plain unknown one</span><span class="val">about 7%</span><span class="track"><i style="width:14%"></i></span></div>
+      </div>
+      <p>The weights and the tests behind them are in the <a href="https://claude.ai/artifact/RUmX9pVU2m24pmBDDEnWaM">dossier</a>.</p>
+    </aside>
+  </div>
+  <div class="sec-head">
+    <h3 class="h3">Four marks</h3>
+    <p class="note">Beside each scene is a list of what it rests on. Every item carries one of these.</p>
+  </div>
+  <ul class="marks">
+    <li><span class="tag doc">Documented</span><span>A catalogue, a laboratory report, a letter or a published study says so, and we read it there.</span></li>
+    <li><span class="tag meas">Measured</span><span>We computed it from the transliteration or the page images. The code is in the repository.</span></li>
+    <li><span class="tag inf">Inferred</span><span>A conclusion drawn from documented or measured facts. New evidence could overturn it.</span></li>
+    <li><span class="tag imag">Imagined</span><span>Invented to make a scene. It suits the period and is tied to no evidence about this book.</span></li>
+  </ul>
+</section>
+
+<!-- ====================================================== SCENES -->
+<section id="scenes" class="scenes">
+  <div class="sec-head">
+    <h2>Nine scenes</h2>
+    <p class="note">The scenes are written in the present tense because they are staged. The makers have no names here. The record gives them none, and the film will show their hands.</p>
+  </div>
+
+  <!-- 1 -->
+  <article class="scene" id="scene-1">
+    <header class="slate"><span class="no">Scene 1</span><h3>Skins</h3><p class="where">A parchment maker's yard · between 1404 and 1438</p></header>
+    <div class="scene-body">
+      <div class="prose">
+        <p>The book begins as calves. Their skins lie in a pit of lime until the hair slips off. A man pegs each one wet onto a wooden frame and scrapes it with a blade curved like a new moon. As it dries under tension the hide turns into a pale sheet that rings when he flicks it. He rubs it down with pumice and chalk and cuts it into rectangles a little larger than two open hands.</p>
+        <p>Someone has ordered a great many of these. Folded once, each rectangle gives four pages about nine inches tall. The order also asks for longer pieces that will fold out two and three pages wide, and one piece six pages large. Added up, it is a small herd.</p>
+        <p>Paper would have done the job. A mill has been turning at Nuremberg since 1390, and the workshops along the Rhine that sell picture books in German write on paper. This buyer wants skin. Old books are made of skin, and this one has to look as though it has always been true.</p>
+      </div>
+      <aside class="ground" aria-label="What scene 1 rests on">
+        <h4>What this rests on</h4>
+        <ul>
+          <li><span class="tag doc">Documented</span><span class="t">The University of Arizona dated four samples from different sheets in 2009: 1404 to 1438 at 95% probability. That dates the skins. It dates the writing only if the skins were used soon.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">The samples tested are calf. A page measures about 225 by 160 mm. One estimate in print is "at least fourteen or fifteen entire calfskins". We traced it to a book review and no further.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">Lime, frame, crescent knife and pumice are the common craft of the period. The Nuremberg mill of 1390 and the paper books of a Strasbourg workshop of about 1415 to 1425 are on record.</span></li>
+          <li><span class="tag inf">Inferred</span><span class="t">Skin was chosen for dignity. The book has no gold, its pigments are common and its drawing is untrained, so parchment is its one real expense.</span></li>
+          <li><span class="tag imag">Imagined</span><span class="t">The yard, the man, the order.</span></li>
+        </ul>
+      </aside>
+    </div>
+  </article>
+
+  <!-- 2 -->
+  <article class="scene" id="scene-2">
+    <header class="slate"><span class="no">Scene 2</span><h3>The buyer</h3><p class="where">A bath town in the German-speaking south · about 1420</p></header>
+    <div class="scene-body">
+      <div class="prose">
+        <p>Nothing in the book names a town. The staging needs one, so take a place that lives on hot water. In the spring of 1416 a papal secretary rode from the church council at Constance to the baths at Baden and wrote down what he saw. There were about thirty pools. People leaned on galleries above the water and talked. The women bathed in linen shifts cut away at the neck and shoulders, and meals were served on tables that floated. Visitors came from two hundred miles away.</p>
+        <p>Our buyer makes a living in such a place from women who come for cures. The work is herbs, bleeding by the calendar, and advice on when to bathe and when to conceive. These are the common cures of the time and the buyer believes in them.</p>
+        <p>The buyer has also seen what a university physician carries. There is a herbal with a plant on every page. There is a calendar of the twelve signs with the rules for each. There is a book of the baths in which naked figures stand in every pool. These books are in Latin, they are costly, and every doctor has the same ones.</p>
+        <p>So the buyer decides to own a book that no rival can match and no patient can check. It will have every kind of page the real ones have. It will be written in letters that belong to no country. It does not have to say anything. It has to be opened at the right moment, in front of the right person, by someone who seems to be reading.</p>
+      </div>
+      <aside class="ground" aria-label="What scene 2 rests on">
+        <h4>What this rests on</h4>
+        <ul>
+          <li><span class="tag doc">Documented</span><span class="t">Poggio Bracciolini's letter of 1416 describes Baden as given here. Nothing ties the manuscript to Baden. We borrow it because an eyewitness account of a southern bath town survives from these years.</span></li>
+          <li><span class="tag meas">Measured</span><span class="t">The surviving book has {{pages_H}} plant pages, {{pages_P}} of jars and roots, {{pages_Z}} zodiac wheels, {{pages_B}} bathing scenes and {{pages_S}} pages of star-marked paragraphs.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">Each kind of page has a known model: illustrated herbals, the German house books of medical astrology compiled from about 1400, and the Italian books of the baths.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">The marginal words are German: a colour note reading <em>rot</em>, and a charm that ends <em>so nim geismilch</em>. The zodiac archer holds a crossbow, as in German manuscripts of the century. Dress in the figures suits about 1400 to 1430. One castle has swallowtail battlements, an Italian form.</span></li>
+          <li><span class="tag inf">Inferred</span><span class="t">The makers worked in the German-speaking south and had seen Italian pictures. Nearly every figure is a woman, so the book's subject, real or pretended, is women's health. Brewer and Lewis argued in 2024 that it concerns women's medicine and conception.</span></li>
+          <li><span class="tag imag">Imagined</span><span class="t">The buyer, the trade and the motive. The historian Sergio Toresella proposed something close in the 1990s: a showpiece made to impress a healer's clients.</span></li>
+        </ul>
+      </aside>
+    </div>
+  </article>
+
+  <!-- 3 -->
+  <article class="scene" id="scene-3">
+    <header class="slate"><span class="no">Scene 3</span><h3>The hand</h3><p class="where">A writing room off the market · the same year</p></header>
+    <div class="scene-body">
+      <div class="prose">
+        <p>The buyer goes to a man who writes for money. He copies deeds and prayer books, and he teaches boys their letters. He hears what is wanted and thinks about labour.</p>
+        <p>He could take a real herbal and exchange every Latin letter for a secret sign. That is slow, it needs checking, and the customer could never tell that it had been done. Filling a page with marks that only look like words takes no longer than writing them.</p>
+        <p>So he makes an alphabet. He borrows shapes his hand already knows: the hooked sign that clerks use to shorten Latin words, a figure like a 4 from the new numerals, loops that run easily from a quill. He adds four tall letters that stand above the line the way capitals do in a charter.</p>
+        <p>Then he finds a rhythm. A word begins in one of a few ways and ends in one of a few ways. The next word is often the last one with something changed. A paragraph opens with a tall letter. A line opens with a stroke that announces it.</p>
+        <p>He tries a page. At arm's length it looks like a language. He almost never has to correct it, because there is nothing in it to get wrong.</p>
+      </div>
+      <aside class="ground" aria-label="What scene 3 rests on">
+        <h4>What this rests on</h4>
+        <ul>
+          <li><span class="tag meas">Measured</span><span class="t">Knowing the previous word helps predict the next by {{v_gram_voy_med}} bits. In {{v_n_meaningful}} real texts the least was {{v_gram_min}}, and ordinary prose gave about {{v_gram_prose_med}}. A written word here does not behave like a word in a sentence.</span></li>
+          <li><span class="tag meas">Measured</span><span class="t">{{parts_possible}} words can be built from a short list of stock beginnings and endings. {{parts_attested}} of them occur, and they make up {{parts_cov}} of the running text.</span></li>
+          <li><span class="tag meas">Measured</span><span class="t">A word resembles the one before it {{near1_voy_pct}} more often than chance allows. {{gallows_open}} of paragraphs open with one of the four tall letters. One letter starts {{edge_p_at}} of lines and {{edge_p_else}} of other words.</span></li>
+          <li><span class="tag meas">Measured</span><span class="t">The transliteration notes {{v4_total}} corrections in {{n_tokens}} words. That is a floor. Nobody has yet counted them from the photographs.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">Students of the script have long matched several of its shapes to Latin abbreviation signs and to numerals. Volunteers asked to write meaningless text produce regularities of the same kinds (Gaskell and Bowern, 2022).</span></li>
+          <li><span class="tag inf">Inferred</span><span class="t">The scribe improvised from stock parts and had no text underneath. A cipher over real sentences would keep some of their word order, unless each written word stands for less than a word.</span></li>
+          <li><span class="tag imag">Imagined</span><span class="t">The man, his trade, and his reasoning about labour.</span></li>
+        </ul>
+      </aside>
+    </div>
+    <figure class="plate">
+      {{word_grid}}
+      <figcaption><span class="kind measure">Measure</span>How often each beginning (rows) meets each ending (columns) in the running text. Brighter cells are commoner words. The commonest single word in the book is <em>{{top1}}</em>, written {{top1_n}} times. Point at a cell to see the word it makes.</figcaption>
+    </figure>
+  </article>
+
+  <!-- 4 -->
+  <article class="scene" id="scene-4">
+    <header class="slate"><span class="no">Scene 4</span><h3>The sheets</h3><p class="where">The same room · over a winter</p></header>
+    <div class="scene-body">
+      <div class="prose">
+        <p>He works one sheet at a time. A sheet is a rectangle of skin folded once, which makes four pages. He draws first, in the brown ink he writes with: a plant from root to flower, filling the page. Where a part should be red he leaves a small note for whoever will paint it, in his own language. The note says <em>rot</em>.</p>
+        <p>Then he writes around the drawing and breaks his lines wherever a leaf is in the way. He fills the first page, turns the leaf and fills the second. Now the sheet lies open with the second page beside the third. He fills the third with the second still in view. He turns the last leaf, fills the fourth, and reaches for the next sheet.</p>
+        <p>There are about ninety words on a page. Twenty-seven of his sheets survive, a hundred and thirteen pages. Most hold one plant each. Sixteen show jars and loose roots set out like an apothecary's shelf.</p>
+        <p>The plants look like herbs and match none exactly. A root from one sits under the leaves of another. Nobody at the baths will go looking for them in a field.</p>
+      </div>
+      <aside class="ground" aria-label="What scene 4 rests on">
+        <h4>What this rests on</h4>
+        <ul>
+          <li><span class="tag meas">Measured</span><span class="t">Two pages on the same sheet share more vocabulary than two other pages by the same scribe in the same gathering. The excess is greatest for the pair that lies open together and falls with distance in writing order. Pages that face each other in the bound book but sit on different sheets show none.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">Layfield and Davis reported the sheet effect in 2026. We reproduced it from their paper, then added the scribe control and the fall-off.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">Ink analysis found text and drawings in the same kind of iron-gall ink, probably made together. Small colour notes in German, one reading <em>rot</em>, survive on pages by this hand.</span></li>
+          <li><span class="tag inf">Inferred</span><span class="t">Each sheet was filled in page order at one sitting, and what the scribe could see shaped what he wrote next.</span></li>
+          <li><span class="tag imag">Imagined</span><span class="t">The winter. That the plants are assembled from parts is our staging. Some scholars name real species for some of them.</span></li>
+        </ul>
+      </aside>
+    </div>
+    <figure class="plate">
+      {{pair_bars}}
+      <figcaption><span class="kind measure">Measure</span>How much more alike two pages are when they share a sheet, set against other pages by the same scribe in the same gathering. The four boxes are the four pages of a folded sheet in writing order. Nine gatherings, latent semantic similarity.</figcaption>
+    </figure>
+  </article>
+
+  <!-- 5 -->
+  <article class="scene" id="scene-5">
+    <header class="slate"><span class="no">Scene 5</span><h3>Four more</h3><p class="where">The same room · later</p></header>
+    <div class="scene-body">
+      <div class="prose">
+        <p>The buyer comes back for the rest: the calendar, the baths, the remedies. The writing master has other work. He sets four of his people to it and shows them the letters and the manner. He cannot give them a list of words, because there is none.</p>
+        <p>They sit together and their habits grow together. A pair of letters their master almost never joins turns up in one of their words out of every five. Scholars will one day call his manner Language A and theirs Language B, and ask which tongues these were.</p>
+        <p>The second hand takes the baths. Small naked women stand in green pools joined by pipes. On one sheet a pipe leaves a pool on the right-hand page, crosses the fold and empties into a pool on the left. The picture joins up only when that sheet lies open by itself.</p>
+        <p>The third hand takes the remedies, or what stands in for them: nearly three hundred short paragraphs, each with a star in the margin. The fourth hand takes the sky. Around each sign of the zodiac it sets thirty women in rings, each holding a star, with a word beside her. The Ram and the Bull get fifteen and fifteen across two pages each. The fifth hand writes seven pages and stops.</p>
+        <p>Twice their work meets on one sheet. On a page of the remedies the second hand writes the first twelve lines and the third hand writes the rest. On the largest sheet in the book, six pages large when unfolded, the fourth hand fills one side with nine linked circles and a small castle with notched Italian battlements, and the second hand fills the panels on the back.</p>
+        <p>Two of them draw the same plant on different sheets. The words beside one are no closer to the words beside the other than any two pages are.</p>
+      </div>
+      <aside class="ground" aria-label="What scene 5 rests on">
+        <h4>What this rests on</h4>
+        <ul>
+          <li><span class="tag doc">Documented</span><span class="t">Lisa Fagin Davis distinguished five scribes in 2020. Her attributions are recorded page by page in the transliteration we used, including the page and the foldout where two hands meet.</span></li>
+          <li><span class="tag meas">Measured</span><span class="t">The letter pair <em>ed</em> occurs in {{ed_B}} of words in Language B and {{ed_A}} in Language A. Changing the scribe changes the vocabulary more than changing the subject does.</span></li>
+          <li><span class="tag meas">Measured</span><span class="t">{{stars_paras}} starred paragraphs. {{zodiac_labels}} labelled figures on the twelve surviving zodiac pages. {{lab_o}} of labels begin with the same letter, against {{run_o}} of words in running text.</span></li>
+          <li><span class="tag meas">Measured</span><span class="t">The interlinear file of 1998 records the plant on f39r as drawn again on f95r2. Their texts rank at the {{v5_pct_lsa}}th percentile of likeness among comparable pairs: ordinary. One pair proves little.</span></li>
+          <li><span class="tag inf">Inferred</span><span class="t">The four later scribes learned together and worked side by side. Thirty figures to a sign suggests one for each degree or day.</span></li>
+          <li><span class="tag imag">Imagined</span><span class="t">That the first hand came first and taught the rest. The record does not say which manner is older. We stage A first because it is the plainer system and its pages carry the notes to a painter.</span></li>
+        </ul>
+      </aside>
+    </div>
+    <figure class="plate">
+      <img src="{{img:sheet_78_81}}" width="835" height="640" alt="Two pages of the bathing section placed side by side as one open sheet. A drawn pipe runs from a pool of bathing women at the top of the right page, down across the fold, into a pool on the left page.">
+      <figcaption><span class="kind object">Object</span>f78v and f81r laid side by side, as the inside of one folded sheet. The pipe from the pool at upper right crosses the fold to the pool at left. In the bound book four other pages lie between them.</figcaption>
+    </figure>
+  </article>
+
+  <!-- 6 -->
+  <article class="scene" id="scene-6">
+    <header class="slate"><span class="no">Scene 6</span><h3>In use</h3><p class="where">The bath town · the years after</p></header>
+    <div class="scene-body">
+      <div class="prose">
+        <p>The sheets go to the buyer loose, a stack of folded skins. For a while that is how the book lives.</p>
+        <p>Stage one consultation. A woman has come to the baths because she has been married four years and has no child. The healer asks the month of her birth, turns to the sheet for that sign, and lays a finger on one of the thirty women. Then the sheet of the baths. Then a plant. The healer's lips move.</p>
+        <p>The patient cannot read, and it would not help her if she could. What she can see is that the answer to her trouble is written down, that the book is strange and old, and that this person can read it. She will do as she is told, and she will pay.</p>
+        <p>Something like belief grows on the healer's side of the table too. On the back of the last sheet someone writes out a charm, part in garbled Latin and part in the German they speak. Crosses divide its words. Its last line opens with two words in the book's own letters and closes with an instruction to take goat's milk. The charms of the time are full of words nobody understands. The book's words have joined them.</p>
+        <p>Then water gets at the stack. It soaks through the first sheets and leaves a tide line that is still there.</p>
+      </div>
+      <aside class="ground" aria-label="What scene 6 rests on">
+        <h4>What this rests on</h4>
+        <ul>
+          <li><span class="tag doc">Documented</span><span class="t">The last page, f116v, carries a few lines in a Gothic hand of the first half of the fifteenth century. The first word is usually read <em>poxleber</em> and the last line ends <em>so nim geismilch</em>. Two words in that line are in the book's script.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">Davis finds the same hand in a note at the top of f17r, and finds that it was written before the water stain. The stain covers the first seven gatherings and came before the book was bound.</span></li>
+          <li><span class="tag inf">Inferred</span><span class="t">Someone who spoke German and could write the book's letters had the sheets while they were still loose. That is a maker or a first owner. The crosses and rhyming words mark the lines as a charm.</span></li>
+          <li><span class="tag imag">Imagined</span><span class="t">The consultation, the patient and her trouble, and the healer's half-belief.</span></li>
+        </ul>
+      </aside>
+    </div>
+    <figure class="plate">
+      <img src="{{img:f116v}}" width="520" height="242" alt="The top of the last page of the manuscript: three faint lines of Gothic handwriting with small crosses between the words." style="max-width:40rem">
+      <figcaption><span class="kind object">Object</span>The top of f116v. Crosses divide the words of the middle lines. The last line begins in the book's script and ends in German.</figcaption>
+    </figure>
+  </article>
+
+  <!-- 7 -->
+  <article class="scene" id="scene-7">
+    <header class="slate"><span class="no">Scene 7</span><h3>The binding</h3><p class="where">A binder's bench · before 1500</p></header>
+    <div class="scene-body">
+      <div class="prose">
+        <p>At some point the stack becomes a book. Whoever sews it cannot read it and has no way to tell which sheet should follow which. They sort by pictures. Plants go with plants, the master's sheets mixed among his pupils'. The bathing sheets are slipped one inside another like the leaves of any gathering. The pipe that crossed an open sheet now runs into the gutter and comes out four pages later.</p>
+        <p>A different pen numbers the gatherings in the corner. The book is sewn on three cords between wooden boards. From now on it has an order, and people will try to read it in that order for six hundred years.</p>
+      </div>
+      <aside class="ground" aria-label="What scene 7 rests on">
+        <h4>What this rests on</h4>
+        <ul>
+          <li><span class="tag doc">Documented</span><span class="t">Davis: scribes alternate sheet by sheet inside the gatherings, the first binding was already a misbinding, and the stain came before it. Zandbergen and Pelling dispute parts of her reading.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">The gathering numbers are fifteenth-century and in an ink unlike the text ink. There were three sewing supports and once wooden boards.</span></li>
+          <li><span class="tag meas">Measured</span><span class="t">A new order for the bathing sheets has been proposed from the text. The same search run on scrambled data does as well or better {{ro13_pct}} of the time. The text shows that each sheet is a unit. It does not show an order among sheets.</span></li>
+          <li><span class="tag inf">Inferred</span><span class="t">The binder sorted by picture because the text gave nothing to sort by. If the text were readable, a binder who could read would have kept its order.</span></li>
+          <li><span class="tag imag">Imagined</span><span class="t">The bench and the binder.</span></li>
+        </ul>
+      </aside>
+    </div>
+    <figure class="plate">
+      <div class="dgscroll">
+      <svg class="dg" viewBox="0 0 720 232" role="img" aria-label="Diagram. Left: five folded sheets standing side by side, each written on its own. Right: the same five sheets nested one inside another as they are bound. Sheet 78 and 81 is highlighted. When nested, leaves 79 and 80 lie between its two halves.">
+        <text class="h" x="20" y="22">AS WRITTEN</text>
+        <text x="20" y="38">five sheets, each folded on its own</text>
+        <g>
+          <polyline class="s" points="32,70 50,170 68,70"/><text x="50" y="192" text-anchor="middle">75|84</text>
+          <polyline class="s" points="92,70 110,170 128,70"/><text x="110" y="192" text-anchor="middle">76|83</text>
+          <polyline class="s" points="152,70 170,170 188,70"/><text x="170" y="192" text-anchor="middle">77|82</text>
+          <polyline class="s on" points="212,70 230,170 248,70"/><text class="on" x="230" y="192" text-anchor="middle">78|81</text>
+          <polyline class="s" points="272,70 290,170 308,70"/><text x="290" y="192" text-anchor="middle">79|80</text>
+        </g>
+        <text x="170" y="214" text-anchor="middle">order among them unknown</text>
+        <text class="h" x="400" y="22">AS BOUND</text>
+        <text x="400" y="38">nested into one gathering</text>
+        <g>
+          <polyline class="s" points="440,70 540,178 640,70"/>
+          <polyline class="s" points="462,70 540,164 618,70"/>
+          <polyline class="s" points="484,70 540,150 596,70"/>
+          <polyline class="s on" points="506,70 540,136 574,70"/>
+          <polyline class="s" points="526,70 540,122 554,70"/>
+          <text x="440" y="60" text-anchor="middle">75</text><text x="462" y="60" text-anchor="middle">76</text><text x="484" y="60" text-anchor="middle">77</text><text class="on" x="506" y="60" text-anchor="middle">78</text><text x="526" y="60" text-anchor="middle">79</text>
+          <text x="554" y="60" text-anchor="middle">80</text><text class="on" x="574" y="60" text-anchor="middle">81</text><text x="596" y="60" text-anchor="middle">82</text><text x="618" y="60" text-anchor="middle">83</text><text x="640" y="60" text-anchor="middle">84</text>
+        </g>
+        <text x="540" y="214" text-anchor="middle">leaves 79 and 80 now part 78 from 81</text>
+      </svg>
+      </div>
+      <figcaption><span class="kind measure">Measure</span>The bathing gathering seen from its top edge. Each V is one folded sheet, labelled by its two leaves.</figcaption>
+    </figure>
+  </article>
+
+  <!-- 8 -->
+  <article class="scene" id="scene-8">
+    <header class="slate"><span class="no">Scene 8</span><h3>Other owners</h3><p class="where">France or Catalonia, Prague, Rome, New Haven · to 1969</p></header>
+    <div class="scene-body">
+      <div class="prose">
+        <p>The book outlives the people who knew what it was. That may take one generation.</p>
+        <p>Its next reader takes it at its word. Someone who writes a French or Catalan sort of dialect goes through the zodiac and writes a month beside each sign: March by the Fish, April by the Ram. It is the first record of a person trying to read the book, and it is a sensible reading. The pictures were built to invite it.</p>
+        <p>After that the trail is empty for a century and a half. In 1599 the accounts of the emperor Rudolf II record six hundred florins paid to an Augsburg physician for a small barrel of strange books. Sixty-six years later a Prague physician reports hearing that the emperor paid six hundred ducats for this one and thought it the work of Roger Bacon. The sums match and the coins do not. The record comes no closer than that.</p>
+        <p>Some time after 1608 the emperor's distiller writes his name on the first page. By 1639 the book belongs to Georg Baresch, a Prague alchemist, who writes about it to Athanasius Kircher in Rome, the Jesuit scholar who claims to read the writing of Egypt. It has been taking up space uselessly in his library, he says. From the herbs and stars he guesses the whole is medical. He adds that an author would hardly have gone to such trouble to hide commonplace things.</p>
+        <p>In 1665 the book is sent to Kircher. It passes into Jesuit libraries. In 1873 it is kept back from confiscation under the label of the Jesuit general's private library. In 1911 or 1912 it is sold quietly to a bookseller named Wilfrid Voynich. In 1969 it reaches Yale.</p>
+        <p>Each of these owners does what the patient at the baths did. They see a book of knowledge, and they cannot read it.</p>
+      </div>
+      <aside class="ground" aria-label="What scene 8 rests on">
+        <h4>What this rests on</h4>
+        <ul>
+          <li><span class="tag doc">Documented</span><span class="t">The month names are in a later hand and a Romance dialect. Readers have called it northern French, Occitan and Catalan.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">Guzy found the 1599 payment to Carl Widemann in 2022. It names no book. The 600 ducats come from Marci's letter of 1665, reporting what a man who died in 1644 had told him.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">The name of Jacobus de Tepenec on f1r was scraped away and shows under ultraviolet light. He used that form of it after 1608 and died in 1622.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">Baresch to Kircher, Prague, 27 April 1639, in our translation from the Latin: the writing <em>inutiliter occupasset locum</em>; <em>conjicio totum esse medicinalem</em>; <em>causa plebeiorum occultandorum, tali industria vix author usus fuisset</em>.</span></li>
+          <li><span class="tag inf">Inferred</span><span class="t">The book reached a Romance-speaking owner before it reached Prague. Baresch's reasoning is the reasoning the book was built to produce.</span></li>
+        </ul>
+      </aside>
+    </div>
+    <figure class="plate">
+      <ol class="time">
+        <li><b>1404–1438</b><span>The calves are killed. The sheets are probably written within a generation.</span></li>
+        <li><b>before 1500</b><span>A German charm is added while the sheets are loose. Water stains them. They are sewn and the gatherings numbered. A Romance hand adds months to the zodiac.</span></li>
+        <li class="gap"><b>c. 1500–1599</b><span>No record.</span></li>
+        <li><b>1599</b><span>Rudolf II pays 600 florins to Carl Widemann of Augsburg for a small barrel of strange books. A possible way in.</span></li>
+        <li><b>after 1608</b><span>Jacobus de Tepenec, imperial distiller, signs the first page.</span></li>
+        <li><b>1637–1639</b><span>Georg Baresch sends samples and then a letter to Athanasius Kircher.</span></li>
+        <li><b>1665</b><span>Johannes Marcus Marci sends the book to Kircher with the story of the emperor and Roger Bacon, and adds that he suspends judgement.</span></li>
+        <li><b>1873</b><span>Kept back from the confiscation of the Jesuit library in Rome.</span></li>
+        <li><b>1911 or 1912</b><span>Wilfrid Voynich buys it from the Jesuits under a promise of secrecy.</span></li>
+        <li><b>1961, 1969</b><span>H. P. Kraus buys it for $24,500, fails to sell it for $160,000, and gives it to the Beinecke Library at Yale.</span></li>
+      </ol>
+      <figcaption><span class="kind archive">Archive</span>Custody, from the records summarised in the dossier.</figcaption>
+    </figure>
+  </article>
+
+  <!-- 9 -->
+  <article class="scene" id="scene-9">
+    <header class="slate"><span class="no">Scene 9</span><h3>What it is, if this is right</h3><p class="where">A reading room · now</p></header>
+    <div class="scene-body">
+      <div class="prose">
+        <p>If this account is right, the manuscript is a portrait of a learned book. Its makers knew such books from the outside. They knew how a herbal fills a page, how a calendar rings a sign with figures, how a paragraph begins. They copied all of that faithfully and left out the one part their customer could not see.</p>
+        <p>It would also be the most sustained imitation of writing that survives from the Middle Ages. Painters of the time put scribbled letters on the hems of robes and on the pages of painted books. Those run for a line or two. This runs for two hundred pages in five hands, and it has held its own against an emperor's court, the most learned Jesuit of his age and the code-breakers of two world wars.</p>
+        <p>And the book would have no secret. Its makers would have one, and it is an ordinary one. They were paid, they were good at the work, and the work did what it was made to do.</p>
+      </div>
+      <aside class="ground" aria-label="What scene 9 rests on">
+        <h4>What this rests on</h4>
+        <ul>
+          <li><span class="tag meas">Measured</span><span class="t">The next letter is far easier to guess than in any real text we tried: {{h2_voy}} bits against {{h2_nat}} in {{n_nat}} languages. No published cipher or generator yet matches all of the book's numbers. The best generator repeats itself {{v_rep_gen_x}} times too much.</span></li>
+          <li><span class="tag doc">Documented</span><span class="t">Pseudo-script on painted cloth and painted pages is common in European art of these centuries. No second person has reproduced any proposed reading of this book in over a hundred years of attempts.</span></li>
+          <li><span class="tag inf">Inferred</span><span class="t">All of scene 9. It follows only if the account does.</span></li>
+        </ul>
+      </aside>
+    </div>
+  </article>
+</section>
+
+<!-- ====================================================== WRONG -->
+<section id="wrong">
+  <div class="sec-head">
+    <h2>How it could be wrong</h2>
+    <p class="note">A reconstruction earns trust by saying what would sink it. Three things would, and two rival tellings fit most of the same evidence.</p>
+  </div>
+  <div class="cols">
+    <div>
+      <h3>The same evidence, read as preservation</h3>
+      <p>Davis reads the five hands as a community writing down knowledge it valued, perhaps women's folk medicine, and adds that this cannot yet be proved. On that reading a sheet is a unit because each sheet holds one piece of text, and the two manners are two habits of one writing system. Our scenes 1, 4, 5, 7 and 8 survive almost unchanged. Scenes 2, 3 and 6 do not.</p>
+    </div>
+    <div>
+      <h3>The same evidence, read as cipher</h3>
+      <p>If each written word stands for a letter or two, the absence of word order is expected and the book is a short real text of about ten thousand words. Naibbe, a cipher of that kind built in 2025, reproduces the look of the text. It does not reproduce the echo between neighbours or the marked line starts, and nothing so elaborate is documented from those decades.</p>
+    </div>
+    <div>
+      <h3>What our own telling still owes</h3>
+      <p>A working model. The published generator of meaningless text matches the manuscript in kind and overshoots in amount. Until some procedure a scribe could follow lands on the book's numbers, this account explains the text only in outline. It also has to explain why vocabulary shifts with subject within one scribe's pages.</p>
+    </div>
+  </div>
+  <div class="scroll" style="padding-bottom:0">
+  <table class="led">
+    <thead><tr><th>If this turned up</th><th>It would mean</th><th>And the account would</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Eye-skips and repeated lines of the kind a copyist makes from an exemplar, counted from the photographs</th><td>The scribes were copying a text that existed before the page did.</td><td>Lose scene 3. The meaning-lost and cipher tellings would rise.</td></tr>
+      <tr><th scope="row">Rare words that follow a plant from its herbal page to the pharmacy pages, across scribes</th><td>The text refers to the pictures.</td><td>Fail. Something is being named.</td></tr>
+      <tr><th scope="row">A decoding rule that a second person can run on pages they have not seen and get sense</th><td>There is a message.</td><td>Fail outright.</td></tr>
+      <tr><th scope="row">Stains, offsets or sewing holes showing the sheets were written or kept in the bound order</th><td>The single-sheet model is wrong.</td><td>Lose scenes 4 and 7 as told.</td></tr>
+      <tr><th scope="row">A scribe-followable routine that hits the book's three prediction numbers and its line starts</th><td>Meaningless text of this exact kind is producible.</td><td>Gain its missing piece.</td></tr>
+      <tr><th scope="row">Protein or DNA matching these skins to a dated, placed manuscript</th><td>A region, perhaps a workshop.</td><td>Trade its imagined town for a real one.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="cols">
+    <div>
+      <h3>Other stagings inside the same account</h3>
+      <ul>
+        <li>The five hands could be a household and its apprentices, or a small religious community, in place of a writing master and his pupils.</li>
+        <li>The purpose could be sale to a collector in place of use with patients. The charm on the last page argues for use.</li>
+        <li>The place could be anywhere from Alsace to the Tyrol or the Veneto. We set it at a bath town because the pictures dwell on bathing.</li>
+        <li>The makers could have half-believed the letters held power. Then this account shades into the invented-language telling.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== FILM -->
+<section id="film" class="film">
+  <div class="sec-head">
+    <h2>For the documentarian</h2>
+    <p class="lede">Five Hands is a film about how a book was made, told through the hands that made it. No face is ever in focus. The audience learns one rule in the first minute: the film always tells them which kind of picture they are looking at.</p>
+  </div>
+
+  <div class="sec-head">
+    <h3 class="h3">Three kinds of picture</h3>
+    <p class="note">They follow the four marks. Inference has no picture of its own. It lives in the narration.</p>
+  </div>
+  <ul class="kinds">
+    <li><span class="kind object">Object</span><span>The manuscript itself, from the Beinecke Library's public-domain photographs. It is never retouched, recoloured or animated. The folio number sits in the lower corner of every shot.</span></li>
+    <li><span class="kind measure">Measure</span><span>Marks drawn over the object in one colour, the blue of the book's own azurite: counts, highlighted letters, lines joining pages. Every number on screen is one the repository reproduces.</span></li>
+    <li><span class="kind workshop">Workshop</span><span>Reconstruction: hands, tools, rooms, weather. A small ring in the corner marks it. No legible page appears in a reconstruction shot. When the film needs to show writing, it cuts to the object.</span></li>
+  </ul>
+  <div class="prose wide">
+    <p>The narration keeps the same rule by tense. It uses the past tense for what is documented or measured, the present for what is staged, and <em>would</em> or <em>may</em> for what is inferred. A viewer who shuts their eyes can still tell the registers apart.</p>
+  </div>
+
+  <div class="sec-head"><h3 class="h3">The world, as far as the record gives it</h3></div>
+  <dl class="spec">
+    <dt>When</dt><dd>Skins of 1404 to 1438. Dress in the figures favours 1400 to 1430. Stage it about 1420.</dd>
+    <dt>Where</dt><dd>Unknown. German marginal words, a crossbow archer of the German kind and Italian battlements point to the German-speaking south with a view over the Alps. Stage a bath town on the Swiss plateau or the upper Rhine, and say on screen that the town is chosen.</dd>
+    <dt>The baths</dt><dd>From Poggio's letter about Baden, 1416: about thirty pools, public and private. A fence between men and women in the public ones. Galleries above for onlookers. Men in leather aprons. Women in knee-length linen shifts open at neck, shoulders and arms. Floating tables, music, visitors from two hundred miles off. The bathers in the book are naked, many in headdresses, as in the Italian bath books.</dd>
+    <dt>The writing room</dt><dd>A sloped desk at a window. Goose quill, penknife, ink horn, pumice, a lead weight on a cord to hold the sheet. Iron-gall ink goes on pale and darkens to brown-black over hours as it meets the air. Writing is done by daylight.</dd>
+    <dt>Paint</dt><dd>From the 2009 analysis: blue of ground azurite, a copper green, red-brown ochre, white of chalk in egg glair, gum as binder. In the scans it lies in thin washes, often over the lines.</dd>
+    <dt>Dress</dt><dd>Full sleeves gathered at the wrist, hoods, veils and rolled headdresses of the first third of the century. Undyed wool and linen for working people. Nothing later than about 1430.</dd>
+    <dt>The models</dt><dd>A herbal with one plant to a page. A German house book of medical astrology with its calendar and signs. An Italian book of the baths. Props may show these closed or at a distance.</dd>
+    <dt>Speech</dt><dd>An Upper German dialect, heard only as murmur. Latin belongs to the real books. Nobody in the film speaks a line.</dd>
+  </dl>
+
+  <div class="sec-head">
+    <h3 class="h3">Colour, sampled from the pages</h3>
+    <p class="note">Reconstruction scenes are graded to this card. The only saturated colours on screen are the ones in the book.</p>
+  </div>
+  <ul class="swatches">
+    <li><i style="--c:{{pal_parchment}}"></i><b>Parchment</b><span>{{pal_parchment}}</span></li>
+    <li><i style="--c:{{pal_parchment_shadow}}"></i><b>Parchment, shade</b><span>{{pal_parchment_shadow}}</span></li>
+    <li><i style="--c:{{pal_ink}}"></i><b>Iron-gall ink</b><span>{{pal_ink}}</span></li>
+    <li><i style="--c:{{pal_ink_faded}}"></i><b>Ink, faded</b><span>{{pal_ink_faded}}</span></li>
+    <li><i style="--c:{{pal_blue}}"></i><b>Azurite</b><span>{{pal_blue}}</span></li>
+    <li><i style="--c:{{pal_green}}"></i><b>Copper green</b><span>{{pal_green}}</span></li>
+    <li><i style="--c:{{pal_green_yellow}}"></i><b>Leaf green</b><span>{{pal_green_yellow}}</span></li>
+    <li><i style="--c:{{pal_red}}"></i><b>Red ochre</b><span>{{pal_red}}</span></li>
+    <li><i style="--c:{{pal_ochre}}"></i><b>Yellow ochre</b><span>{{pal_ochre}}</span></li>
+  </ul>
+
+  <div class="sec-head"><h3 class="h3">Frame, lens, light, sound</h3></div>
+  <dl class="spec">
+    <dt>Frame</dt><dd>1.37 to 1. An open sheet of this book is about 320 by 225 mm, a ratio of 1.42, so one sheet fills the frame with a thin border. Deliver pillarboxed inside 16 by 9.</dd>
+    <dt>Lenses</dt><dd>A 100 mm macro for pen, ink and pigment. A 50 mm for desk and hands. A 28 mm for rooms, used rarely. Object shots on a copy stand with the sensor parallel to the page.</dd>
+    <dt>Light</dt><dd>Writing happens in soft north light from the scribe's left, so the hand's shadow falls away from the line. Night belongs to the baths and the consultation: tallow and rushlight, low and warm, faces lost. The object is lit flat and even at daylight balance.</dd>
+    <dt>Movement</dt><dd>The camera moves the way reading does. Along a line at the pace of a finger. Down a page. A slow push to one word. In the workshop it sits on sticks or a slider at desk height. The one overhead shot is the folding of a sheet.</dd>
+    <dt>Speed</dt><dd>24 frames a second. Ink macro at 48. One time-lapse: a stroke darkening.</dd>
+    <dt>Sound</dt><dd>The quill is the score: its scratch on skin, the tap on the horn, the knife. Water for the baths. Music enters late and stays thin, one bowed and one plucked instrument. No drones, no choir, nothing that signals mystery.</dd>
+    <dt>Voice</dt><dd>One narrator, unhurried. No dialogue and no experts on camera. Sources appear as a line of text when a document is on screen.</dd>
+  </dl>
+
+  <div class="sec-head">
+    <h3 class="h3">Shape</h3>
+    <p class="note">About twenty-six minutes. It also cuts into seven short chapters.</p>
+  </div>
+  <ol class="acts">
+    <li><b>0:00</b><strong>Cold open</strong><span>The object. Five strips of writing. What we counted. The hinge into reconstruction, then the title.</span></li>
+    <li><b>1:30</b><strong>Skins</strong><span>Scene 1. Lime, frame, knife. The radiocarbon dates over the cut sheets.</span></li>
+    <li><b>4:00</b><strong>The hand</strong><span>Scenes 2 and 3. The buyer and the real books. The alphabet. The word grid assembles over a line of text. The line where word order should be, and is not.</span></li>
+    <li><b>10:00</b><strong>Sheets</strong><span>Scenes 4 and 5. The fold, filmed from above. Four more hands. The pipe that crosses the fold.</span></li>
+    <li><b>16:00</b><strong>In use</strong><span>Scenes 6 and 7. The baths at night. A finger on a painted figure. The charm. Water. Needle and cord.</span></li>
+    <li><b>21:00</b><strong>Other owners</strong><span>Scene 8. The months in another hand. Prague. Baresch's letter read over the pages he describes.</span></li>
+    <li><b>24:30</b><strong>What would change our mind</strong><span>Scene 9, then the list of findings that would sink this account. The film ends on the list.</span></li>
+  </ol>
+
+  <div class="sec-head">
+    <h3 class="h3">Storyboard</h3>
+    <p class="note">Eighteen frames at the film's ratio. Object frames are cut from the real pages. Workshop frames are described and wait to be shot or generated.</p>
+  </div>
+  <ol class="board">
+    <li><div class="frame"><img src="{{img:fr_f1r}}" alt="The faded first page of the manuscript."></div><p class="slug"><span>01</span>Object · f1r</p><p>The first page, worn pale. Slow push. Somewhere on it a scraped name shows only under ultraviolet.</p><p class="how">copy stand · push in · room tone</p></li>
+    <li><div class="frame todo"><p>A calfskin laced to a frame. The curved knife comes down it.</p></div><p class="slug"><span>02</span>Workshop · skins</p><p>Shavings fall. The skin drums under the blade. Cut to a flick of a finger and the ring of a dry sheet.</p><p class="how">50 mm, then 100 mm macro · overcast yard</p></li>
+    <li><div class="frame todo"><p>A sloped desk at a north window. Two hands and a quill.</p></div><p class="slug"><span>03</span>Workshop · the writing room</p><p>We see hands, sleeves, the edge of a hood. The face stays above the frame. The sheet is blank.</p><p class="how">50 mm · sticks at desk height · window light from the left</p></li>
+    <li><div class="frame todo"><p>One wet stroke of ink, grey, turning brown.</p></div><p class="slug"><span>04</span>Workshop · ink</p><p>A single curved stroke on bare skin. The bead of ink sinks and darkens as it dries.</p><p class="how">100 mm macro · 48 fps, then time-lapse · quill scratch</p></li>
+    <li><div class="frame"><img src="{{img:fr_jars}}" alt="Painted jars beside rows of roots and leaves with short labels."></div><p class="slug"><span>05</span>Object, then measure · f88r</p><p>Track along one line. In blue, the same few beginnings and endings light up word after word, and the grid assembles beside them.</p><p class="how">lateral track · word grid builds</p></li>
+    <li><div class="frame todo"><p>From above: a rectangle of skin is folded once and opened.</p></div><p class="slug"><span>06</span>Workshop · the fold</p><p>Four dissolves. Page one fills, the leaf turns, page two fills, the sheet opens, pages two and three lie side by side.</p><p class="how">overhead · locked off · the only top shot in the film</p></li>
+    <li><div class="frame"><img src="{{img:fr_plant}}" alt="A plant with three dark blue flowers and green fern-like leaves, with lines of script beside it."></div><p class="slug"><span>07</span>Object · f17r</p><p>A plant page. Text breaks where the leaves are. Tilt up to the faint note in the top margin, written by the hand of the last page.</p><p class="how">tilt up · quill fades out</p></li>
+    <li><div class="frame"><img src="{{img:fr_two_hands}}" alt="A page of dense script with stars in the margin."></div><p class="slug"><span>08</span>Object, then measure · f115r</p><p>Twelve lines in one hand, then another takes over. A blue rule marks the change. Two people sat at this page.</p><p class="how">push to line 12 · rule draws on</p></li>
+    <li><div class="frame"><img src="{{img:sheet_78_81}}" alt="Two bathing pages side by side with a pipe crossing between them."></div><p class="slug"><span>09</span>Object · f78v with f81r</p><p>The two pages slide together as one sheet. The pipe joins. Then the gathering is nested around them and they part.</p><p class="how">two stills on one stand · the nesting diagram follows</p></li>
+    <li><div class="frame"><img src="{{img:fr_aries}}" alt="A zodiac wheel with a ram at the centre and rings of small women holding stars."></div><p class="slug"><span>10</span>Object · f71r</p><p>The Ram and his fifteen women. Push to one figure, her star and the word beside her.</p><p class="how">push in · count appears: 30 to a sign</p></li>
+    <li><div class="frame"><img src="{{img:fr_castle}}" alt="A small drawn castle with towers and a notched wall beside a field of stars."></div><p class="slug"><span>11</span>Object · the six-page foldout</p><p>A castle the size of a thumbnail. Its battlements are notched in the Italian way. Somebody here had seen the south.</p><p class="how">extreme push · hold</p></li>
+    <li><div class="frame todo"><p>Night. Steam, a timber gallery, linen in warm light.</p></div><p class="slug"><span>12</span>Workshop · the baths</p><p>Backs and shoulders in the water, a table afloat, onlookers leaning above. Built from Poggio's letter, and titled so.</p><p class="how">28 mm · rushlight · water and murmur</p></li>
+    <li><div class="frame todo"><p>A finger rests on a painted figure. Across the table, a woman's folded hands.</p></div><p class="slug"><span>13</span>Workshop · the consultation</p><p>The page is out of focus. The focus is on the two pairs of hands and the space between them.</p><p class="how">50 mm · one tallow dip · near silence</p></li>
+    <li><div class="frame"><img src="{{img:fr_charm}}" alt="Three faint lines of Gothic handwriting at the top of a stained page."></div><p class="slug"><span>14</span>Object, then measure · f116v</p><p>Track along the charm. Blue picks out the crosses, then the two words in the book's letters, then <em>so nim geismilch</em>.</p><p class="how">lateral track · translation as subtitle</p></li>
+    <li><div class="frame todo"><p>Water creeps under a stack of folded sheets. Later, a needle passes through the fold.</p></div><p class="slug"><span>15</span>Workshop · stain and thread</p><p>Two macro shots joined by a dissolve. The tide line on the real pages follows.</p><p class="how">100 mm macro · drip, then thread through skin</p></li>
+    <li><div class="frame"><img src="{{img:fr_pisces}}" alt="Two fish at the centre of a zodiac wheel with the word mars written beside them."></div><p class="slug"><span>16</span>Object · f70v2</p><p>The Fish, and beside them one word in another hand and another language: <em>mars</em>. The first reader.</p><p class="how">push in · a different pen sound</p></li>
+    <li><div class="frame todo"><p>Prague, 1639. A page of a letter in Latin.</p></div><p class="slug"><span>17</span>Archive · Baresch to Kircher</p><p>The letter itself, by licence from the Gregorian University archive. His sentence about commonplace things is read over the plant pages.</p><p class="how">copy stand · quote on screen with its shelfmark</p></li>
+    <li><div class="frame"><img src="{{img:fr_stars}}" alt="A page of short paragraphs, each with a star in the left margin."></div><p class="slug"><span>18</span>Object · f103r</p><p>The starred paragraphs. Pull back until the whole page is in frame. The list of what would change our mind runs beside it.</p><p class="how">pull back · quill returns · cut to black</p></li>
+  </ol>
+
+  <div class="sec-head">
+    <h3 class="h3">Narration, first ninety seconds</h3>
+    <p class="note">A draft, to show the tense rule working.</p>
+  </div>
+  <div class="script">
+    <p class="cue"><span class="kind object">Object</span>f1r, slow push</p>
+    <p class="vo">This book was written about six hundred years ago, on the skins of calves. It is kept at Yale. Nobody has read it.</p>
+    <p class="cue"><span class="kind object">Object</span>five strips of writing, one above another</p>
+    <p class="vo">Five people wrote it. A palaeographer told them apart in 2020 by the way each one made the same letters.</p>
+    <p class="cue"><span class="kind measure">Measure</span>counts rise over a line of text</p>
+    <p class="vo">It holds about thirty-nine thousand words. We counted what they do. Their order carried almost no information. In every real text we tried it carried at least five times more, and in ordinary prose about a hundred times more.</p>
+    <p class="cue"><span class="kind workshop">Workshop</span>a desk, a window, two hands</p>
+    <p class="vo">So try this. A man sits down at a window. He has been paid to make a book that looks like knowledge.</p>
+    <p class="title">Five Hands</p>
+  </div>
+
+  <div class="sec-head"><h3 class="h3">Stills</h3></div>
+  <div class="scroll" style="padding-bottom:0">
+  <table class="led">
+    <thead><tr><th>Plate</th><th>What it shows</th><th>Made from</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Five hands</th><td>One strip of writing per scribe, stacked. The opening image of this page.</td><td>f88r, f78v, f103r, f71r, f48v</td></tr>
+      <tr><th scope="row">The word grid</th><td>Beginnings against endings, with counts.</td><td>The transliteration, computed</td></tr>
+      <tr><th scope="row">The open sheet</th><td>f78v and f81r as one surface, the pipe crossing the fold.</td><td>Two page photographs</td></tr>
+      <tr><th scope="row">Written and bound</th><td>Five sheets side by side, then nested.</td><td>The collation, drawn</td></tr>
+      <tr><th scope="row">Likeness within a sheet</th><td>Four page pairs and the facing pages that share no sheet.</td><td>Computed, nine gatherings</td></tr>
+      <tr><th scope="row">The charm</th><td>The top of f116v with crosses, script words and the German line picked out.</td><td>One page photograph</td></tr>
+      <tr><th scope="row">Custody</th><td>The owners and the silent century and a half.</td><td>The records</td></tr>
+      <tr><th scope="row">Colour card</th><td>Nine colours sampled from the pages.</td><td>Page photographs, computed</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="sec-head"><h3 class="h3">House rules</h3></div>
+  <div class="rules">
+    <div>
+      <p class="eyebrow">Always</p>
+      <ul>
+        <li>Put the folio number on every object shot and the ring on every reconstruction.</li>
+        <li>Cut to the real page whenever writing has to be legible.</li>
+        <li>Say <em>may</em>, <em>would</em> or <em>we stage</em> whenever the narration leaves the record.</li>
+        <li>Keep hands, tools and cloth plain: wool, linen, oak, horn, iron.</li>
+        <li>Give the rival readings their minute, in their own strongest form.</li>
+        <li>End on what would change the account.</li>
+      </ul>
+    </div>
+    <div>
+      <p class="eyebrow">Never</p>
+      <ul>
+        <li>Call the book decoded, solved or translated.</li>
+        <li>Show a face as a named maker, or name the town as fact.</li>
+        <li>Invent a legible page, or animate, recolour or restore a real one.</li>
+        <li>Bring in Roger Bacon, Leonardo, John Dee or plants from the Americas as live options. The skins are too late for the first and, with the dress and the handwriting, too early for the rest.</li>
+        <li>Place the 1912 purchase at the Villa Mondragone. The books had been hidden at Castel Gandolfo.</li>
+        <li>Present the 600 ducats as a recorded sale. It is hearsay set down half a century later.</li>
+        <li>Use cowls, cloisters or chant. Nothing puts the makers in a monastery.</li>
+        <li>Light a writing scene with candles, or score any scene for mystery.</li>
+      </ul>
+    </div>
+  </div>
+
+  <details>
+    <summary>Briefs for the eight reconstruction frames</summary>
+    <div class="prompts">
+      <p><b>House style, added to every brief.</b> Photographic, natural light, 35 mm film grain, 1.37:1 frame. Southern Germany about 1420. Muted palette of undyed wool, linen, oak and limewash; the only saturated colours are azurite blue, copper green and red ochre in small amounts. Hands and tools in focus, faces out of frame or out of focus. No legible writing anywhere. No candles in daytime scenes. No monks, no armour, no stained glass, no gold. A small open ring is added in the lower right corner in the edit.</p>
+      <p><b>02 Skins.</b> Overcast yard. A pale calfskin laced with cords to a rectangular wooden frame leaning against a wall. A man's forearms and a crescent-shaped steel knife scraping downward; curls of shaving on the blade. Lime pit and wet hides soft in the background. 50 mm, eye level.</p>
+      <p><b>03 The writing room.</b> Interior, day. A sloped oak desk under a small north-facing window with thick greenish panes. Two hands in loose wool sleeves gathered at the wrist: the right holds a goose quill, the left a small knife pinning a blank sheet of parchment. Cow-horn inkwell set in the desk. Soft light from the left. 50 mm, camera at desk height, face above the frame.</p>
+      <p><b>04 Ink.</b> Extreme close view of bare cream parchment with visible grain and follicle marks. The split nib of a quill has just drawn one curved stroke; the ink is wet, pale grey-brown, pooled at the end of the stroke. Shallow focus, raking window light. 100 mm macro.</p>
+      <p><b>06 The fold.</b> Directly overhead. A rectangle of parchment about 32 by 22 cm on a dark oak table; two hands fold it once along the short axis. Quill, knife, pumice stone and horn inkwell at the edge of frame. Even north light, no shadows across the sheet. Locked-off top shot.</p>
+      <p><b>12 The baths.</b> Interior, night. A timber bath hall with a rectangular stone pool of steaming water. Bathers seen from behind in the water, women in knee-length linen shifts open at the shoulders, hair bound in cloth. A wooden board floats with bread and cups. A gallery with a rail above, figures leaning on it in silhouette. Light from rush lamps and one brazier; deep shadow. 28 mm, low angle across the water.</p>
+      <p><b>13 The consultation.</b> Interior, night. A small table. One hand rests an index finger on an open sheet of parchment that is soft and out of focus, showing only blurred colour. Across the table a woman's hands are folded on plain wool. A single tallow dip in an iron holder. 50 mm, shallow focus on the fingertip.</p>
+      <p><b>15 Stain and thread.</b> Two frames. First: clear water spreading under the corner of a stack of folded cream parchment sheets on a wooden shelf, the edge darkening. Second: a bone needle drawing linen thread through the fold of nested parchment sheets over a hemp cord on a sewing frame. 100 mm macro, daylight.</p>
+      <p><b>17 The letter.</b> Not generated. Photograph of the original, Rome, Gregorian University archive, APUG 557, folio 353, by licence.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ====================================================== SOURCES -->
+<section id="sources">
+  <div class="sec-head">
+    <h2>Sources</h2>
+    <p class="note">Every measured number on this page is produced by the code in the repository and explained, with its controls, in the <a href="https://claude.ai/artifact/RUmX9pVU2m24pmBDDEnWaM">dossier</a>. The documented items were read at the sources below.</p>
+  </div>
+  <ul class="src">
+    <li>Page photographs: Beinecke Rare Book and Manuscript Library, Yale University, MS 408. Public domain.</li>
+    <li>Transliteration: Zandbergen and Landini, version 3b, with Davis's scribe attributions; Takahashi; Glen Claston's v101; the 1998 interlinear file.</li>
+    <li>René Zandbergen, voynich.nu: radiocarbon, materials, history, letters, marginal writing, illustrations.</li>
+    <li>McCrone Associates, report on inks and pigments, 2009.</li>
+    <li>Lisa Fagin Davis, "How Many Glyphs and How Many Scribes?", <i>Manuscript Studies</i> 5, 2020; "Voynich Codicology", 2025; lecture, Toronto, September 2025.</li>
+    <li>Colin Layfield and Lisa Fagin Davis, on latent semantic analysis and the order of sheets, 2026.</li>
+    <li>Stefan Guzy, "Book Transactions of Emperor Rudolf II, 1576–1612", 2022.</li>
+    <li>Keagan Brewer and Michelle Lewis, <i>Social History of Medicine</i> 37, 2024.</li>
+    <li>Daniel Gaskell and Claire Bowern, on gibberish written by volunteers, 2022. Torsten Timm and Andreas Schinner, <i>Cryptologia</i> 44, 2020. Michael Greshko, the Naibbe cipher, <i>Cryptologia</i>, 2025.</li>
+    <li>Georg Baresch to Athanasius Kircher, Prague, 27 April 1639. Latin text as transcribed by Philip Neal from APUG 557, f. 353.</li>
+    <li>Poggio Bracciolini to Niccolò Niccoli, Baden, 1416, in the translation of Phyllis Gordan.</li>
+    <li>Handschriftencensus, entry for the iatromathematical house book. Studies of the Strasbourg workshop of 1418 and of Diebold Lauber.</li>
+    <li>Sergio Toresella on the alchemical herbals, as reported by Zandbergen.</li>
+  </ul>
+  <footer>
+    <p>A reconstruction made with an AI system under one person's direction. It has not been reviewed by specialists. It reads nothing in the manuscript and should not be cited as a solution.</p>
+    <p>Built by src/build_story.py from report/story.template.html and the result tables.</p>
+  </footer>
+</section>
+
+</div></div>
